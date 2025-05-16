@@ -25,7 +25,7 @@ public class CourseController {
      * Retrieves all courses.
      */
     @GetMapping
-    public ResponseEntity<List<CourseDTO>> list() {
+    public ResponseEntity<List<CourseDTO>> getAllCourses() {
         List<CourseDTO> result = courseService.getAllCourses().stream().map(CourseMapper::toDto).toList();
         return ResponseEntity.ok(result);
     }
