@@ -26,6 +26,8 @@ dependencies {
 	implementation 'com.mysql:mysql-connector-j' // MySQL Connector
 	implementation 'org.flywaydb:flyway-core' // Flyway for database migrations
 	implementation 'org.flywaydb:flyway-mysql' // MySQL support for Flyway
+	implementation 'io.swagger.core.v3:swagger-annotations:2.2.21' // Swagger annotations
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0' // SpringDoc OpenAPI for Swagger UI
 }
 
 tasks.named('test') {

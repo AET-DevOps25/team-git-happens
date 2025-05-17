@@ -28,7 +28,7 @@ public class CourseControllerTests {
         Course sample2 = new Course("IN2000","Test2","Desc2",5, Set.of()); 
 
         sample.setCategories(Set.of());  // empty set
-        given(courseService.getAllCourses()).willReturn(List.of(sample));
+        given(courseService.getAllCourses()).willReturn(List.of(sample, sample2));
 
         mvc.perform(get("/courses"))
            .andExpect(status().isOk())
