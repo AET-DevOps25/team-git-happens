@@ -1,2 +1,23 @@
-google-generativeai
+# === Core LangChain & FastAPI ===
+langchain
+langchain-community
+langchain-core
+langchain-huggingface
+
+# Hugging Face & Embeddings
+huggingface-hub
+sentence-transformers
+
+# PDF-Verarbeitung
+pypdf
+
+# Vektor-Suche (FAISS)
+faiss-cpu
+
+# API-Framework
+fastapi
+uvicorn
+
+requests
+
 python-dotenv
