@@ -11,7 +11,6 @@ import com.team.course_service.dto.CourseDTO;
 import com.team.course_service.mapper.CourseMapper;
 import com.team.course_service.service.CourseService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

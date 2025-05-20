@@ -73,4 +73,4 @@ INSERT INTO course_category(course_id, category_name) VALUES
   -- Robotics
   ('IN2376', 'Robotics'),
   ('CIT433037', 'Robotics'),
-  ('IN2356', 'Robotics');
+  ('IN2355', 'Robotics');
