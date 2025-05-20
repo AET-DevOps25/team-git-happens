@@ -36,7 +36,23 @@ dependencies {
     runtimeOnly  'com.mysql:mysql-connector-j:8.4.0'
 }
 
+flyway {
+    // class‑paths that Flyway will scan for migrations, database‑type jars, etc.
+    configurations = [ 'compileClasspath', 'flywayMigration' ]
 
+    url      = 'jdbc:mysql://localhost:3306/course_db?useSSL=false&serverTimezone=UTC'
+    user     = 'admin'
+    password = 'githappens!'
+
+    schemas  = [ 'course_db' ]
+    locations = [ 'classpath:db/migration' ]
+
+    /*
+     * Allows Flyway to start on an existing schema by inserting a synthetic baseline row
+     * (prevents "Schema history table does not exist" errors).
+     */
+    baselineOnMigrate = true
+}
 
 tasks.named('test') {
 	useJUnitPlatform()
