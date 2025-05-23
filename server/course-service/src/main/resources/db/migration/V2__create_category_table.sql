@@ -1,0 +1,3 @@
+CREATE TABLE category (
+  name VARCHAR(50) PRIMARY KEY
+);

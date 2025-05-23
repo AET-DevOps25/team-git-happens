@@ -1,0 +1,62 @@
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_server
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 'githappens!' # Change this!
+      # MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD are removed here
+      # as we'll use init scripts for more granular control.
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Mount a directory for SQL initialization scripts
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-proot", "-p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  course-service:
+    build:
+      context: ./course-service
+      dockerfile: Dockerfile
+    container_name: course_service_app
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8085:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/course_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: githappens! 
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_FLYWAY_ENABLED: true
+      # SPRING_FLYWAY_USER: ${SPRING_DATASOURCE_USERNAME} # Flyway will use datasource user/pass
+      # SPRING_FLYWAY_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      # SPRING_FLYWAY_URL: ${SPRING_DATASOURCE_URL}
+
+
+  flyway:
+    image: flyway/flyway:9
+    container_name: flyway_cli
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:mysql://db:3306/course_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      FLYWAY_USER: admin
+      FLYWAY_PASSWORD: githappens!
+      FLYWAY_CLEAN_DISABLED: "false"      # ← enable clean    
+    volumes:
+      # point this at wherever your SQL migrations live
+      - ./course-service/src/main/resources/db/migration:/flyway/sql
+
+volumes:
+  mysql_data:
