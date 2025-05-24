@@ -54,8 +54,25 @@ services:
       # SPRING_FLYWAY_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       # SPRING_FLYWAY_URL: ${SPRING_DATASOURCE_URL}
 
+  authentication-service: 
+    build:
+      context: ./server/authentication-service 
+      dockerfile: Dockerfile
+    container_name: authentication_service_app
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8086:8080" 
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/auth_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true 
+      SPRING_DATASOURCE_USERNAME: admin 
+      SPRING_DATASOURCE_PASSWORD: githappens!
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate 
+      SPRING_FLYWAY_ENABLED: true 
 
-  flyway:
+  flyway_course:
     image: flyway/flyway:9
     command: migrate
     container_name: flyway_cli
@@ -70,5 +87,19 @@ services:
     volumes:
       - ./server/course-service/src/main/resources/db/migration:/flyway/sql
 
+  flyway_authentication:  
+    image: flyway/flyway:9
+    command: migrate
+    container_name: flyway_auth_cli
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:mysql://db:3306/auth_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      FLYWAY_USER: admin
+      FLYWAY_PASSWORD: githappens!
+      FLYWAY_CLEAN_DISABLED: "false"      # ← enable clean    
+    volumes:
+      - ./server/authentication-service/src/main/resources/db/migration:/flyway/sql
 volumes:
   mysql_data:
