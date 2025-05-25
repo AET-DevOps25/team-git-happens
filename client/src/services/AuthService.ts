@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { toast } from 'sonner';
 import type{ Student } from '@/types';
@@ -24,8 +23,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     // POST /api/authenticate with {email, password}
     try {
       // Simple validation for TUM email
-      if (!email.endsWith('@tum.de')) {
-        toast.error('Please enter a valid TUM email address');
+      if (!email.endsWith('@tum.de') && !email.endsWith('@mytum.de')) {
+        toast.error('Please enter a valid TUM email address (@tum.de or @mytum.de)');
         return false;
       }
       

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -65,7 +64,7 @@ const Login = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                Must be a valid @tum.de email address
+                Must be a valid @tum.de or @mytum.de email address
               </p>
             </div>
             <div className="space-y-2">

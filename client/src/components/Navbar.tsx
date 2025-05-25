@@ -31,7 +31,7 @@ const Navbar = () => {
 
           <nav className="flex items-center space-x-4 lg:space-x-6 mx-6">
             <NavLink
-              to="/subjects"
+              to="/courses"
               className={({ isActive }) =>
                 `text-sm font-medium transition-colors hover:text-primary ${
                   isActive ? 'text-primary' : 'text-muted-foreground'
