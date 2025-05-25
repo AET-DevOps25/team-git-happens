@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -79,10 +79,25 @@ const Login = () => {
               />
             </div>
           </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </Button>
+          <CardFooter className="flex flex-col items-center space-y-4">
+            <div className="flex w-full space-x-2">
+              <Button 
+                type="submit"
+                className="flex-1"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Signing in...' : 'Sign In'}
+              </Button>
+              <Button 
+                type="button"
+                variant="outline" 
+                className="flex-1"
+                onClick={() => navigate('/register')} 
+                disabled={isLoading}
+              >
+                Sign Up
+              </Button>
+            </div>
           </CardFooter>
         </form>
       </Card>

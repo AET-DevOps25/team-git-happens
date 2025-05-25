@@ -1,4 +1,3 @@
-
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -82,9 +81,14 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="default" onClick={() => navigate('/login')}>
-              Log in
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button variant="default" onClick={() => navigate('/login')}>
+                Log in
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/register')}>
+                Sign Up
+              </Button>
+            </div>
           )}
         </div>
       </div>

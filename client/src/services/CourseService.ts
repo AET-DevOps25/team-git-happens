@@ -69,9 +69,9 @@ export const CourseService = {
     });
   },
   
-  enrollInCourse: async (studentId: number, courseId: string): Promise<string[]> => {
-    const updatedEnrolledCourseIds = await fetchApi<string[]>(
-      `${API_BASE_URL}/students/${studentId}/enroll`, 
+  enrollInCourse: async (studentMatriculationNumber: string, courseId: string): Promise<string[]> => {
+    const updatedEnrolledCourseIds = await fetchApi<string[]>( 
+      `${API_BASE_URL}/students/${studentMatriculationNumber}/enroll`, 
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -83,18 +83,16 @@ export const CourseService = {
     if (student) {
       const updatedStudent = { 
         ...student,
-        enrolledCourses: updatedEnrolledCourseIds.map(id => parseInt(id, 10)) 
+        enrolledCourses: updatedEnrolledCourseIds // Already string[]
       };
       useAuthStore.getState().updateStudent(updatedStudent);
     }
     return updatedEnrolledCourseIds;
   },
   
-  unenrollFromCourse: async (studentId: number, courseId: string): Promise<string[]> => {
-    // Assumes backend endpoint DELETE /api/students/{studentId}/enroll/{courseId}
-    // And returns the updated list of enrolled course IDs for the student.
-    const updatedEnrolledCourseIds = await fetchApi<string[]>(
-      `${API_BASE_URL}/students/${studentId}/enroll/${courseId}`, 
+  unenrollFromCourse: async (studentMatriculationNumber: string, courseId: string): Promise<string[]> => {
+    const updatedEnrolledCourseIds = await fetchApi<string[]>( 
+      `${API_BASE_URL}/students/${studentMatriculationNumber}/enroll/${courseId}`, 
       {
         method: 'DELETE',
       }
@@ -103,8 +101,7 @@ export const CourseService = {
     if (student) {
       const updatedStudent = { 
         ...student,
-        // Convert string[] to number[] for enrolledCourses
-        enrolledCourses: updatedEnrolledCourseIds.map(id => parseInt(id, 10))
+        enrolledCourses: updatedEnrolledCourseIds 
       };
       useAuthStore.getState().updateStudent(updatedStudent);
     }

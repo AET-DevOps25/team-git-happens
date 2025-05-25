@@ -1,15 +1,26 @@
 import { create } from 'zustand';
 import { toast } from 'sonner';
-import type{ Student } from '@/types';
+import type { Student, StudentDTO } from '@/types'; // Assuming StudentDTO might be used or similar for response
+
+// Define the shape of the registration request payload
+interface RegisterPayload {
+  matriculationNumber: string;
+  name: string;
+  email: string;
+  password: string;
+}
 
 interface AuthState {
   student: Student | null;
   token: string | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
+  register: (payload: RegisterPayload) => Promise<boolean>; // Add register function signature
   logout: () => void;
   updateStudent: (student: Student) => void;
 }
+
+const API_BASE_URL = 'http://localhost:8086'; 
 
 export const useAuthStore = create<AuthState>((set) => ({
   student: localStorage.getItem('courseCompassUser') 
@@ -19,32 +30,82 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: !!localStorage.getItem('courseCompassUser'),
   
   login: async (email: string, password: string) => {
-    // In a real app, this would call the AuthenticationController endpoint:
-    // POST /api/authenticate with {email, password}
     try {
       // Simple validation for TUM email
       if (!email.endsWith('@tum.de') && !email.endsWith('@mytum.de')) {
         toast.error('Please enter a valid TUM email address (@tum.de or @mytum.de)');
         return false;
       }
+
+      const response = await fetch(`${API_BASE_URL}/auth/login/email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text(); // Error response might be text
+        toast.error(`Login failed: ${errorBody || response.statusText}`);
+        return false;
+      }
+
+      // Expecting a JSON response with token and student data
+      const loginResponse = await response.json();
       
-      // Simulate API call
-      const student = {
-        id: Math.floor(Math.random() * 10000),
-        name: email.split('@')[0], // Extract name from email for demo
-        email,
-        enrolledCourses: [] // Initialize with empty enrollments
+      const token = loginResponse.token;
+      const studentDataFromBackend = loginResponse.student;
+
+      if (!token || !studentDataFromBackend) {
+        toast.error('Login failed: Invalid response from server.');
+        return false;
+      }
+
+      const studentForStore: Student = {
+        matriculationNumber: studentDataFromBackend.matriculationNumber,
+        name: studentDataFromBackend.name,
+        email: studentDataFromBackend.email,
+        enrolledCourses: studentDataFromBackend.enrolledCourses || [] 
       };
       
-      const token = "mock-jwt-token-" + Math.random().toString(36).substring(2);
-      
-      localStorage.setItem('courseCompassUser', JSON.stringify(student));
+      localStorage.setItem('courseCompassUser', JSON.stringify(studentForStore));
       localStorage.setItem('courseCompassToken', token);
-      set({ student, token, isAuthenticated: true });
-      toast.success(`Welcome, ${student.name}!`);
+      set({ student: studentForStore, token, isAuthenticated: true });
+      toast.success(`Welcome, ${studentForStore.name}!`);
       return true;
     } catch (error) {
-      toast.error('Login failed. Please try again.');
+      console.error('Login error:', error);
+      toast.error('Login failed. Please check the console for details.');
+      return false;
+    }
+  },
+  
+  register: async (payload: RegisterPayload) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        // Backend returns plain text for errors (400, 409, 500)
+        const errorBody = await response.text(); 
+        toast.error(`Registration failed: ${errorBody || response.statusText}`);
+        return false;
+      }
+
+      // Successful registration (201) returns StudentDTO
+      const registeredStudent: StudentDTO = await response.json(); 
+      toast.success(`Registration successful for ${registeredStudent.name}! Please log in.`);
+      return true; // Indicates success, caller can navigate to login
+
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error('Registration failed. An unexpected error occurred. Please check the console.');
       return false;
     }
   },
