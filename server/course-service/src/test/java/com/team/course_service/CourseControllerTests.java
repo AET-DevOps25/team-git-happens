@@ -5,8 +5,10 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import static org.mockito.BDDMockito.given;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.mockito.Mockito; // Corrected import
+import static org.mockito.BDDMockito.given; // Corrected import
 import org.springframework.http.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,15 +21,25 @@ import com.team.course_service.service.CourseService;
 public class CourseControllerTests {
     @Autowired
     private MockMvc mvc;
-    @MockBean
-    private CourseService courseService;
+
+    @Autowired
+    private CourseService courseService; // This will be the mock from ControllerTestConfig
+
+    @TestConfiguration
+    static class ControllerTestConfig {
+
+        @Bean
+        public CourseService courseService() {
+            return Mockito.mock(CourseService.class); 
+        }
+    }
 
     @Test
     void getAll_shouldReturnJsonArray() throws Exception {
         Course sample = new Course("TST100","Test","Desc",3, Set.of());
         Course sample2 = new Course("IN2000","Test2","Desc2",5, Set.of()); 
 
-        sample.setCategories(Set.of());  // empty set
+        // sample.setCategories(Set.of()); // This line is redundant if categories are already Set.of() in constructor
         given(courseService.getAllCourses()).willReturn(List.of(sample, sample2));
 
         mvc.perform(get("/courses"))
@@ -38,8 +50,7 @@ public class CourseControllerTests {
            .andExpect(jsonPath("$[0].description").value("Desc"))
            .andExpect(jsonPath("$[0].credits").value(3))
            .andExpect(jsonPath("$[0].categories").isArray())
-           .andExpect(status().isOk())
-           .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+           // Removed duplicate status() and contentType() checks
            .andExpect(jsonPath("$[1].id").value("IN2000"))
            .andExpect(jsonPath("$[1].title").value("Test2"))
            .andExpect(jsonPath("$[1].description").value("Desc2"))
