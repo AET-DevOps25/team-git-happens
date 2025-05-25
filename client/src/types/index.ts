@@ -1,9 +1,9 @@
 export interface Student {
-  id: number;
+  matriculationNumber: string; 
   name: string;
   email: string;
   password?: string;
-  enrolledCourses?: number[]; // IDs of enrolled courses
+  enrolledCourses?: string[]; 
 }
 
 export interface Course {
@@ -18,7 +18,6 @@ export interface Course {
 
 export interface UserPreferences {
   interests: string[];
-  // difficultyPreference?: 'EASY' | 'MEDIUM' | 'HARD';
   creditPreference?: number;
   additionalInfo?: string;
 }
@@ -37,7 +36,7 @@ export interface CourseDTO {
 }
 
 export interface StudentDTO {
-  id: number;
+  matriculationNumber: string; 
   name: string;
   email: string;
   enrolledCourses?: string[];
