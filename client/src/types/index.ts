@@ -1,10 +1,19 @@
-
 export interface Student {
   id: number;
   name: string;
   email: string;
   password?: string;
   enrolledCourses?: number[]; // IDs of enrolled courses
+}
+
+export interface Course {
+  id: number;
+  name: string;
+  description: string;
+  tags: string[];
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  credits: number;
+  avgRating?: number;
 }
 
 export interface UserPreferences {
@@ -14,15 +23,16 @@ export interface UserPreferences {
   additionalInfo?: string;
 }
 
-// DTOs aligned with the backend model
-export interface SubjectDTO {
-  id: number;
+export interface CategoryDTO {
   name: string;
+}
+
+export interface CourseDTO {
+  id: string;
+  title: string;
   description: string;
-  tags: string[];
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  categories: CategoryDTO[];
   credits: number;
-  prerequisites?: number[]; 
   avgRating?: number;
 }
 
@@ -30,7 +40,7 @@ export interface StudentDTO {
   id: number;
   name: string;
   email: string;
-  enrolledCourses?: number[];
+  enrolledCourses?: string[];
 }
 
 // Authentication types
