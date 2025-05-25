@@ -1,6 +1,7 @@
 package com.team.course_service.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,5 +23,9 @@ public class CourseService {
 
     public List<Course> getAllCourses() {
         return courseRepository.findAll();
+    }
+
+    public Optional<Course> getCourseById(String id) {
+        return courseRepository.findById(id);
     }
 }
