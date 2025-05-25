@@ -13,7 +13,7 @@ import com.team.authentication_service.model.Student;
 import com.team.authentication_service.repository.StudentRepository; 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 
 @SpringBootTest              
@@ -54,7 +54,9 @@ public class AuthIntegrationTest {
                         .contentType(APPLICATION_JSON_VALUE)
                         .content(loginRequestJson)) // Use the JSON string
                 .andExpect(status().isOk())
-                .andExpect(content().string("Login successful")); 
+                // Updated to check for specific JSON fields instead of plain string "Login successful"
+                .andExpect(jsonPath("$.token").exists()) 
+                .andExpect(jsonPath("$.student.email").value(testEmail));
     }
 
     @Test
