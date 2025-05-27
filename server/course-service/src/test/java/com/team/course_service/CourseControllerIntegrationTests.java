@@ -1,6 +1,5 @@
 package com.team.course_service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.course_service.model.Category;
 import com.team.course_service.model.Course;
 import com.team.course_service.repository.CategoryRepository;
@@ -13,8 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional; // Optional, but good for DB tests
-
+import org.springframework.transaction.annotation.Transactional; 
 import java.util.List;
 import java.util.Set;
 
@@ -36,9 +34,6 @@ public class CourseControllerIntegrationTests {
 
     @Autowired
     private CategoryRepository categoryRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper; // For converting objects to JSON strings if needed for POST/PUT
 
     private Course course1;
     private Course course2;

@@ -101,7 +101,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       // Successful registration (201) returns StudentDTO
       const registeredStudent: StudentDTO = await response.json(); 
       toast.success(`Registration successful for ${registeredStudent.name}! Please log in.`);
-      return true; // Indicates success, caller can navigate to login
+      return true; 
 
     } catch (error) {
       console.error('Registration error:', error);

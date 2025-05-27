@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Register from "./pages/Register"; // Import the Register page
+import Registration from "./pages/Registration"; // Changed from Register to Registration
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import CourseList from "./pages/CourseList";
@@ -25,7 +25,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} /> {/* Add route for Register page */}
+              <Route path="/register" element={<Registration />} /> {/* Changed from Register to Registration */}
               <Route path="/courses" element={<CourseList />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

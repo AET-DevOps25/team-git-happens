@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useAuthStore } from '@/services/AuthService';
 import { toast } from 'sonner';
 
-const Register = () => {
+const Registration = () => {
   const navigate = useNavigate();
   const { register } = useAuthStore(); // Use the register function from the store
   const [matriculationNumber, setMatriculationNumber] = useState('');
@@ -147,4 +147,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Registration;
