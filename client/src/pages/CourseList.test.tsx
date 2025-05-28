@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import CourseList from '../pages/CourseList';
@@ -62,12 +62,25 @@ describe('CourseList Page', () => {
   beforeEach(() => {
     // Reset mocks before each test in the main describe block
     mockGetAllCourses.mockReset();
+    // Clear any toast mocks if they were called, to prevent test interference
+    if (jest.isMockFunction(jest.requireMock('sonner').toast.error)) {
+      jest.requireMock('sonner').toast.error.mockClear();
+    }
+    if (jest.isMockFunction(jest.requireMock('sonner').toast.success)) {
+      jest.requireMock('sonner').toast.success.mockClear();
+    }
+    if (jest.isMockFunction(jest.requireMock('sonner').toast.info)) {
+      jest.requireMock('sonner').toast.info.mockClear();
+    }
   });
 
   describe('when loading initially', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       mockGetAllCourses.mockReturnValue(new Promise(() => {})); // Simulate pending promise
-      renderCourseList();
+      // Wrap initial render in act if it causes state updates that are not awaited
+      await act(async () => {
+        renderCourseList();
+      });
     });
 
     it('renders loading state', () => {
@@ -76,10 +89,13 @@ describe('CourseList Page', () => {
   });
 
   describe('when courses are fetched successfully', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       mockGetAllCourses.mockResolvedValue(mockCourses);
-      renderCourseList();
-            return waitFor(() => {
+      await act(async () => {
+        renderCourseList();
+      });
+      // waitFor already handles act wrapping for the assertions within it
+      await waitFor(() => {
         expect(screen.getByText('Introduction to Programming')).toBeInTheDocument();
       });
     });
@@ -93,7 +109,9 @@ describe('CourseList Page', () => {
 
     it('filters courses by search query (title)', async () => {
       const searchInput = screen.getByPlaceholderText('Search courses...');
-      await userEvent.type(searchInput, 'Calculus');
+      await act(async () => {
+        await userEvent.type(searchInput, 'Calculus');
+      });
 
       await waitFor(() => {
         expect(screen.getByText('Calculus I')).toBeInTheDocument();
@@ -103,7 +121,10 @@ describe('CourseList Page', () => {
 
     it('filters courses by category selection', async () => {
       const categoryBadge = screen.getByText((content, element) => content === 'Programming' && element.classList.contains('cursor-pointer'));
-      await userEvent.click(categoryBadge);
+      
+      await act(async () => {
+        await userEvent.click(categoryBadge);
+      });
 
       await waitFor(() => {
         expect(screen.getByText('Introduction to Programming')).toBeInTheDocument();
@@ -114,18 +135,23 @@ describe('CourseList Page', () => {
 
     it('clears filters when "Clear Filters" button is clicked', async () => {
       const searchInput = screen.getByPlaceholderText('Search courses...');
-      await userEvent.type(searchInput, 'Calculus');
+      await act(async () => {
+        await userEvent.type(searchInput, 'Calculus');
+      });
       
       const categoryBadge = screen.getByText('Programming');
-      await userEvent.click(categoryBadge);
+      await act(async () => {
+        await userEvent.click(categoryBadge);
+      });
 
-      // Wait for filters to apply and something to disappear
       await waitFor(() => {
         expect(screen.queryByText('Calculus I')).not.toBeInTheDocument();
       });
 
       const clearButton = screen.getByRole('button', { name: /clear filters/i });
-      await userEvent.click(clearButton);
+      await act(async () => {
+        await userEvent.click(clearButton);
+      });
 
       await waitFor(() => {
         expect(screen.getByText('Introduction to Programming')).toBeInTheDocument();
@@ -137,11 +163,12 @@ describe('CourseList Page', () => {
   });
 
   describe('when no courses are available', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       mockGetAllCourses.mockResolvedValue([]);
-      renderCourseList();
-      // Wait for the component to process the empty array
-      return waitFor(() => {
+      await act(async () => {
+        renderCourseList();
+      });
+      await waitFor(() => {
         expect(screen.queryByText('Loading courses...')).not.toBeInTheDocument();
       });
     });

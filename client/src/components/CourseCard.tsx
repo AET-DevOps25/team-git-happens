@@ -12,7 +12,7 @@ interface CourseCardProps {
 
 const CourseCard = ({ course, showDetails = true }: CourseCardProps) => {
   return (
-    <Link to={`/course/${course.id}`}>
+    <Link to={`/courses/${course.id}`}>
       <Card className="h-full card-hover">
         <CardHeader>
           <p className="text-xs text-muted-foreground mb-1">ID: {course.id}</p> 

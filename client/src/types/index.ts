@@ -3,7 +3,18 @@ export interface Student {
   name: string;
   email: string;
   password?: string;
-  enrolledCourses?: string[]; 
+//  enrolledCourses?: string[]; 
+}
+
+export interface Review {
+  id: number;
+  studentMatrNr: string;
+  courseId: string;
+  studentName?: string;
+  courseName?: string;
+  rating: number;
+  reviewText: string;
+  createdAt: string;
 }
 
 export interface Course {
@@ -33,6 +44,15 @@ export interface CourseDTO {
   categories: CategoryDTO[];
   credits: number;
   avgRating?: number;
+}
+
+export interface ReviewDTO {
+  id: number;
+  studentMatrNr: string;
+  courseId: string; 
+  rating: number;
+  reviewText: string;
+  createdAt: string;
 }
 
 export interface StudentDTO {

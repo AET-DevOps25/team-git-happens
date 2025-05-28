@@ -5,7 +5,9 @@ const API_BASE_URL = 'http://localhost:8085';
 
 // Helper function for API calls
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
+  console.log('[CourseService] Fetching API:', url, 'with options:', options); // Added log
   const response = await fetch(url, options);
+  console.log('[CourseService] API Response Status:', response.status, 'for URL:', url); // Added log
   if (!response.ok) {
     let errorMessage = `API request failed: ${response.status} ${response.statusText}`;
     try {

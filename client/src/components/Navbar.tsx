@@ -66,10 +66,10 @@ const Navbar = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => navigate('/my-subjects')}>
+                {/* <DropdownMenuItem onClick={() => navigate('/my-subjects')}>
                   <BookOpen className="w-4 h-4 mr-2" />
                   My Courses
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem onClick={() => navigate('/my-reviews')}>
                   <Star className="w-4 h-4 mr-2" />
                   My Reviews

@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import { toast } from 'sonner';
-import type { Student, StudentDTO } from '@/types'; // Assuming StudentDTO might be used or similar for response
+import type { Student, StudentDTO } from '@/types';
 
-// Define the shape of the registration request payload
 interface RegisterPayload {
   matriculationNumber: string;
   name: string;
@@ -14,26 +13,32 @@ interface AuthState {
   student: Student | null;
   token: string | null;
   isAuthenticated: boolean;
+  loading: boolean; // Added loading state
+  error: string | null; // Added error state
   login: (email: string, password: string) => Promise<boolean>;
-  register: (payload: RegisterPayload) => Promise<boolean>; // Add register function signature
+  register: (payload: RegisterPayload) => Promise<boolean>;
   logout: () => void;
   updateStudent: (student: Student) => void;
 }
 
-const API_BASE_URL = 'http://localhost:8086'; 
+const API_BASE_URL = 'http://localhost:8086';
 
-export const useAuthStore = create<AuthState>((set) => ({
-  student: localStorage.getItem('courseCompassUser') 
-    ? JSON.parse(localStorage.getItem('courseCompassUser') || '{}') 
+export const useAuthStore = create<AuthState>((set, get) => ({ // Added get
+  student: localStorage.getItem('courseCompassUser')
+    ? JSON.parse(localStorage.getItem('courseCompassUser') || '{}')
     : null,
   token: localStorage.getItem('courseCompassToken') || null,
   isAuthenticated: !!localStorage.getItem('courseCompassUser'),
-  
+  loading: false, // Initialize loading state
+  error: null, // Initialize error state
+
   login: async (email: string, password: string) => {
+    set({ loading: true, error: null }); // Set loading true, clear previous errors
     try {
       // Simple validation for TUM email
       if (!email.endsWith('@tum.de') && !email.endsWith('@mytum.de')) {
         toast.error('Please enter a valid TUM email address (@tum.de or @mytum.de)');
+        set({ loading: false });
         return false;
       }
 
@@ -47,7 +52,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       if (!response.ok) {
         const errorBody = await response.text(); // Error response might be text
-        toast.error(`Login failed: ${errorBody || response.statusText}`);
+        const errorMessage = `Login failed: ${errorBody || response.statusText}`;
+        toast.error(errorMessage);
+        set({ loading: false, error: errorMessage });
         return false;
       }
 
@@ -58,7 +65,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       const studentDataFromBackend = loginResponse.student;
 
       if (!token || !studentDataFromBackend) {
-        toast.error('Login failed: Invalid response from server.');
+        const errorMessage = 'Login failed: Invalid response from server.';
+        toast.error(errorMessage);
+        set({ loading: false, error: errorMessage });
         return false;
       }
 
@@ -66,22 +75,25 @@ export const useAuthStore = create<AuthState>((set) => ({
         matriculationNumber: studentDataFromBackend.matriculationNumber,
         name: studentDataFromBackend.name,
         email: studentDataFromBackend.email,
-        enrolledCourses: studentDataFromBackend.enrolledCourses || [] 
+        // enrolledCourses: studentDataFromBackend.enrolledCourses || [] 
       };
       
       localStorage.setItem('courseCompassUser', JSON.stringify(studentForStore));
       localStorage.setItem('courseCompassToken', token);
-      set({ student: studentForStore, token, isAuthenticated: true });
+      set({ student: studentForStore, token, isAuthenticated: true, loading: false, error: null });
       toast.success(`Welcome, ${studentForStore.name}!`);
       return true;
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Login failed. Please check the console for details.');
+      const errorMessage = 'Login failed. Please check the console for details.';
+      toast.error(errorMessage);
+      set({ loading: false, error: errorMessage });
       return false;
     }
   },
   
   register: async (payload: RegisterPayload) => {
+    set({ loading: true, error: null }); // Set loading true, clear previous errors
     try {
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
@@ -92,20 +104,25 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
 
       if (!response.ok) {
-        // Backend returns plain text for errors (400, 409, 500)
-        const errorBody = await response.text(); 
-        toast.error(`Registration failed: ${errorBody || response.statusText}`);
+        const errorBody = await response.text();
+        // Use the error message from the backend if available
+        const errorMessage = errorBody || `Registration failed: ${response.statusText}`;
+        toast.error(errorMessage); // Display the actual error from backend
+        set({ loading: false, error: errorMessage });
         return false;
       }
 
       // Successful registration (201) returns StudentDTO
       const registeredStudent: StudentDTO = await response.json(); 
       toast.success(`Registration successful for ${registeredStudent.name}! Please log in.`);
-      return true; 
-
+      set({ loading: false, error: null }); // Clear error on success
+      return true;
     } catch (error) {
       console.error('Registration error:', error);
-      toast.error('Registration failed. An unexpected error occurred. Please check the console.');
+      // Use a generic message or error.message if available
+      const errorMessage = (error instanceof Error) ? error.message : 'Registration failed. An unexpected error occurred.';
+      toast.error(errorMessage);
+      set({ loading: false, error: errorMessage });
       return false;
     }
   },
@@ -113,7 +130,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem('courseCompassUser');
     localStorage.removeItem('courseCompassToken');
-    set({ student: null, token: null, isAuthenticated: false });
+    set({ student: null, token: null, isAuthenticated: false, loading: false, error: null }); // Reset all relevant state
     toast.info('You have been logged out');
   },
   
