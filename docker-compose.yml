@@ -21,7 +21,17 @@ services:
       retries: 5
       start_period: 30s
 
-    
+  genai-service:
+      build:
+        context: ./genai-service
+        dockerfile: Dockerfile
+      container_name: genai_app
+      ports:
+        - "8000:8000"
+      restart: unless-stopped
+      depends_on:
+        - db
+  
   client-app:
     build:
       context: ./client
