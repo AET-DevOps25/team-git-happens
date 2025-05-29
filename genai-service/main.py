@@ -8,7 +8,7 @@ from langchain.chains import RetrievalQA
 import os
 
 # Konfiguration
-os.environ["HUGGINGFACEHUB_API_TOKEN"] = "hf_..."
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = "add your own tocken"
 
 # Daten vorbereiten (kann später optimiert werden mit Persistenz)
 loader = PyPDFLoader("Curriculum.pdf")
