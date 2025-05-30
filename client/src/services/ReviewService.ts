@@ -93,25 +93,20 @@ export const ReviewService = {
   },
 
   getReviewsByCourseId: async (subjectId: string): Promise<Review[]> => {
-    console.log(`Fetching reviews for subject ID: ${subjectId}`);
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 500));
     const reviews = MOCK_REVIEWS.filter(r => r.courseId === subjectId);
-    console.log(`Found reviews: `, reviews);
     return reviews;
   },
 
   getReviewsByStudentMatrNr: async (studentMatrNr: string): Promise<Review[]> => {
-    console.log(`Fetching reviews for student matriculation number: ${studentMatrNr}`);
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 500));
     const reviews = MOCK_REVIEWS.filter(r => r.studentMatrNr === studentMatrNr);
-    console.log(`Found reviews for student ${studentMatrNr}: `, reviews);
     return reviews;
   },
 
   addReview: async (reviewData: Omit<Review, 'id' | 'createdAt' | 'studentName' | 'courseName'>): Promise<Review> => {
-    console.log("Adding review:", reviewData);
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -130,7 +125,6 @@ export const ReviewService = {
       createdAt: new Date().toISOString(),
     };
     MOCK_REVIEWS.push(newReview);
-    console.log("Review added:", newReview);
     return newReview;
   }
 };

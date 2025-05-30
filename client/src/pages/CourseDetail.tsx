@@ -28,33 +28,26 @@ const CourseDetail = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      console.log('[CourseDetail] courseIdFromParams:', courseIdFromParams); // Log courseIdFromParams
       if (!courseIdFromParams) {
-        console.log('[CourseDetail] No courseIdFromParams, returning.');
         return;
       }
 
       try {
         setLoading(true);
-        console.log(`[CourseDetail] Fetching course with ID: ${courseIdFromParams}`); // Log before fetch
         const courseData = await CourseService.getCourseById(courseIdFromParams);
-        console.log('[CourseDetail] Fetched courseData:', courseData); // Log fetched data
 
         if (!courseData) {
           toast.error('Course not found');
           setCourse(null);
-          console.log('[CourseDetail] Course data not found, setting course to null.');
           return;
         }
 
         setCourse(courseData);
 
-        console.log(`[CourseDetail] Fetching reviews for course ID: ${courseIdFromParams}`); // Log before fetching reviews
         const reviewsData = await ReviewService.getReviewsByCourseId(courseIdFromParams);
-        console.log('[CourseDetail] Fetched reviewsData:', reviewsData); // Log fetched reviews
+
         setReviews(reviewsData);
       } catch (error) {
-        console.error('[CourseDetail] Error loading data:', error); // Log the full error object
         toast.error('Failed to load course details');
       } finally {
         setLoading(false);
