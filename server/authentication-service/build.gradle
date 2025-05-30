@@ -1,0 +1,90 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.5'
+    id 'io.spring.dependency-management' version '1.1.7'
+    // Flyway Gradle plugin (kept on 9.x so it matches the Flyway core version below)
+    id 'org.flywaydb.flyway' version '9.22.3'
+}
+
+group = 'com.team'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        // Java 21 for compiling/running the application itself. Gradle (and therefore Flyway
+        // tasks) will still run on the JDK that launches Gradle, which should be Java 17.
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+/*
+ * Extra configuration whose jars are put on Flyway's *task* class‑path.
+ * The plugin will scan any configuration listed in flyway.configurations below.
+ */
+configurations {
+    flywayMigration
+}
+
+dependencies {
+    /* --- Spring Boot --- */
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    /* --- Flyway at application runtime --- */
+    implementation 'org.flywaydb:flyway-core:9.22.3'
+    runtimeOnly  'org.flywaydb:flyway-mysql:9.22.3'
+    runtimeOnly  'com.mysql:mysql-connector-j:8.4.0'
+
+    /* --- Flyway Gradle tasks (repair / migrate / clean) --- */
+    flywayMigration 'org.flywaydb:flyway-mysql:9.22.3'
+    flywayMigration 'com.mysql:mysql-connector-j:8.4.0'
+
+    /* --- API documentation --- */
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.21'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+
+    /* --- Optional in‑memory DB for local dev / tests --- */
+    runtimeOnly 'com.h2database:h2'
+
+	/* --- For the encryption/decryption of the passwords --- */
+	implementation 'org.springframework.security:spring-security-crypto'
+
+    /* --- JWT Support --- */
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // Or jjwt-gson if you prefer Gson
+}
+
+/*
+ * Flyway settings that Gradle tasks (flywayClean, flywayMigrate, …) will use.
+ * The Spring Boot application can still override these through application.yml /
+ * environment variables – they are independent.
+ */
+flyway {
+    // class‑paths that Flyway will scan for migrations, database‑type jars, etc.
+    configurations = [ 'compileClasspath', 'flywayMigration' ]
+
+    url      = 'jdbc:mysql://localhost:3306/authdb?useSSL=false&serverTimezone=UTC'
+    user     = 'admin'
+    password = 'authpass'
+
+    schemas  = [ 'authdb' ]
+    locations = [ 'classpath:db/migration' ]
+
+    /*
+     * Allows Flyway to start on an existing schema by inserting a synthetic baseline row
+     * (prevents "Schema history table does not exist" errors).
+     */
+    baselineOnMigrate = true
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

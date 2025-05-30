@@ -1,36 +1,65 @@
-
 export interface Student {
-  id: number;
+  matriculationNumber: string; 
   name: string;
   email: string;
   password?: string;
-  enrolledCourses?: number[]; // IDs of enrolled courses
+//  enrolledCourses?: string[]; 
 }
 
-export interface UserPreferences {
-  interests: string[];
-  // difficultyPreference?: 'EASY' | 'MEDIUM' | 'HARD';
-  creditPreference?: number;
-  additionalInfo?: string;
+export interface Review {
+  id: number;
+  studentMatrNr: string;
+  courseId: string;
+  studentName?: string;
+  courseName?: string;
+  rating: number;
+  reviewText: string;
+  createdAt: string;
 }
 
-// DTOs aligned with the backend model
-export interface SubjectDTO {
+export interface Course {
   id: number;
   name: string;
   description: string;
   tags: string[];
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   credits: number;
-  prerequisites?: number[]; 
   avgRating?: number;
 }
 
-export interface StudentDTO {
+export interface UserPreferences {
+  interests: string[];
+  creditPreference?: number;
+  additionalInfo?: string;
+}
+
+export interface CategoryDTO {
+  name: string;
+}
+
+export interface CourseDTO {
+  id: string;
+  title: string;
+  description: string;
+  categories: CategoryDTO[];
+  credits: number;
+  avgRating?: number;
+}
+
+export interface ReviewDTO {
   id: number;
+  studentMatrNr: string;
+  courseId: string; 
+  rating: number;
+  reviewText: string;
+  createdAt: string;
+}
+
+export interface StudentDTO {
+  matriculationNumber: string; 
   name: string;
   email: string;
-  enrolledCourses?: number[];
+  enrolledCourses?: string[];
 }
 
 // Authentication types
