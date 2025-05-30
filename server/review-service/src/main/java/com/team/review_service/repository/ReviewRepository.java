@@ -9,5 +9,4 @@ import com.team.review_service.model.Review;
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
     List<Review> findByCourseId(String courseId);
     List<Review> findByStudentMatrNr(String studentMatrNr);
-
 }
