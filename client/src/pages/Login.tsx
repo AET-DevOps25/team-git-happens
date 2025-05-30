@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuthStore } from '@/services/AuthService';
 import { toast } from 'sonner';
-import { GraduationCap } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -65,7 +63,7 @@ const Login = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                Must be a valid @tum.de email address
+                Must be a valid @tum.de or @mytum.de email address
               </p>
             </div>
             <div className="space-y-2">
@@ -80,10 +78,25 @@ const Login = () => {
               />
             </div>
           </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </Button>
+          <CardFooter className="flex flex-col items-center space-y-4">
+            <div className="flex w-full space-x-2">
+              <Button 
+                type="submit"
+                className="flex-1"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Signing in...' : 'Sign In'}
+              </Button>
+              <Button 
+                type="button"
+                variant="outline" 
+                className="flex-1"
+                onClick={() => navigate('/register')} 
+                disabled={isLoading}
+              >
+                Sign Up
+              </Button>
+            </div>
           </CardFooter>
         </form>
       </Card>

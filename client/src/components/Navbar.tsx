@@ -1,4 +1,3 @@
-
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,7 +30,7 @@ const Navbar = () => {
 
           <nav className="flex items-center space-x-4 lg:space-x-6 mx-6">
             <NavLink
-              to="/subjects"
+              to="/courses"
               className={({ isActive }) =>
                 `text-sm font-medium transition-colors hover:text-primary ${
                   isActive ? 'text-primary' : 'text-muted-foreground'
@@ -67,10 +66,10 @@ const Navbar = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => navigate('/my-subjects')}>
+                {/* <DropdownMenuItem onClick={() => navigate('/my-subjects')}>
                   <BookOpen className="w-4 h-4 mr-2" />
                   My Courses
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem onClick={() => navigate('/my-reviews')}>
                   <Star className="w-4 h-4 mr-2" />
                   My Reviews
@@ -82,9 +81,14 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="default" onClick={() => navigate('/login')}>
-              Log in
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button variant="default" onClick={() => navigate('/login')}>
+                Log in
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/register')}>
+                Sign Up
+              </Button>
+            </div>
           )}
         </div>
       </div>
