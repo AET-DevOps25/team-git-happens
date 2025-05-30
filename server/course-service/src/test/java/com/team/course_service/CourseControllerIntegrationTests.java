@@ -1,11 +1,9 @@
 package com.team.course_service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.course_service.model.Category;
 import com.team.course_service.model.Course;
 import com.team.course_service.repository.CategoryRepository;
 import com.team.course_service.repository.CourseRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional; // Optional, but good for DB tests
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -37,9 +35,6 @@ public class CourseControllerIntegrationTests {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper; // For converting objects to JSON strings if needed for POST/PUT
-
     private Course course1;
     private Course course2;
     private Category category1;
@@ -60,12 +55,6 @@ public class CourseControllerIntegrationTests {
         courseRepository.saveAll(List.of(course1, course2));
     }
 
-    @AfterEach
-    void tearDown() {
-        // @Transactional handles rollback, but explicit deleteAll can be used if not using @Transactional
-        // courseRepository.deleteAll();
-        // categoryRepository.deleteAll();
-    }
 
     @Test
     void getAllCourses_shouldReturnListOfCourses() throws Exception {
@@ -73,11 +62,10 @@ public class CourseControllerIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(course1.getId()))) // Order might not be guaranteed, adjust assertion if needed
+                .andExpect(jsonPath("$[0].id", is(course1.getId()))) 
                 .andExpect(jsonPath("$[0].title", is(course1.getTitle())))
                 .andExpect(jsonPath("$[1].id", is(course2.getId())))
                 .andExpect(jsonPath("$[1].title", is(course2.getTitle())));
-        // Add more detailed assertions for categories if necessary
     }
 
     @Test
