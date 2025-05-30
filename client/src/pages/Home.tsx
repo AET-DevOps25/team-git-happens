@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Compass, BookOpen, Star, ArrowRight, GraduationCap } from 'lucide-react';
@@ -22,7 +21,7 @@ const Home = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 mt-8">
-          <Button size="lg" onClick={() => navigate('/subjects')}>
+          <Button size="lg" onClick={() => navigate('/courses')}>
             <BookOpen className="mr-2 h-5 w-5" />
             Browse Courses
           </Button>

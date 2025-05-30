@@ -15,11 +15,13 @@ import java.util.stream.Collectors;
 public class AuthService {
     private final StudentRepository studentsRepo;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider; 
     
     @Autowired
-    public AuthService(StudentRepository studentsRepo, PasswordEncoder passwordEncoder) {
+    public AuthService(StudentRepository studentsRepo, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
         this.studentsRepo = studentsRepo;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider; 
     }
 
     public List<StudentDTO> getStudents() {
@@ -59,30 +61,34 @@ public class AuthService {
     }
 
     
-    public boolean loginByEmail(String email, String password) {
+    public Student loginByEmail(String email, String password) { // Return Student object
         var maybeStudent = studentsRepo.findByEmail(email);
         if (maybeStudent.isEmpty()) {
-            System.out.println("findByEmail returned false");
-            return false;          
+            System.out.println("findByEmail returned no student for: " + email);
+            return null;          
         }
         Student student = maybeStudent.get();
         if (!passwordEncoder.matches(password, student.getPasswordHash())) {
-            System.out.println("Password does not match");
-            return false;         
+            System.out.println("Password does not match for student: " + email);
+            return null;         
         }
-        return true;    
+        return student;
     }
 
    
-    public boolean loginByMatrNr(String matriculationNumber, String password) {
+    public Student loginByMatrNr(String matriculationNumber, String password) { 
         var maybeStudent = studentsRepo.findByMatriculationNumber(matriculationNumber);
         if (maybeStudent.isEmpty()) {
-            return false;          
+            return null;          
         }
         Student student = maybeStudent.get();
         if (!passwordEncoder.matches(password, student.getPasswordHash())) {
-            return false;         
+            return null;         
         }
-        return true;
+        return student; 
+    }
+
+    public String generateToken(Student student) {
+        return jwtTokenProvider.generateToken(student); 
     }
 }
