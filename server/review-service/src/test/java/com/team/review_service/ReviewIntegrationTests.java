@@ -31,7 +31,7 @@ class ReviewIntegrationTests {
 
     @Test
     void shouldCreateAndRetrieveReviewViaHttp() throws Exception {
-        
+       
         ReviewDTO reviewToCreate = new ReviewDTO();
         reviewToCreate.setStudentMatrNr("12345678");
         reviewToCreate.setCourseId("IN2000");
@@ -65,6 +65,7 @@ class ReviewIntegrationTests {
                 .andExpect(jsonPath("$.rating").value(5))
                 .andExpect(jsonPath("$.reviewText").value("Excellent course, highly recommended!"))
                 .andExpect(jsonPath("$.createdAt").exists()); 
-                
+            
     }
+                
 }

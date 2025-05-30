@@ -1,6 +1,5 @@
 package com.team.review_service.mapper;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
