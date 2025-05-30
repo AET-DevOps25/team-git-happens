@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,13 +37,16 @@ public class ReviewControllerTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private ReviewService reviewService; 
+    private ReviewService reviewService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    private ReviewDTO reviewDTO1;
-    private Review review1;
+    private ReviewDTO reviewResponseDTO; 
+    private Review reviewEntity;  
+    private LocalDateTime fixedCreationTime = LocalDateTime.of(2024, 1, 1, 12, 0, 0);
+    private String fixedCreationTimeString = fixedCreationTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
 
     @TestConfiguration
     static class ControllerTestConfig {
@@ -54,39 +58,62 @@ public class ReviewControllerTests {
 
     @BeforeEach
     void setUp() {
-        reviewDTO1 = new ReviewDTO(1, "IN2000", "01234567", (byte) 4, "Great course!", LocalDateTime.now());
-        review1 = ReviewMapper.toEntity(reviewDTO1); 
+        // reviewEntity is what the mocked service will work with and return.
+        reviewEntity = new Review();
+        reviewEntity.setReviewId(1);
+        reviewEntity.setCourseId("IN2000");
+        reviewEntity.setStudentMatrNr("01234567");
+        reviewEntity.setRating((byte) 4);
+        reviewEntity.setReviewText("Great course!");
+        reviewEntity.setCreatedAt(fixedCreationTime);
+
+        // reviewResponseDTO is what the controller is expected to return, mapped from reviewEntity.
+        reviewResponseDTO = ReviewMapper.toDto(reviewEntity); 
     }
 
     @Test
     void createReview_whenValidInput_shouldReturnCreatedReview() throws Exception {
-        given(reviewService.create(any(Review.class))).willReturn(Optional.of(review1));
+        // DTO for the request body, typically ID and createdAt are null or not set by client.
+        ReviewDTO requestDto = new ReviewDTO(null, "IN2000", "01234567", (byte) 4, "Great course!", null);
+
+        // Mock the service to return the reviewEntity (which has ID and createdAt set)
+        given(reviewService.create(any(Review.class))).willReturn(Optional.of(reviewEntity));
 
         mockMvc.perform(post("/reviews")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(reviewDTO1)))
+                        .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.reviewId").value(reviewDTO1.getReviewId()))
-                .andExpect(jsonPath("$.studentMatrNr").value(reviewDTO1.getStudentMatrNr()));
+                .andExpect(jsonPath("$.reviewId").value(reviewEntity.getReviewId()))
+                .andExpect(jsonPath("$.studentMatrNr").value(requestDto.getStudentMatrNr()))
+                .andExpect(jsonPath("$.courseId").value(requestDto.getCourseId()))
+                .andExpect(jsonPath("$.rating").value((int) requestDto.getRating()))
+                .andExpect(jsonPath("$.reviewText").value(requestDto.getReviewText()))
+                .andExpect(jsonPath("$.createdAt").value(fixedCreationTimeString));
     }
 
     @Test
     void createReview_whenServiceReturnsEmpty_shouldReturnBadRequest() throws Exception {
+        ReviewDTO requestDto = new ReviewDTO(null, "IN2000", "01234567", (byte) 4, "Great course!", null);
         given(reviewService.create(any(Review.class))).willReturn(Optional.empty());
 
         mockMvc.perform(post("/reviews")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(reviewDTO1)))
+                        .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void getReviewById_whenReviewExists() throws Exception {
-        given(reviewService.getReviewById(1)).willReturn(Optional.of(review1));
+        given(reviewService.getReviewById(1)).willReturn(Optional.of(reviewEntity));
 
         mockMvc.perform(get("/reviews/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.reviewId").value(reviewDTO1.getReviewId()));
+                .andExpect(jsonPath("$.reviewId").value(reviewEntity.getReviewId()))
+                .andExpect(jsonPath("$.courseId").value(reviewEntity.getCourseId()))
+                .andExpect(jsonPath("$.studentMatrNr").value(reviewEntity.getStudentMatrNr()))
+                .andExpect(jsonPath("$.rating").value((int) reviewEntity.getRating()))
+                .andExpect(jsonPath("$.reviewText").value(reviewEntity.getReviewText()))
+                .andExpect(jsonPath("$.createdAt").value(fixedCreationTimeString));
     }
 
     @Test
@@ -99,13 +126,16 @@ public class ReviewControllerTests {
 
     @Test
     void getReviewsByCourseId() throws Exception {
-        given(reviewService.getReviewsByCourseId("IN2000")).willReturn(List.of(review1));
+        given(reviewService.getReviewsByCourseId("IN2000")).willReturn(List.of(reviewEntity));
 
         mockMvc.perform(get("/courses/IN2000/reviews"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].courseId").value("IN2000"));
+                .andExpect(jsonPath("$[0].reviewId").value(reviewEntity.getReviewId()))
+                .andExpect(jsonPath("$[0].courseId").value(reviewEntity.getCourseId()))
+                .andExpect(jsonPath("$[0].studentMatrNr").value(reviewEntity.getStudentMatrNr()))
+                .andExpect(jsonPath("$[0].createdAt").value(fixedCreationTimeString));
     }
-    
+
     @Test
     void getReviewsByCourseId_NoReviews() throws Exception {
         given(reviewService.getReviewsByCourseId("INXXXX")).willReturn(Collections.emptyList());
@@ -117,11 +147,13 @@ public class ReviewControllerTests {
 
     @Test
     void getReviewsByStudentMatrNr() throws Exception {
-        given(reviewService.getReviewsByStudentMatrNr("01234567")).willReturn(List.of(review1));
+        given(reviewService.getReviewsByStudentMatrNr("01234567")).willReturn(List.of(reviewEntity));
 
         mockMvc.perform(get("/students/01234567/reviews"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].studentMatrNr").value("01234567"));
+                .andExpect(jsonPath("$[0].reviewId").value(reviewEntity.getReviewId()))
+                .andExpect(jsonPath("$[0].studentMatrNr").value(reviewEntity.getStudentMatrNr()))
+                .andExpect(jsonPath("$[0].createdAt").value(fixedCreationTimeString));
     }
 
     @Test

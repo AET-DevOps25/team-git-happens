@@ -35,6 +35,8 @@ public class ReviewServiceTests {
 
     private Review review1;
     private Review review2;
+    private LocalDateTime fixedTime1 = LocalDateTime.of(2024, 1, 1, 10, 0, 0);
+    private LocalDateTime fixedTime2 = LocalDateTime.of(2024, 1, 2, 11, 0, 0);
 
     @BeforeEach
     void setUp() {
@@ -44,7 +46,7 @@ public class ReviewServiceTests {
         review1.setCourseId("IN2000");
         review1.setRating((byte) 4);
         review1.setReviewText("Great course!");
-        review1.setCreatedAt(LocalDateTime.now().minusDays(1));
+        review1.setCreatedAt(fixedTime1); 
 
         review2 = new Review();
         review2.setReviewId(2);
@@ -52,7 +54,7 @@ public class ReviewServiceTests {
         review2.setCourseId("IN2000");
         review2.setRating((byte) 5);
         review2.setReviewText("Excellent!");
-        review2.setCreatedAt(LocalDateTime.now());
+        review2.setCreatedAt(fixedTime2); 
     }
 
     @Test
@@ -154,7 +156,7 @@ public class ReviewServiceTests {
 
 
     @Test
-    void deleteReview_shouldCallRepositoryDeleteById() { // Renamed for clarity
+    void deleteReview_shouldCallRepositoryDeleteById() {
         Integer reviewIdToDelete = 1;
         doNothing().when(reviewRepository).deleteById(reviewIdToDelete);
 
@@ -165,12 +167,12 @@ public class ReviewServiceTests {
 
     @Test
     void deleteReview_whenDeletingNonExistentId_shouldCallRepositoryDeleteByIdAndNotThrowError() {
-        Integer reviewIdToDelete = 999; // A non-existent ID
-        doNothing().when(reviewRepository).deleteById(reviewIdToDelete); // Mocking the repository call
+        Integer reviewIdToDelete = 999; 
+        doNothing().when(reviewRepository).deleteById(reviewIdToDelete); 
 
         // We expect no exception to be thrown by the service
         assertDoesNotThrow(() -> reviewService.deleteReview(reviewIdToDelete));
 
-        verify(reviewRepository).deleteById(reviewIdToDelete); // Verify it was still called
+        verify(reviewRepository).deleteById(reviewIdToDelete);
     }
 }
