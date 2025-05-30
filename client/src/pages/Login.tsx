@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuthStore } from '@/services/AuthService';
 import { toast } from 'sonner';
-import { GraduationCap } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
