@@ -99,11 +99,22 @@ jobs:
           dockerize -wait tcp://localhost:3000 -timeout 1m
           dockerize -wait tcp://localhost:8000 -timeout 1m
 
+      - name: Test course-service
+        working-directory: ./server/course-service
+        run: ./gradlew test --no-daemon
+
+      - name: Test authentication-service
+        working-directory: ./server/authentication-service
+        run: ./gradlew test --no-daemon
+
+      - name: Test recommendation-gateway
+        working-directory: ./server/recommendation-gateway
+        run: ./gradlew test --no-daemon
+
       - name: Run end-to-end tests
         run: |
-          # Add commands to run your end-to-end tests here
           echo "Running end-to-end tests..."
-          # Example: docker-compose exec web npm run e2e
+          # Beispiel: docker-compose exec web npm run e2e
 
       - name: Shut down services
         run: docker-compose down
