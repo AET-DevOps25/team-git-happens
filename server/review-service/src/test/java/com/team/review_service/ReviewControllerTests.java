@@ -3,7 +3,6 @@ package com.team.review_service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.review_service.controller.ReviewController;
 import com.team.review_service.dto.ReviewDTO;
-import com.team.review_service.mapper.ReviewMapper;
 import com.team.review_service.model.Review;
 import com.team.review_service.service.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +41,6 @@ public class ReviewControllerTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private ReviewDTO reviewResponseDTO; 
     private Review reviewEntity;  
     private LocalDateTime fixedCreationTime = LocalDateTime.of(2024, 1, 1, 12, 0, 0);
     private String fixedCreationTimeString = fixedCreationTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -67,8 +65,6 @@ public class ReviewControllerTests {
         reviewEntity.setReviewText("Great course!");
         reviewEntity.setCreatedAt(fixedCreationTime);
 
-        // reviewResponseDTO is what the controller is expected to return, mapped from reviewEntity.
-        reviewResponseDTO = ReviewMapper.toDto(reviewEntity); 
     }
 
     @Test
