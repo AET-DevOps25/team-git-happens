@@ -3,7 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.4.5'
     id 'io.spring.dependency-management' version '1.1.7'
     // Flyway Gradle plugin (kept on 9.x so it matches the Flyway core version below)
-    id 'org.flywaydb.flyway' version '9.22.3'
+    //id 'org.flywaydb.flyway' version '9.22.3'
 }
 
 group = 'com.team'
@@ -21,13 +21,6 @@ repositories {
     mavenCentral()
 }
 
-/*
- * Extra configuration whose jars are put on Flyway's *task* class‑path.
- * The plugin will scan any configuration listed in flyway.configurations below.
- */
-configurations {
-    flywayMigration
-}
 
 dependencies {
     /* --- Spring Boot --- */
@@ -43,8 +36,8 @@ dependencies {
     runtimeOnly  'com.mysql:mysql-connector-j:8.4.0'
 
     /* --- Flyway Gradle tasks (repair / migrate / clean) --- */
-    flywayMigration 'org.flywaydb:flyway-mysql:9.22.3'
-    flywayMigration 'com.mysql:mysql-connector-j:8.4.0'
+    //flywayMigration 'org.flywaydb:flyway-mysql:9.22.3'
+    //flywayMigration 'com.mysql:mysql-connector-j:8.4.0'
 
     /* --- API documentation --- */
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.21'
@@ -60,29 +53,6 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // Or jjwt-gson if you prefer Gson
-}
-
-/*
- * Flyway settings that Gradle tasks (flywayClean, flywayMigrate, …) will use.
- * The Spring Boot application can still override these through application.yml /
- * environment variables – they are independent.
- */
-flyway {
-    // class‑paths that Flyway will scan for migrations, database‑type jars, etc.
-    configurations = [ 'compileClasspath', 'flywayMigration' ]
-
-    url      = 'jdbc:mysql://localhost:3306/authdb?useSSL=false&serverTimezone=UTC'
-    user     = 'admin'
-    password = 'authpass'
-
-    schemas  = [ 'authdb' ]
-    locations = [ 'classpath:db/migration' ]
-
-    /*
-     * Allows Flyway to start on an existing schema by inserting a synthetic baseline row
-     * (prevents "Schema history table does not exist" errors).
-     */
-    baselineOnMigrate = true
 }
 
 tasks.named('test') {

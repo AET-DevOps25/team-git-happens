@@ -72,6 +72,24 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate 
       SPRING_FLYWAY_ENABLED: true 
 
+  review-service:
+    build:
+      context: ./server/review-service
+      dockerfile: Dockerfile
+    container_name: review_service_app
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8087:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/review_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true 
+      SPRING_DATASOURCE_USERNAME: admin 
+      SPRING_DATASOURCE_PASSWORD: githappens!
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate 
+      SPRING_FLYWAY_ENABLED: true
+
   flyway_course:
     image: flyway/flyway:9
     command: migrate
@@ -101,5 +119,21 @@ services:
       FLYWAY_CLEAN_DISABLED: "false"      # ← enable clean    
     volumes:
       - ./server/authentication-service/src/main/resources/db/migration:/flyway/sql
+
+  flyway_review:
+    image: flyway/flyway:9
+    command: migrate
+    container_name: flyway_review_cli
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:mysql://db:3306/review_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      FLYWAY_USER: admin
+      FLYWAY_PASSWORD: githappens!
+      FLYWAY_CLEAN_DISABLED: "false"          
+    volumes:
+      - ./server/review-service/src/main/resources/db/migration:/flyway/sql
+      
 volumes:
   mysql_data:
