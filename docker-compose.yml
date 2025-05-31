@@ -80,6 +80,7 @@ services:
       restart: unless-stopped
       depends_on:
         - db
+        - course-service 
   
 
 volumes:
