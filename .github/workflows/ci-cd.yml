@@ -1,0 +1,100 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ recommendation-gateway-setup ]
+  pull_request:
+    branches: [ recommendation-gateway-setup ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: githappens!
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pgithappens!" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install client dependencies
+        working-directory: ./client
+        run: npm ci
+
+      - name: Run client tests
+        working-directory: ./client
+        run: npm test -- --watchAll=false
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build & test course-service
+        working-directory: ./server/course-service
+        run: ./gradlew build --no-daemon
+
+      - name: Build & test authentication-service
+        working-directory: ./server/authentication-service
+        run: ./gradlew build --no-daemon
+
+      - name: Build & test recommendation-gateway
+        working-directory: ./server/recommendation-gateway
+        run: ./gradlew build --no-daemon
+
+      - name: Build genai-service Docker image
+        working-directory: ./genai-service
+        run: docker build -t genai-service .
+
+      - name: Build client Docker image
+        working-directory: ./client
+        run: docker build -t client-app .
+
+      - name: Build course-service Docker image
+        working-directory: ./server/course-service
+        run: docker build -t course-service .
+
+      - name: Build authentication-service Docker image
+        working-directory: ./server/authentication-service
+        run: docker build -t authentication-service .
+
+      - name: Build recommendation-gateway Docker image
+        working-directory: ./server/recommendation-gateway
+        run: docker build -t recommendation-gateway .
+
+      - name: Run Docker Compose
+        run: docker-compose up -d
+
+      - name: Wait for services to be healthy
+        run: |
+          dockerize -wait tcp://localhost:3306 -timeout 1m
+          dockerize -wait tcp://localhost:8080 -timeout 1m
+          dockerize -wait tcp://localhost:8081 -timeout 1m
+          dockerize -wait tcp://localhost:8082 -timeout 1m
+          dockerize -wait tcp://localhost:5000 -timeout 1m
+
+      - name: Run end-to-end tests
+        run: |
+          # Add commands to run your end-to-end tests here
+          echo "Running end-to-end tests..."
+          # Example: docker-compose exec web npm run e2e
+
+      - name: Shut down services
+        run: docker-compose down
+
