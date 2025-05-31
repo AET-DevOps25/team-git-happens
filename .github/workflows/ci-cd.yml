@@ -78,6 +78,12 @@ jobs:
         working-directory: ./server/recommendation-gateway
         run: docker build -t recommendation-gateway .
 
+      # Docker Compose installieren (vor dem ersten docker-compose-Befehl)
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
       - name: Run Docker Compose
         run: docker-compose up -d
 
