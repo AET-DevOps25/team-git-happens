@@ -84,6 +84,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      - name: Install dockerize
+        run: |
+          wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz
+          tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz
+
       - name: Run Docker Compose
         run: docker-compose up -d
 
