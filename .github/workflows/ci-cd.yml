@@ -96,7 +96,6 @@ jobs:
         run: |
           dockerize -wait tcp://localhost:3306 -timeout 1m
           dockerize -wait tcp://localhost:8085 -timeout 1m
-          dockerize -wait tcp://localhost:8081 -timeout 1m
           dockerize -wait tcp://localhost:8082 -timeout 1m
           dockerize -wait tcp://localhost:5000 -timeout 1m
 
