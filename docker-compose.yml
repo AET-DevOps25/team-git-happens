@@ -88,7 +88,7 @@ services:
       SPRING_DATASOURCE_USERNAME: admin 
       SPRING_DATASOURCE_PASSWORD: githappens!
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate 
-      SPRING_FLYWAY_ENABLED: true
+      SPRING_FLYWAY_ENABLED: "true"
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
 
   flyway_course:
