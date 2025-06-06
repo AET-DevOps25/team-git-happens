@@ -12,7 +12,7 @@ public class RecommendationController {
     @PostMapping
     public ResponseEntity<String> getRecommendation(@RequestBody Map<String, Object> payload) {
         // AI-Microservice Endpoint
-        String aiUrl = "http://localhost:8000/frage";
+        String aiUrl = "http://localhost:8000/question";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();

@@ -8,20 +8,27 @@ from langchain_core.documents import Document
 import os
 import requests
 
-os.environ["HUGGINGFACEHUB_API_TOKEN"] = "your tocken"
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = "ADD_Your_Token"
 
 app = FastAPI()
 
-class FrageRequest(BaseModel):
-    frage: str
+class QuestionRequest(BaseModel):
+    question: str
 
 def build_rag_chain():
-    # Die Kurse JETZT holen, nicht beim Start!
-    response = requests.get("http://course-service:8080/courses")
-    courses = response.json()
+    response_courses = requests.get("http://course-service:8080/courses")
+    courses = response_courses.json()
+
+    response_reviews = requests.get("http://review-service:8080/reviews")
+    reviews = response_reviews.json()
+
+
     documents = []
     for course in courses:
-        text = f"{course['title']} {course['description']} Credits: {course['credits']}"
+
+        course_reviews = [r for r in reviews if r["courseId"] == course["id"]]
+        review_texts = " ".join([r["reviewText"] for r in course_reviews])
+        text = f"{course['title']} {course['description']} Credits: {course['credits']} Reviews: {review_texts}"
         documents.append(Document(page_content=text, metadata={"id": course["id"]}))
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     chunks = splitter.split_documents(documents)
@@ -39,8 +46,8 @@ def build_rag_chain():
     )
     return qa_chain
 
-@app.post("/frage")
-def frage_beantworten(req: FrageRequest):
+@app.post("/question")
+def answer_question(req: QuestionRequest):
     qa_chain = build_rag_chain()
-    antwort = qa_chain.run(req.frage)
-    return {"antwort": antwort}
+    answer = qa_chain.run(req.question)
+    return {"answer": answer}
