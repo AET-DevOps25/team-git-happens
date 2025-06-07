@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Star } from 'lucide-react';
 
@@ -42,18 +41,26 @@ const StarRating = ({
         const filled = (hoverRating || value) >= rating;
         
         return (
-          <Star
+          <button
             key={i}
-            size={18}
-            className={`
-              ${filled ? 'text-tum-yellow fill-tum-yellow' : 'text-gray-300'} 
-              ${!readonly ? 'cursor-pointer' : ''}
-              transition-colors
-            `}
+            type="button" // Important for buttons within forms
+            aria-label={`Rate ${rating} out of ${max} stars`}
+            title={`Rate ${rating} out of ${max} stars`}
             onClick={() => handleClick(rating)}
             onMouseEnter={() => handleMouseEnter(rating)}
             onMouseLeave={() => handleMouseLeave()}
-          />
+            // Minimal styling to make the button itself invisible
+            className={`p-0 m-0 bg-transparent border-none ${!readonly ? 'cursor-pointer' : ''}`}
+          >
+            <Star
+              // Removed onClick, onMouseEnter, onMouseLeave from Star itself
+              size={18}
+              className={`
+                ${filled ? 'text-tum-yellow fill-tum-yellow' : 'text-gray-300'} 
+                transition-colors
+              `}
+            />
+          </button>
         );
       })}
     </div>
