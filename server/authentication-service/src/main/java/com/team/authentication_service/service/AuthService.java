@@ -33,12 +33,12 @@ public class AuthService {
     }
 
 
-    public StudentDTO getStudentByMatriculationNumber(String matriculationNumber) {
+    public Optional<StudentDTO> getStudentByMatriculationNumber(String matriculationNumber) {
         Optional<Student> studentOptional = studentsRepo.findByMatriculationNumber(matriculationNumber);
         if (studentOptional.isEmpty()) {
-            return null; 
+            return Optional.empty(); 
         }
-        return StudentMapper.toDTO(studentOptional.get());
+        return Optional.of(StudentMapper.toDTO(studentOptional.get()));
     }
 
     public StudentDTO registerStudent(String matriculationNumber, String name, String email, String password) {
