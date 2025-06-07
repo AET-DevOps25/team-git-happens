@@ -9,6 +9,7 @@ import com.team.authentication_service.model.Student;
 import com.team.authentication_service.repository.StudentRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +30,15 @@ public class AuthService {
                 .stream()
                 .map(StudentMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+
+    public Optional<StudentDTO> getStudentByMatriculationNumber(String matriculationNumber) {
+        Optional<Student> studentOptional = studentsRepo.findByMatriculationNumber(matriculationNumber);
+        if (studentOptional.isEmpty()) {
+            return Optional.empty(); 
+        }
+        return Optional.of(StudentMapper.toDTO(studentOptional.get()));
     }
 
     public StudentDTO registerStudent(String matriculationNumber, String name, String email, String password) {

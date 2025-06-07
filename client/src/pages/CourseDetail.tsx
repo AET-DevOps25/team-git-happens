@@ -80,7 +80,7 @@ const CourseDetail = () => {
 
     try {
       setSubmitting(true);
-      const newReviewData: Omit<ReviewDTO, 'id' | 'createdAt'> = {
+      const newReviewData: Omit<ReviewDTO, 'reviewId' | 'createdAt'> = {
         studentMatrNr: student.matriculationNumber,
         courseId: course.id,
         rating,
@@ -201,7 +201,7 @@ const CourseDetail = () => {
           ) : (
             <div className="space-y-4">
               {reviews.map(review => (
-                <ReviewCard key={review.id} review={review} />
+                <ReviewCard key={review.reviewId} review={review} />
               ))}
             </div>
           )}
