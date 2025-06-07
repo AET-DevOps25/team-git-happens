@@ -8,7 +8,7 @@ services:
       # MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD are removed here
       # as we'll use init scripts for more granular control.
     ports:
-      - "3307:x"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       # Mount a directory for SQL initialization scripts
