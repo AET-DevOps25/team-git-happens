@@ -77,7 +77,20 @@ describe('CourseDetail Page', () => {
     mockGetReviewsByCourseId.mockReset();
     mockAddReview.mockReset();
     mockUseAuthStore.mockReturnValue({ student: mockStudent, isAuthenticated: true });
-    mockGetStudentByMatriculationNumber.mockResolvedValue(mockStudent); // Default mock implementation
+    // Mock getStudentByMatriculationNumber to return an Optional with the mockStudent
+    mockGetStudentByMatriculationNumber.mockResolvedValue({
+      isPresent: () => true,
+      get: () => mockStudent,
+      orElse: (defaultValue) => mockStudent,
+      map: (fn) => ({ 
+        isPresent: () => true, 
+        get: () => fn(mockStudent),
+        orElse: (defaultValue) => fn(mockStudent),
+        map: jest.fn(),
+        flatMap: jest.fn()
+      }),
+      flatMap: jest.fn()
+    });
     jest.clearAllMocks();
   });
 
@@ -95,9 +108,24 @@ describe('CourseDetail Page', () => {
     mockGetReviewsByCourseId.mockResolvedValue(mockReviews);
     // Specific mock for this test if needed, otherwise default from beforeEach is used
     mockGetStudentByMatriculationNumber.mockImplementation(async (matrNr) => {
-      if (matrNr === '12345678') return { ...mockStudent, name: 'Student One' };
-      if (matrNr === '87654321') return { ...mockStudent, name: 'Student Two' };
-      return mockStudent; // Default fallback
+      let student;
+      if (matrNr === '12345678') student = { ...mockStudent, name: 'Student One' };
+      else if (matrNr === '87654321') student = { ...mockStudent, name: 'Student Two' };
+      else student = mockStudent; // Default fallback
+      
+      return {
+        isPresent: () => true,
+        get: () => student,
+        orElse: (defaultValue) => student,
+        map: (fn) => ({ 
+          isPresent: () => true, 
+          get: () => fn(student),
+          orElse: (defaultValue) => fn(student),
+          map: jest.fn(),
+          flatMap: jest.fn()
+        }),
+        flatMap: jest.fn()
+      };
     });
 
     await act(async () => {

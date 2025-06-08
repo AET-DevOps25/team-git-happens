@@ -2,6 +2,7 @@ package com.team.authentication_service.controller;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,11 +47,11 @@ public class AuthController {
 
     @GetMapping("/students/{matriculationNumber}")
     public ResponseEntity<StudentDTO> getStudentByMatriculationNumber(@PathVariable String matriculationNumber) {
-        StudentDTO studentDTO = auth.getStudentByMatriculationNumber(matriculationNumber);
-        if (studentDTO == null) {
-            return ResponseEntity.notFound().build();
+        Optional<StudentDTO> studentDTO = auth.getStudentByMatriculationNumber(matriculationNumber);
+        if (!studentDTO.isEmpty()) {
+            return ResponseEntity.ok(studentDTO.get());
         }
-        return ResponseEntity.ok(studentDTO);
+        return ResponseEntity.notFound().build();
     }
     
     @Operation(summary = "Register a new student",

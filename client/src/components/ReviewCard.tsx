@@ -34,9 +34,12 @@ const ReviewCard = ({ review }: ReviewCardProps) => {
         if (currentUser && review.studentMatrNr === currentUser.matriculationNumber) {
           setStudentDisplayName(currentUser.name);
         } else if (review.studentMatrNr) {
-          // Fetch other student's name using StudentService
-          const student = await StudentService.getStudentByMatriculationNumber(review.studentMatrNr);
-          setStudentDisplayName(student?.name || review.studentMatrNr); // Fallback to matrNr if name not found
+          const studentOptional = await StudentService.getStudentByMatriculationNumber(review.studentMatrNr);
+          setStudentDisplayName(
+            studentOptional.isPresent() 
+              ? studentOptional.get().name 
+              : review.studentMatrNr
+          ); // Fallback to matrNr if name not found
         } else {
           setStudentDisplayName("Unknown Student"); // Fallback if no matriculation number
         }
