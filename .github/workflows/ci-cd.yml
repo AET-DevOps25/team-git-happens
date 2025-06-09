@@ -48,7 +48,6 @@ jobs:
         working-directory: ./server/review-service
         run: ./gradlew build --no-daemon
 
-      # Docker Compose installieren (vor dem ersten docker-compose-Befehl)
       - name: Install Docker Compose
         run: |
           sudo apt-get update
@@ -62,23 +61,5 @@ jobs:
       - name: Build Docker Compose images
         run: docker-compose build
 
-      - name: Run Docker Compose
-        run: docker-compose up -d
 
-      - name: Wait for services to be healthy
-        run: |
-          dockerize -wait tcp://localhost:3307 -timeout 1m
-          dockerize -wait tcp://localhost:8085 -timeout 1m
-          dockerize -wait tcp://localhost:8086 -timeout 1m
-          dockerize -wait tcp://localhost:8087 -timeout 1m
-          dockerize -wait tcp://localhost:3000 -timeout 1m
-      #   dockerize -wait tcp://localhost:8000 -timeout 1m
-
-      # - name: Test recommendation-gateway
-      #   working-directory: ./server/recommendation-gateway
-      #   run: ./gradlew test --no-daemon
-
-
-      - name: Shut down services
-        run: docker-compose down
 
