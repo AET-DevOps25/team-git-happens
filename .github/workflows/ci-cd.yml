@@ -48,30 +48,6 @@ jobs:
         working-directory: ./server/review-service
         run: ./gradlew build --no-daemon
 
-      # - name: Build genai-service Docker image
-      #   working-directory: ./genai-service
-      #   run: docker build -t genai-service .
-
-      - name: Build client Docker image
-        working-directory: ./client
-        run: docker build -t client-app .
-
-      - name: Build course-service Docker image
-        working-directory: ./server/course-service
-        run: docker build -t course-service .
-
-      - name: Build authentication-service Docker image
-        working-directory: ./server/authentication-service
-        run: docker build -t authentication-service .
-
-      # - name: Build recommendation-gateway Docker image
-      #   working-directory: ./server/recommendation-gateway
-      #   run: docker build -t recommendation-gateway .
-
-      - name: Build review-service Docker image
-        working-directory: ./server/review-service
-        run: docker build -t review-service .
-
       # Docker Compose installieren (vor dem ersten docker-compose-Befehl)
       - name: Install Docker Compose
         run: |
@@ -83,6 +59,9 @@ jobs:
           wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz
           tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz
 
+      - name: Build Docker images
+        run: docker-compose build
+        
       - name: Run Docker Compose
         run: docker-compose up --abort-on-container-exit e2e
 
