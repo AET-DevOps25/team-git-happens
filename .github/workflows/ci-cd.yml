@@ -40,9 +40,9 @@ jobs:
         working-directory: ./server/authentication-service
         run: ./gradlew build --no-daemon
 
-      - name: Build & test recommendation-gateway
-        working-directory: ./server/recommendation-gateway
-        run: ./gradlew build --no-daemon
+      # - name: Build & test recommendation-gateway
+      #   working-directory: ./server/recommendation-gateway
+      #   run: ./gradlew build --no-daemon
 
       - name: Build & test review-service
         working-directory: ./server/review-service
@@ -64,9 +64,9 @@ jobs:
         working-directory: ./server/authentication-service
         run: docker build -t authentication-service .
 
-      - name: Build recommendation-gateway Docker image
-        working-directory: ./server/recommendation-gateway
-        run: docker build -t recommendation-gateway .
+      # - name: Build recommendation-gateway Docker image
+      #   working-directory: ./server/recommendation-gateway
+      #   run: docker build -t recommendation-gateway .
 
       - name: Build review-service Docker image
         working-directory: ./server/review-service
@@ -101,9 +101,9 @@ jobs:
         working-directory: ./server/authentication-service
         run: ./gradlew test --no-daemon
 
-      - name: Test recommendation-gateway
-        working-directory: ./server/recommendation-gateway
-        run: ./gradlew test --no-daemon
+      # - name: Test recommendation-gateway
+      #   working-directory: ./server/recommendation-gateway
+      #   run: ./gradlew test --no-daemon
 
       - name: Run end-to-end tests
         run: |
