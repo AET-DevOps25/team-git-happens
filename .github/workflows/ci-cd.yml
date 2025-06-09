@@ -59,11 +59,11 @@ jobs:
           wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz
           tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz
 
-      - name: Build Docker images
+      - name: Build Docker Compose images
         run: docker-compose build
-        
+
       - name: Run Docker Compose
-        run: docker-compose up --abort-on-container-exit e2e
+        run: docker-compose up -d
 
       - name: Wait for services to be healthy
         run: |
