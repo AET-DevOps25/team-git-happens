@@ -1,10 +1,9 @@
 name: CI/CD Pipeline
 #test
-on:
-  push:
-    branches: [ recommendation-gateway-setup ]
-  pull_request:
-    branches: [ recommendation-gateway-setup ]
+on: [
+  push,
+  pull_request
+]
 
 jobs:
   build-and-test:
