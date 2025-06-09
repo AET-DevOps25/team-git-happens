@@ -48,9 +48,9 @@ jobs:
         working-directory: ./server/review-service
         run: ./gradlew build --no-daemon
 
-      - name: Build genai-service Docker image
-        working-directory: ./genai-service
-        run: docker build -t genai-service .
+      # - name: Build genai-service Docker image
+      #   working-directory: ./genai-service
+      #   run: docker build -t genai-service .
 
       - name: Build client Docker image
         working-directory: ./client
