@@ -90,7 +90,7 @@ jobs:
         if: ${{ failure() }}
         run: |
           echo "::group::Review-service logs"
-          docker-compose logs review-service
+          docker compose logs review-service
           echo "::endgroup::"
 
       - name: Wait for services to be healthy
