@@ -84,7 +84,7 @@ jobs:
           tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz
 
       - name: Run Docker Compose
-        run: docker-compose up 
+        run: docker-compose up --abort-on-container-exit e2e
 
       - name: Wait for services to be healthy
         run: |
