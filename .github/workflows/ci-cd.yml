@@ -84,14 +84,7 @@ jobs:
           tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz
 
       - name: Run Docker Compose
-        run: docker-compose up -d
-
-      - name: Dump review-service logs on failure
-        if: ${{ failure() }}
-        run: |
-          echo "::group::Review-service logs"
-          docker compose logs review-service
-          echo "::endgroup::"
+        run: docker-compose up 
 
       - name: Wait for services to be healthy
         run: |
