@@ -1,0 +1,90 @@
+name: CI/CD Pipeline
+on: [
+  push,
+  pull_request
+]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install client dependencies
+        working-directory: ./client
+        run: npm ci
+
+      - name: Run client tests
+        working-directory: ./client
+        run: npm test -- --watchAll=false
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build & test course-service
+        working-directory: ./server/course-service
+        run: ./gradlew build --no-daemon
+
+      - name: Build & test authentication-service
+        working-directory: ./server/authentication-service
+        run: ./gradlew build --no-daemon
+
+      # - name: Build & test recommendation-gateway
+      #   working-directory: ./server/recommendation-gateway
+      #   run: ./gradlew build --no-daemon
+
+      - name: Build & test review-service
+        working-directory: ./server/review-service
+        run: ./gradlew build --no-daemon
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build client image
+        run: docker build -t ghcr.io/aet-devops25/team-git-happens/client:latest ./client
+
+      - name: Push client image
+        run: docker push ghcr.io/aet-devops25/team-git-happens/client:latest
+
+      - name: Build course-service image
+        run: docker build -t ghcr.io/aet-devops25/team-git-happens/course:latest ./server/course-service
+
+      - name: Push course-service image
+        run: docker push ghcr.io/aet-devops25/team-git-happens/course:latest
+
+      - name: Build authentication-service image
+        run: docker build -t ghcr.io/aet-devops25/team-git-happens/authentication:latest ./server/authentication-service
+
+      - name: Push authentication-service image
+        run: docker push ghcr.io/aet-devops25/team-git-happens/authentication:latest
+
+      - name: Build review-service image
+        run: docker build -t ghcr.io/aet-devops25/team-git-happens/review:latest ./server/review-service
+
+      - name: Push review-service image
+        run: docker push ghcr.io/aet-devops25/team-git-happens/review:latest
+
+      # - name: Build recommendation-gateway image
+      #   run: docker build -t ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest ./server/recommendation-gateway  
+      
+      # - name: Push recommendation-gateway image
+      #   run: docker push ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest
+
+    
+
+
+

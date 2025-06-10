@@ -21,6 +21,7 @@ services:
       start_period: 30s
 
   client-app:
+    image: ghcr.io/aet-devops25/team-git-happens/client:latest
     build:
       context: ./client
       dockerfile: Dockerfile
@@ -32,6 +33,7 @@ services:
       - course-service 
 
   course-service:
+    image: ghcr.io/aet-devops25/team-git-happens/course:latest
     build:
       context: ./server/course-service
       dockerfile: Dockerfile
@@ -47,12 +49,13 @@ services:
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: githappens! 
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_FLYWAY_ENABLED: true
+      SPRING_FLYWAY_ENABLED: "true"
       # SPRING_FLYWAY_USER: ${SPRING_DATASOURCE_USERNAME} # Flyway will use datasource user/pass
       # SPRING_FLYWAY_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       # SPRING_FLYWAY_URL: ${SPRING_DATASOURCE_URL}
 
   authentication-service: 
+    image: ghcr.io/aet-devops25/team-git-happens/authentication:latest
     build:
       context: ./server/authentication-service 
       dockerfile: Dockerfile
@@ -68,9 +71,10 @@ services:
       SPRING_DATASOURCE_USERNAME: admin 
       SPRING_DATASOURCE_PASSWORD: githappens!
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate 
-      SPRING_FLYWAY_ENABLED: true 
+      SPRING_FLYWAY_ENABLED: "true" 
 
   review-service:
+    image: ghcr.io/aet-devops25/team-git-happens/review:latest
     build:
       context: ./server/review-service
       dockerfile: Dockerfile
@@ -88,7 +92,7 @@ services:
       SPRING_DATASOURCE_USERNAME: admin 
       SPRING_DATASOURCE_PASSWORD: githappens!
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate 
-      SPRING_FLYWAY_ENABLED: true
+      SPRING_FLYWAY_ENABLED: "true"
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
 
   flyway_course:
