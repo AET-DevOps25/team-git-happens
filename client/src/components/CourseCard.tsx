@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import StarRating from './StarRating';
+import { useEffect, useState } from 'react';
+import { ReviewService } from '@/services/ReviewService';
 
 interface CourseCardProps {
   course: CourseDTO;
@@ -11,6 +13,22 @@ interface CourseCardProps {
 }
 
 const CourseCard = ({ course, showDetails = true }: CourseCardProps) => {
+  const [averageRating, setAverageRating] = useState<number | undefined>(undefined);
+  
+  useEffect(() => {
+    const fetchAverageRating = async () => {
+      try {
+        console.log(`Fetching average rating for course ${course.id}`);
+        const rating = await ReviewService.getAverageRatingByCourseId(course.id);
+        console.log(`Received rating for course ${course.id}:`, rating);
+        setAverageRating(rating);
+      } catch (error) {
+        console.error(`Failed to fetch average rating for course ${course.id}:`, error);
+      }
+    };
+    
+    fetchAverageRating();
+  }, [course.id]);
   return (
     <Link to={`/courses/${course.id}`}>
       <Card className="h-full card-hover">
@@ -38,8 +56,11 @@ const CourseCard = ({ course, showDetails = true }: CourseCardProps) => {
         </CardContent>
         <CardFooter className="flex justify-between">
           <div className="flex items-center">
-            <StarRating value={course.avgRating || 0} readonly />
-            <span className="ml-2 text-sm">({course.avgRating?.toFixed(1)})</span>
+            {/* Make sure we have a valid number for the star rating */}
+            <StarRating value={averageRating !== undefined ? Number(averageRating) : 0} readonly />
+            <span className="ml-2 text-sm">
+              {averageRating !== undefined ? Number(averageRating).toFixed(1) : 'N/A'}
+            </span>
           </div>
           <div className="flex items-center text-sm text-muted-foreground">
             <BookOpen size={16} className="mr-1" />

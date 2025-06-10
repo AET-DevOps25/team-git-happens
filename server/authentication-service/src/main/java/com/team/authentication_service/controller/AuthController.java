@@ -2,11 +2,13 @@ package com.team.authentication_service.controller;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +45,15 @@ public class AuthController {
         return ResponseEntity.ok(student);
     }
 
+    @GetMapping("/students/{matriculationNumber}")
+    public ResponseEntity<StudentDTO> getStudentByMatriculationNumber(@PathVariable String matriculationNumber) {
+        Optional<StudentDTO> studentDTO = auth.getStudentByMatriculationNumber(matriculationNumber);
+        if (!studentDTO.isEmpty()) {
+            return ResponseEntity.ok(studentDTO.get());
+        }
+        return ResponseEntity.notFound().build();
+    }
+    
     @Operation(summary = "Register a new student",
                responses = {
                    @ApiResponse(responseCode = "201", description = "Student registered successfully",

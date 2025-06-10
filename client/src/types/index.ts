@@ -7,11 +7,9 @@ export interface Student {
 }
 
 export interface Review {
-  id: number;
+  reviewId: number;
   studentMatrNr: string;
   courseId: string;
-  studentName?: string;
-  courseName?: string;
   rating: number;
   reviewText: string;
   createdAt: string;
@@ -47,7 +45,7 @@ export interface CourseDTO {
 }
 
 export interface ReviewDTO {
-  id: number;
+  reviewId: number;
   studentMatrNr: string;
   courseId: string; 
   rating: number;
