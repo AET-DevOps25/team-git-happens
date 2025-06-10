@@ -120,8 +120,8 @@ const Recommend = () => {
                   value={creditPreference}
                   onChange={(e) => setCreditPreference(e.target.value)}
                   className="w-full max-w-xs"
-                  min="1"
-                  max="10"
+                  min="3"
+                  max="45"
                 />
               </div>
               
