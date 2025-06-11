@@ -25,7 +25,8 @@ RUN pip install --no-cache-dir \
     langchain-huggingface \
     PyMuPDF \
     pypdf \
-    faiss-cpu
+    faiss-cpu\
+    sentence-transformers
 
 
 COPY . .
