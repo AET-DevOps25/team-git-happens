@@ -22,7 +22,7 @@ services:
       start_period: 30s
 
   client-app:
-    image: ${DOCKER_REGISTRY}/team-git-happens-client:${IMAGE_TAG:-latest}  # Your pre-built client image
+    image: ghcr.io/aet-devops25/team-git-happens/client:${IMAGE_TAG:-latest}  # Your pre-built client image
     container_name: client_app
     restart: always
     ports:
@@ -35,7 +35,7 @@ services:
       - review-service
 
   course-service:
-    image: ${DOCKER_REGISTRY}/team-git-happens-course-service:${IMAGE_TAG:-latest}  # Your pre-built image
+    image: ghcr.io/aet-devops25/team-git-happens/course:${IMAGE_TAG:-latest}  # Your pre-built image
     container_name: course_service_app
     restart: always
     depends_on:
@@ -52,7 +52,7 @@ services:
       - app_network
 
   authentication-service:
-    image: ${DOCKER_REGISTRY}/team-git-happens-auth-service:${IMAGE_TAG:-latest}  # Your pre-built image
+    image: ghcr.io/aet-devops25/team-git-happens/authentication:${IMAGE_TAG:-latest}  # Your pre-built image
     container_name: authentication_service_app
     restart: always
     depends_on:
@@ -69,7 +69,7 @@ services:
       - app_network
 
   review-service:
-    image: ${DOCKER_REGISTRY}/team-git-happens-review-service:${IMAGE_TAG:-latest}  # Your pre-built image
+    image: ghcr.io/aet-devops25/team-git-happens/review:${IMAGE_TAG:-latest}  # Your pre-built image
     container_name: review_service_app
     restart: always
     depends_on:
@@ -84,6 +84,26 @@ services:
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
     networks:
       - app_network
+      
+  # recommendation-gateway:
+  #   image: ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:${IMAGE_TAG:-latest}
+  #   container_name: recommendation_gateway
+  #   restart: always
+  #   environment:
+  #     SERVER_PORT: 8080
+  #   networks:
+  #     - app_network
+  #   depends_on:
+  #     - genai-service
+      
+  # genai-service:
+  #   image: ghcr.io/aet-devops25/team-git-happens/genai-service:${IMAGE_TAG:-latest}
+  #   container_name: genai_service
+  #   restart: always
+  #   environment:
+  #     HF_TOKEN: ${HF_TOKEN:-sample_token}  # Use environment variable or default
+  #   networks:
+  #     - app_network
 
   # Flyway migration containers - for the first deployment or migrations
   flyway_course:
@@ -130,7 +150,7 @@ services:
       FLYWAY_PASSWORD: ${DB_PASSWORD:-githappens!}
       FLYWAY_CLEAN_DISABLED: "true"
     volumes:
-      - ./migrations/review:/flyway/sql  # Directory to store SQL migration files
+      - ./migrations/review:/flyway/sql  
     networks:
       - app_network
 
