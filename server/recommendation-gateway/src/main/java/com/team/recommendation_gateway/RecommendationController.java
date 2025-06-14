@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
 
@@ -20,9 +21,18 @@ public class RecommendationController {
 
     @PostMapping
     public ResponseEntity<String> getRecommendation(@RequestBody Map<String, Object> payload) {
-        Integer credits = (Integer) payload.get("credits");
-        List<String> categories = (List<String>) payload.get("categories");
-        String description = (String) payload.get("description");
+        Integer credits = payload.get("credits") instanceof Integer ? (Integer) payload.get("credits") : 0;
+                List<String> categories = new ArrayList<>();
+        if (payload.get("categories") instanceof List<?>) {
+            List<?> rawList = (List<?>) payload.get("categories");
+            for (Object item : rawList) {
+                if (item instanceof String) {
+                    categories.add((String) item);
+                }
+            }
+        }
+        
+        String description = payload.get("description") instanceof String ? (String) payload.get("description") : "";
 
         String prompt = String.format(
                 "A user wants course recommendations with the following criteria:\n" +
