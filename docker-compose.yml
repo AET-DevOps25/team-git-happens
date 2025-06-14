@@ -139,6 +139,31 @@ services:
       FLYWAY_CLEAN_DISABLED: "false"
     volumes:
       - ./server/review-service/src/main/resources/db/migration:/flyway/sql
-      
+  genai-service:
+    build:
+      context: ./genai-service
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    container_name: genai_app
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    depends_on:
+      - db
+      - course-service
+      - review-service
+ 
+  recommendation-gateway:
+    build:
+      context: ./server/recommendation-gateway     # Pfad zu deinem Dockerfile
+      dockerfile: Dockerfile
+    container_name: recommendation_gateway_app
+    ports:
+      - "8090:8080"                # Portmapping: außen:innen
+    depends_on:
+      - genai-service
+      - course-service
+      - review-service
 volumes:
   mysql_data:
