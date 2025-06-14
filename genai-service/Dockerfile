@@ -13,10 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Zuerst nur die CPU-Variante installieren
 RUN pip install --no-cache-dir torch==2.3.0+cpu torchvision==0.18.0+cpu --index-url https://download.pytorch.org/whl/cpu
 
-# Jetzt die anderen Pakete (ziehen dann kein CUDA mehr nach)
 RUN pip install --no-cache-dir \
     fastapi \
     uvicorn \

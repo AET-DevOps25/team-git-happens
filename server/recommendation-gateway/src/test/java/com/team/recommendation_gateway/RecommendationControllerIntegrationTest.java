@@ -5,10 +5,8 @@ import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
@@ -28,7 +26,7 @@ class RecommendationControllerIntegrationTest {
     @BeforeAll
     static void setup() throws IOException {
         mockWebServer = new MockWebServer();
-        mockWebServer.start(8000); // Port muss mit dem in deinem Controller konfigurierten übereinstimmen
+        mockWebServer.start(8000);
     }
 
     @AfterAll
