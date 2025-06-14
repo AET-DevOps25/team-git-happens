@@ -6,17 +6,21 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from ChatWebUI import ChatWebUI
 import requests
+from dotenv import load_dotenv
+import os
 
+load_dotenv() 
 app = FastAPI()
 
 class QuestionRequest(BaseModel):
     question: str
 
 llm = ChatWebUI(
-    api_url="AddURL",
-    api_key="ADDAPIKey",
-    model="llama3.3:latest"
+    api_url=os.getenv("API_URL"),
+    api_key=os.getenv("API_KEY"),
+    model=os.getenv("MODEL")
 )
+
 
 def build_rag_context(question: str) -> str:
     response_courses = requests.get("http://course-service:8080/courses")

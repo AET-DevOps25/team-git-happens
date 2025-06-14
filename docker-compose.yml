@@ -143,14 +143,17 @@ services:
     build:
       context: ./genai-service
       dockerfile: Dockerfile
+    env_file:
+      - .env
     container_name: genai_app
     ports:
       - "8000:8000"
     restart: unless-stopped
     depends_on:
       - db
-      - course-service 
+      - course-service
       - review-service
+
   recommendation-gateway:
     build:
       context: ./server/recommendation-gateway     # Pfad zu deinem Dockerfile
