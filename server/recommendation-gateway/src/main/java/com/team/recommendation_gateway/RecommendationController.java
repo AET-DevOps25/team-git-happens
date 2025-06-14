@@ -1,6 +1,6 @@
 package com.team.recommendation_gateway;
 
-import org.springframework.beans.factory.annotation.Autowired; // NEU!
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
