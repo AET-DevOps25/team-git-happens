@@ -21,6 +21,7 @@ services:
       start_period: 30s
 
   client-app:
+    image: ghcr.io/aet-devops25/team-git-happens/client:latest
     build:
       context: ./client
       dockerfile: Dockerfile
@@ -32,6 +33,7 @@ services:
       - course-service 
 
   course-service:
+    image: ghcr.io/aet-devops25/team-git-happens/course:latest
     build:
       context: ./server/course-service
       dockerfile: Dockerfile
@@ -47,12 +49,13 @@ services:
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: githappens! 
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_FLYWAY_ENABLED: true
+      SPRING_FLYWAY_ENABLED: "true"
       # SPRING_FLYWAY_USER: ${SPRING_DATASOURCE_USERNAME} # Flyway will use datasource user/pass
       # SPRING_FLYWAY_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       # SPRING_FLYWAY_URL: ${SPRING_DATASOURCE_URL}
 
   authentication-service: 
+    image: ghcr.io/aet-devops25/team-git-happens/authentication:latest
     build:
       context: ./server/authentication-service 
       dockerfile: Dockerfile
@@ -68,9 +71,10 @@ services:
       SPRING_DATASOURCE_USERNAME: admin 
       SPRING_DATASOURCE_PASSWORD: githappens!
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate 
-      SPRING_FLYWAY_ENABLED: true 
+      SPRING_FLYWAY_ENABLED: "true" 
 
   review-service:
+    image: ghcr.io/aet-devops25/team-git-happens/review:latest
     build:
       context: ./server/review-service
       dockerfile: Dockerfile
@@ -88,7 +92,7 @@ services:
       SPRING_DATASOURCE_USERNAME: admin 
       SPRING_DATASOURCE_PASSWORD: githappens!
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate 
-      SPRING_FLYWAY_ENABLED: true
+      SPRING_FLYWAY_ENABLED: "true"
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
 
   flyway_course:
@@ -135,6 +139,31 @@ services:
       FLYWAY_CLEAN_DISABLED: "false"
     volumes:
       - ./server/review-service/src/main/resources/db/migration:/flyway/sql
-      
+  genai-service:
+    build:
+      context: ./genai-service
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    container_name: genai_app
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    depends_on:
+      - db
+      - course-service
+      - review-service
+ 
+  recommendation-gateway:
+    build:
+      context: ./server/recommendation-gateway     # Pfad zu deinem Dockerfile
+      dockerfile: Dockerfile
+    container_name: recommendation_gateway_app
+    ports:
+      - "8090:8080"                # Portmapping: außen:innen
+    depends_on:
+      - genai-service
+      - course-service
+      - review-service
 volumes:
   mysql_data:
