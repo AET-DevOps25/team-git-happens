@@ -26,7 +26,7 @@ RUN pip install --no-cache-dir \
     pypdf \
     faiss-cpu\
     sentence-transformers\
-    python-dotenv
+    python-dotenv 
 
 
 

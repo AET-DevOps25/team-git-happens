@@ -20,7 +20,7 @@ llm = ChatWebUI(
     api_key=os.getenv("API_KEY"),
     model=os.getenv("MODEL")
 )
-
+ 
 
 def build_rag_context(question: str) -> str:
     response_courses = requests.get("http://course-service:8080/courses")

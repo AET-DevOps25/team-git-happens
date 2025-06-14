@@ -153,7 +153,7 @@ services:
       - db
       - course-service
       - review-service
-
+ 
   recommendation-gateway:
     build:
       context: ./server/recommendation-gateway     # Pfad zu deinem Dockerfile
