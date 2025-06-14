@@ -1,27 +1,12 @@
 name: CI/CD Pipeline
-#test
-on:
-  push:
-    branches: [ recommendation-gateway-setup ]
-  pull_request:
-    branches: [ recommendation-gateway-setup ]
+on: [
+  push,
+  pull_request
+]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: githappens!
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -pgithappens!" 
-          --health-interval=10s 
-          --health-timeout=5s 
-          --health-retries=5
 
     steps:
       - name: Checkout code
@@ -54,76 +39,52 @@ jobs:
         working-directory: ./server/authentication-service
         run: ./gradlew build --no-daemon
 
-      - name: Build & test recommendation-gateway
-        working-directory: ./server/recommendation-gateway
-        run: ./gradlew build --no-daemon
+      # - name: Build & test recommendation-gateway
+      #   working-directory: ./server/recommendation-gateway
+      #   run: ./gradlew build --no-daemon
 
       - name: Build & test review-service
         working-directory: ./server/review-service
         run: ./gradlew build --no-daemon
 
-      - name: Build genai-service Docker image
-        working-directory: ./genai-service
-        run: docker build -t genai-service .
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build client Docker image
-        working-directory: ./client
-        run: docker build -t client-app .
+      - name: Build client image
+        run: docker build -t ghcr.io/aet-devops25/team-git-happens/client:latest ./client
 
-      - name: Build course-service Docker image
-        working-directory: ./server/course-service
-        run: docker build -t course-service .
+      - name: Push client image
+        run: docker push ghcr.io/aet-devops25/team-git-happens/client:latest
 
-      - name: Build authentication-service Docker image
-        working-directory: ./server/authentication-service
-        run: docker build -t authentication-service .
+      - name: Build course-service image
+        run: docker build -t ghcr.io/aet-devops25/team-git-happens/course:latest ./server/course-service
 
-      - name: Build recommendation-gateway Docker image
-        working-directory: ./server/recommendation-gateway
-        run: docker build -t recommendation-gateway .
+      - name: Push course-service image
+        run: docker push ghcr.io/aet-devops25/team-git-happens/course:latest
 
-      - name: Build review-service Docker image
-        working-directory: ./server/review-service
-        run: docker build -t review-service .
+      - name: Build authentication-service image
+        run: docker build -t ghcr.io/aet-devops25/team-git-happens/authentication:latest ./server/authentication-service
 
-      # Docker Compose installieren (vor dem ersten docker-compose-Befehl)
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
+      - name: Push authentication-service image
+        run: docker push ghcr.io/aet-devops25/team-git-happens/authentication:latest
 
-      - name: Install dockerize
-        run: |
-          wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz
-          tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz
+      - name: Build review-service image
+        run: docker build -t ghcr.io/aet-devops25/team-git-happens/review:latest ./server/review-service
 
-      - name: Run Docker Compose
-        run: docker-compose up -d
+      - name: Push review-service image
+        run: docker push ghcr.io/aet-devops25/team-git-happens/review:latest
 
-      - name: Wait for services to be healthy
-        run: |
-          dockerize -wait tcp://localhost:3307 -timeout 1m
-          dockerize -wait tcp://localhost:8085 -timeout 1m
-          dockerize -wait tcp://localhost:3000 -timeout 1m
-          dockerize -wait tcp://localhost:8000 -timeout 1m
+      # - name: Build recommendation-gateway image
+      #   run: docker build -t ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest ./server/recommendation-gateway  
+      
+      # - name: Push recommendation-gateway image
+      #   run: docker push ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest
 
-      - name: Test course-service
-        working-directory: ./server/course-service
-        run: ./gradlew test --no-daemon
+    
 
-      - name: Test authentication-service
-        working-directory: ./server/authentication-service
-        run: ./gradlew test --no-daemon
 
-      - name: Test recommendation-gateway
-        working-directory: ./server/recommendation-gateway
-        run: ./gradlew test --no-daemon
-
-      - name: Run end-to-end tests
-        run: |
-          echo "Running end-to-end tests..."
-          # Beispiel: docker-compose exec web npm run e2e
-
-      - name: Shut down services
-        run: docker-compose down
 

@@ -25,6 +25,7 @@ const CourseDetail = () => {
   const [reviewText, setReviewText] = useState('');
   const [rating, setRating] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [apiAverageRating, setApiAverageRating] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     const loadData = async () => {
@@ -44,9 +45,18 @@ const CourseDetail = () => {
 
         setCourse(courseData);
 
+        // Fetch reviews
         const reviewsData = await ReviewService.getReviewsByCourseId(courseIdFromParams);
-
         setReviews(reviewsData);
+        
+        try {
+          const avgRating = await ReviewService.getAverageRatingByCourseId(courseIdFromParams);
+          // Store the properly converted numerical rating
+          setApiAverageRating(avgRating);
+          console.log(`Retrieved average rating for course ${courseIdFromParams}:`, avgRating);
+        } catch (ratingError) {
+          console.error("Error fetching average rating:", ratingError);
+        }
       } catch (error) {
         toast.error('Failed to load course details');
       } finally {
@@ -80,7 +90,7 @@ const CourseDetail = () => {
 
     try {
       setSubmitting(true);
-      const newReviewData: Omit<ReviewDTO, 'id' | 'createdAt'> = {
+      const newReviewData: Omit<ReviewDTO, 'reviewId' | 'createdAt'> = {
         studentMatrNr: student.matriculationNumber,
         courseId: course.id,
         rating,
@@ -116,9 +126,11 @@ const CourseDetail = () => {
     );
   }
   
-  const averageRating = reviews.length > 0
-    ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
-    : course.avgRating || 0;
+   const averageRating = apiAverageRating !== undefined ? 
+    apiAverageRating : 
+    (reviews.length > 0
+      ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+      : course.avgRating || 0);
 
   return (
     <div className="container max-w-7xl mx-auto px-4 py-8">
@@ -201,7 +213,7 @@ const CourseDetail = () => {
           ) : (
             <div className="space-y-4">
               {reviews.map(review => (
-                <ReviewCard key={review.id} review={review} />
+                <ReviewCard key={review.reviewId} review={review} />
               ))}
             </div>
           )}
@@ -232,8 +244,10 @@ const CourseDetail = () => {
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Rating:</span>
                 <div className="flex items-center">
-                  <StarRating value={course.avgRating || 0} readonly />
-                  <span className="ml-2">({course.avgRating?.toFixed(1)})</span>
+                  <StarRating value={Number(averageRating) || 0} readonly />
+                  <span className="ml-2">
+                    ({averageRating !== undefined ? Number(averageRating).toFixed(1) : 'N/A'})
+                  </span>
                 </div>
               </div>
               
