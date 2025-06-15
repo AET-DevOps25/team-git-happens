@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -7,30 +7,40 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { RecommendationService, RecommendedCourse } from '@/services/RecommendationService';
-import { UserPreferences } from '@/types';
+import { CourseService } from '@/services/CourseService';
+import { UserPreferences, CategoryDTO } from '@/types';
 import CourseCard from '@/components/CourseCard';
 import Spinner from '@/components/Spinner';
 import { toast } from 'sonner';
 import { Compass } from 'lucide-react';
 
-const CATEGORY_OPTIONS = [
-  { id: 'ai', label: 'Artificial Intelligence' },
-  { id: 'systems', label: 'Systems & Networks' },
-  { id: 'theory', label: 'Theoretical Computer Science' },
-  { id: 'software', label: 'Software Engineering' },
-  { id: 'data', label: 'Data Science & Analytics' },
-  { id: 'security', label: 'Security & Privacy' },
-  { id: 'graphics', label: 'Graphics & Visualization' },
-  { id: 'web', label: 'Web & Mobile Development' },
-];
-
 const Recommend = () => {
+  const [categories, setCategories] = useState<CategoryDTO[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [creditPreference, setCreditPreference] = useState<string>('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<RecommendedCourse[]>([]);
   const [showResults, setShowResults] = useState(false);
+
+  // Fetch categories from the API on component mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const categoriesData = await CourseService.getAllCategories();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+        toast.error('Failed to load categories');
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    loadCategories();
+  }, []);
   
   const handleCategoryChange = (category: string) => {
     setSelectedCategories(prev => 
@@ -54,7 +64,7 @@ const Recommend = () => {
     }
     
     const preferences: UserPreferences = {
-      interests: selectedCategories,
+      interests: selectedCategories, // Use category names directly from the database
       creditPreference: creditPreference ? parseInt(creditPreference) : undefined,
       additionalInfo: description
     };
@@ -97,18 +107,25 @@ const Recommend = () => {
               {/* Categories section */}
               <div>
                 <h2 className="text-lg font-medium mb-4">What categories are you interested in? *</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {CATEGORY_OPTIONS.map((option) => (
-                    <div key={option.id} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={option.id} 
-                        checked={selectedCategories.includes(option.id)}
-                        onCheckedChange={() => handleCategoryChange(option.id)}
-                      />
-                      <Label htmlFor={option.id}>{option.label}</Label>
-                    </div>
-                  ))}
-                </div>
+                {categoriesLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                    <span className="text-sm text-muted-foreground">Loading categories...</span>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {categories.map((category) => (
+                      <div key={category.name} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={category.name} 
+                          checked={selectedCategories.includes(category.name)}
+                          onCheckedChange={() => handleCategoryChange(category.name)}
+                        />
+                        <Label htmlFor={category.name}>{category.name}</Label>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               
               {/* Credit preference */}
@@ -141,8 +158,17 @@ const Recommend = () => {
               </div>
               
               <Button type="submit" className="w-full" disabled={loading}>
-                <Compass className="mr-2 h-5 w-5" />
-                {loading ? 'Finding courses...' : 'Get Recommendations'}
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Analyzing with AI...
+                  </>
+                ) : (
+                  <>
+                    <Compass className="mr-2 h-5 w-5" />
+                    Get Recommendations
+                  </>
+                )}
               </Button>
             </form>
           </CardContent>
@@ -150,7 +176,13 @@ const Recommend = () => {
       ) : (
         <>
           {loading ? (
-            <Spinner text="Analyzing your preferences and finding the best courses..." />
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+              <h3 className="text-lg font-medium mb-2">AI is analyzing your preferences...</h3>
+              <p className="text-sm text-muted-foreground text-center max-w-md">
+                Our AI is carefully reviewing your interests and matching them with the best courses. This may take a few seconds.
+              </p>
+            </div>
           ) : (
             <>
               <div className="mb-8">

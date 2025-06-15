@@ -1,4 +1,4 @@
-import { CourseDTO, StudentDTO } from "../types";
+import { CourseDTO, StudentDTO, CategoryDTO } from "../types";
 import { useAuthStore } from "./AuthService";
 
 const API_BASE_URL = 'http://localhost:8085'; 
@@ -29,6 +29,10 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
 export const CourseService = {
   getAllCourses: async (): Promise<CourseDTO[]> => {
     return fetchApi<CourseDTO[]>(`${API_BASE_URL}/courses`);
+  },
+
+  getAllCategories: async (): Promise<CategoryDTO[]> => {
+    return fetchApi<CategoryDTO[]>(`${API_BASE_URL}/categories`);
   },
 
   getCourseById: async (id: string): Promise<CourseDTO | undefined> => {
