@@ -36,7 +36,7 @@ public class RecommendationController {
 
         String prompt = String.format(
                 "A user wants course recommendations with the following criteria:\n" +
-                        "- Total number of credits they want to take: %d (with a tolerance of ±2 credit)\n" +
+                        "- Total number of credits they want to take: %d \n" +
                         "- Categories: %s\n" +
                         "- Description: %s\n" +
                         "Please recommend a list of suitable courses from the curriculum that together add up to approximately the total credits mentioned (with a ±1 credit tolerance) and answewr in english. "
