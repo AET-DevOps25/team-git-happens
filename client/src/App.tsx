@@ -10,6 +10,8 @@ import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import CourseList from "./pages/CourseList";
 import CourseDetail from "./pages/CourseDetail"; 
+import Recommend from "./pages/Recommend"; 
+import AuthGuard from "./components/AuthGuard";
 
 
 const queryClient = new QueryClient();
@@ -29,6 +31,7 @@ const App = () => (
               <Route path="/register" element={<Registration />} /> 
               <Route path="/courses" element={<CourseList />} />
               <Route path="/courses/:id" element={<CourseDetail />} /> 
+              <Route path="/recommend" element={<AuthGuard><Recommend /></AuthGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

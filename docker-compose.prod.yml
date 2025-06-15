@@ -1,0 +1,143 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_server
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD:-githappens!}'  # Use environment variable or default
+    ports:
+      - "3306:3306"  # Only expose if needed for external access
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d  # Only needs the init scripts
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-githappens!}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  client-app:
+    image: ${DOCKER_REGISTRY}/team-git-happens-client:${IMAGE_TAG:-latest}  # Your pre-built client image
+    container_name: client_app
+    restart: always
+    ports:
+      - "80:80"  # Map to standard HTTP port for production
+    networks:
+      - app_network
+    depends_on:
+      - course-service
+      - authentication-service
+      - review-service
+
+  course-service:
+    image: ${DOCKER_REGISTRY}/team-git-happens-course-service:${IMAGE_TAG:-latest}  # Your pre-built image
+    container_name: course_service_app
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/course_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-githappens!}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_FLYWAY_ENABLED: true
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+    networks:
+      - app_network
+
+  authentication-service:
+    image: ${DOCKER_REGISTRY}/team-git-happens-auth-service:${IMAGE_TAG:-latest}  # Your pre-built image
+    container_name: authentication_service_app
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/auth_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-githappens!}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_FLYWAY_ENABLED: true
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+    networks:
+      - app_network
+
+  review-service:
+    image: ${DOCKER_REGISTRY}/team-git-happens-review-service:${IMAGE_TAG:-latest}  # Your pre-built image
+    container_name: review_service_app
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/review_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-githappens!}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_FLYWAY_ENABLED: true
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+    networks:
+      - app_network
+
+  # Flyway migration containers - for the first deployment or migrations
+  flyway_course:
+    image: flyway/flyway:9
+    command: migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:mysql://mysql_server:3306/course_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      FLYWAY_USER: admin
+      FLYWAY_PASSWORD: ${DB_PASSWORD:-githappens!}
+      FLYWAY_CLEAN_DISABLED: "true"  # For production, disable clean
+    volumes:
+      - ./migrations/course:/flyway/sql  # Directory to store SQL migration files
+    networks:
+      - app_network
+
+  flyway_authentication:
+    image: flyway/flyway:9
+    command: migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:mysql://mysql_server:3306/auth_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      FLYWAY_USER: admin
+      FLYWAY_PASSWORD: ${DB_PASSWORD:-githappens!}
+      FLYWAY_CLEAN_DISABLED: "true"
+    volumes:
+      - ./migrations/auth:/flyway/sql  # Directory to store SQL migration files
+    networks:
+      - app_network
+
+  flyway_review:
+    image: flyway/flyway:9
+    command: migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:mysql://mysql_server:3306/review_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      FLYWAY_USER: admin
+      FLYWAY_PASSWORD: ${DB_PASSWORD:-githappens!}
+      FLYWAY_CLEAN_DISABLED: "true"
+    volumes:
+      - ./migrations/review:/flyway/sql  # Directory to store SQL migration files
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local

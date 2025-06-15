@@ -54,7 +54,7 @@ class RecommendationControllerUnitTest {
     @Test
     void postRecommendation_shouldCallGenAI_andReturnResponse() throws Exception {
         // given
-        String mockAnswer = "[{\"course\": \"IN9876\", \"reason\": \"Excellent for ML beginners.\"}]";
+        String mockAnswer = "{\"answer\": \"[{\\\"course\\\": \\\"Advanced Natural Language Processing\\\", \\\"reason\\\": \\\"Excellent for ML beginners.\\\"}]\"}";
         ResponseEntity<String> aiResponse = new ResponseEntity<>(mockAnswer, HttpStatus.OK);
         Mockito.when(restTemplate.postForEntity(Mockito.anyString(), Mockito.any(), Mockito.eq(String.class)))
                 .thenReturn(aiResponse);
@@ -62,7 +62,7 @@ class RecommendationControllerUnitTest {
         String jsonPayload = """
                     {
                         "credits": 10,
-                        "categories": ["ML"],
+                        "categories": ["Machine Learning and Analytics"],
                         "description": "data science"
                     }
                 """;
@@ -72,6 +72,6 @@ class RecommendationControllerUnitTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonPayload))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("IN9876")));
+                .andExpect(content().string(containsString("Advanced Natural Language Processing")));
     }
 }

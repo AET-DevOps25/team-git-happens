@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: recommendation-gateway
+  jpa:
+    open-in-view: false
+
+genai:
+  api:
+    url: http://genai_app:8000
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.web.filter.CorsFilter: DEBUG
+    com.team.recommendation_gateway: DEBUG
