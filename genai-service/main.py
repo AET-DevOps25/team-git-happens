@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -8,19 +9,45 @@ from ChatWebUI import ChatWebUI
 import requests
 from dotenv import load_dotenv
 import os
+import logging
+from typing import Dict
 
-load_dotenv() 
-app = FastAPI()
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger("genai-service")
+
+# Load environment variables
+load_dotenv()
+
+# Define FastAPI app with metadata
+app = FastAPI(
+    title="GenAI Service",
+    description="API for GenAI applications",
+    version="1.0.0"
+)
 
 class QuestionRequest(BaseModel):
     question: str
 
-llm = ChatWebUI(
-    api_url=os.getenv("API_URL"),
-    api_key=os.getenv("API_KEY"),
-    model=os.getenv("MODEL")
-)
- 
+# Initialize LLM client
+try:
+    llm = ChatWebUI(
+        api_url=os.getenv("API_URL"),
+        api_key=os.getenv("API_KEY"),
+        model=os.getenv("MODEL")
+    )
+except Exception as e:
+    logger.error(f"Failed to initialize LLM client: {str(e)}")
+    raise
+
+@app.get("/health", status_code=status.HTTP_200_OK)
+@app.head("/health", status_code=status.HTTP_200_OK)
+def health_check():
+    """Health check endpoint for container monitoring"""
+    return {"status": "healthy", "service": "genai-service"}
 
 def build_rag_context(question: str) -> str:
     response_courses = requests.get("http://course-service:8080/courses")
