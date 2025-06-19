@@ -78,11 +78,11 @@ jobs:
       - name: Push review-service image
         run: docker push ghcr.io/aet-devops25/team-git-happens/review:latest
 
-      # - name: Build recommendation-gateway image
-      #   run: docker build -t ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest ./server/recommendation-gateway  
+      - name: Build recommendation-gateway image
+        run: docker build -t ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest ./server/recommendation-gateway  
       
-      # - name: Push recommendation-gateway image
-      #   run: docker push ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest
+      - name: Push recommendation-gateway image
+        run: docker push ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest
 
     
 
