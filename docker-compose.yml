@@ -4,7 +4,7 @@ services:
     container_name: mysql_server
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD:-githappens!}' # Use env var or default
+      MYSQL_ROOT_PASSWORD: '${PASSWORD:-githappens!}' # Use env var or default
       # MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD are removed here
       # as we'll use init scripts for more granular control.
     ports:
@@ -46,8 +46,8 @@ services:
       - "8085:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/course_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME:-admin}'
-      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}' 
+      SPRING_DATASOURCE_USERNAME: '${USERNAME:-admin}'
+      SPRING_DATASOURCE_PASSWORD: '${PASSWORD:-githappens!}' 
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SPRING_FLYWAY_ENABLED: "true"
       # SPRING_FLYWAY_USER: ${SPRING_DATASOURCE_USERNAME} # Flyway will use datasource user/pass
@@ -68,8 +68,8 @@ services:
       - "8086:8080" 
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/auth_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true 
-      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME:-admin}'
-      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}'
+      SPRING_DATASOURCE_USERNAME: '${USERNAME:-admin}'
+      SPRING_DATASOURCE_PASSWORD: '${PASSWORD:-githappens!}'
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate 
       SPRING_FLYWAY_ENABLED: "true"
       SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
@@ -89,8 +89,8 @@ services:
       - "8087:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/review_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true 
-      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME:-admin}'
-      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}'
+      SPRING_DATASOURCE_USERNAME: '${USERNAME:-admin}'
+      SPRING_DATASOURCE_PASSWORD: '${PASSWORD:-githappens!}'
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate 
       SPRING_FLYWAY_ENABLED: "true"
       SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
