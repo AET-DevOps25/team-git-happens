@@ -2,7 +2,7 @@ name: CI - Continuous Integration
 
 on:
   push:
-    branches: [ main, develop, feature/* ]
+    branches: [ main, develop, deployment-ec2 ]
   pull_request:
     branches: [ main, develop ]
 
