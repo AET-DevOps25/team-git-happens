@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuthStore } from '@/services/AuthService';
-import { GraduationCap, ChevronDown, BookOpen, Star } from 'lucide-react';
+import { ChevronDown, Star } from 'lucide-react';
 
 const Navbar = () => {
   const { student, isAuthenticated, logout } = useAuthStore();

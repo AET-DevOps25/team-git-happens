@@ -28,7 +28,7 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
         // Ignore if response body is not JSON or empty
         console.log('Could not parse error response body', e);
       }
-      const error = new Error(errorMessage) as any;
+      const error = new Error(errorMessage) as Error & { status: number };
       error.status = response.status;
       throw error;
     }
@@ -147,10 +147,10 @@ export const RecommendationService = {
     }
   },
   
-  getRecommendationsFromUserReviews: async (email: string): Promise<RecommendedCourse[]> => {
+  getRecommendationsFromUserReviews: async (): Promise<RecommendedCourse[]> => {
     // In a real app, this would call:
-    // POST /api/recommendations with {email} in body
-    return new Promise(async (resolve) => {
+    // POST /api/recommendations with email in body
+    return new Promise((resolve) => {
       setTimeout(async () => {
         const courses = await CourseService.getAllCourses();
         

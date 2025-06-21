@@ -10,7 +10,6 @@ import { RecommendationService, RecommendedCourse } from '@/services/Recommendat
 import { CourseService } from '@/services/CourseService';
 import { UserPreferences, CategoryDTO } from '@/types';
 import CourseCard from '@/components/CourseCard';
-import Spinner from '@/components/Spinner';
 import { toast } from 'sonner';
 import { Compass } from 'lucide-react';
 

@@ -34,7 +34,7 @@ export const ReviewService = {
       try {
         const parsed = JSON.parse(rawData);
         return typeof parsed === 'number' ? parsed : parseFloat(parsed);
-      } catch (jsonError) {
+      } catch {
         const numValue = parseFloat(rawData);
         if (!isNaN(numValue)) {
           return numValue;

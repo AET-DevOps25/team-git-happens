@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Registration from './Registration';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { useAuthStore } from '@/services/AuthService';
 import { toast } from 'sonner';
 
 // Mock the useAuthStore

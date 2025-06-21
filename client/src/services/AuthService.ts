@@ -23,7 +23,7 @@ interface AuthState {
 
 const API_BASE_URL = 'http://localhost:8086';
 
-export const useAuthStore = create<AuthState>((set, get) => ({ // Added get
+export const useAuthStore = create<AuthState>((set) => ({
   student: localStorage.getItem('courseCompassUser')
     ? JSON.parse(localStorage.getItem('courseCompassUser') || '{}')
     : null,

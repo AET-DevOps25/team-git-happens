@@ -1,12 +1,11 @@
-import { render, screen, waitFor, act, fireEvent } from '@testing-library/react'; // Import fireEvent
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter, MemoryRouter, Routes, Route } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import CourseDetail from './CourseDetail';
 import { CourseService } from '../services/CourseService';
 import { ReviewService } from '../services/ReviewService';
 import { useAuthStore } from '../services/AuthService';
 import { CourseDTO, ReviewDTO, Student } from '../types';
-import { StudentService } from '../services/StudentService';
 
 jest.mock('../services/CourseService');
 jest.mock('../services/ReviewService');
@@ -81,11 +80,10 @@ describe('CourseDetail Page', () => {
     mockGetStudentByMatriculationNumber.mockResolvedValue({
       isPresent: () => true,
       get: () => mockStudent,
-      orElse: (defaultValue) => mockStudent,
+      orElse: () => mockStudent,
       map: (fn) => ({ 
         isPresent: () => true, 
-        get: () => fn(mockStudent),
-        orElse: (defaultValue) => fn(mockStudent),
+        get: () => fn(mockStudent),          orElse: () => fn(mockStudent),
         map: jest.fn(),
         flatMap: jest.fn()
       }),
@@ -116,11 +114,11 @@ describe('CourseDetail Page', () => {
       return {
         isPresent: () => true,
         get: () => student,
-        orElse: (defaultValue) => student,
+        orElse: () => student,
         map: (fn) => ({ 
           isPresent: () => true, 
           get: () => fn(student),
-          orElse: (defaultValue) => fn(student),
+          orElse: () => fn(student),
           map: jest.fn(),
           flatMap: jest.fn()
         }),

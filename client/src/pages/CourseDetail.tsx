@@ -57,7 +57,7 @@ const CourseDetail = () => {
         } catch (ratingError) {
           console.error("Error fetching average rating:", ratingError);
         }
-      } catch (error) {
+      } catch {
         toast.error('Failed to load course details');
       } finally {
         setLoading(false);
