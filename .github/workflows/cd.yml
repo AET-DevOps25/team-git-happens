@@ -1,11 +1,14 @@
 name: CD - Continuous Deployment
 
 on:
-  workflow_run:
-    workflows: ["CI - Continuous Integration"]
-    types:
-      - completed
+  # Trigger on push to specific branches (more reliable than workflow_run)
+  push:
     branches: [ main, develop, deployment-ec2 ]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - '*.md'
+  
   workflow_dispatch:
     inputs:
       environment:
@@ -38,9 +41,7 @@ jobs:
   terraform:
     name: Terraform Infrastructure
     runs-on: ubuntu-latest
-    if: |
-      (github.event.workflow_run.conclusion == 'success') ||
-      (github.event_name == 'workflow_dispatch')
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     
     outputs:
       ec2-ip: ${{ steps.output.outputs.ec2_public_ip }}
@@ -71,7 +72,7 @@ jobs:
         if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
           echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
           echo "image_tag=${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.event.workflow_run.head_branch }}" == "main" ]]; then
+        elif [[ "${{ github.ref_name }}" == "main" ]]; then
           echo "environment=prod" >> $GITHUB_OUTPUT
           echo "image_tag=latest" >> $GITHUB_OUTPUT
         else
@@ -170,7 +171,7 @@ jobs:
       run: |
         if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
           echo "image_tag=${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.event.workflow_run.head_branch }}" == "main" ]]; then
+        elif [[ "${{ github.ref_name }}" == "main" ]]; then
           echo "image_tag=latest" >> $GITHUB_OUTPUT
         else
           echo "image_tag=develop" >> $GITHUB_OUTPUT
@@ -206,4 +207,4 @@ jobs:
         echo "- **Application URL**: ${{ needs.terraform.outputs.app-url }}" >> $GITHUB_STEP_SUMMARY
         echo "- **EC2 Instance**: ${{ needs.terraform.outputs.ec2-ip }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Database**: Containerized MySQL" >> $GITHUB_STEP_SUMMARY
-        echo "- **Branch**: ${{ github.event.workflow_run.head_branch || github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
