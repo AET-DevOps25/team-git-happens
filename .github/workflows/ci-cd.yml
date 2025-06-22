@@ -90,8 +90,8 @@ jobs:
 
 
 
-      - name: Build genai-app image
-        run: docker build -t ghcr.io/aet-devops25/team-git-happens/genai-app:latest ./genai-app
+      - name: Build genai-service image
+        run: docker build -t ghcr.io/aet-devops25/team-git-happens/genai-service:latest ./genai-service
 
-      - name: Push genai-app image
-        run: docker push ghcr.io/aet-devops25/team-git-happens/genai-app:latest
+      - name: Push genai-service image
+        run: docker push ghcr.io/aet-devops25/team-git-happens/genai-service:latest
