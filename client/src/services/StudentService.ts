@@ -1,6 +1,6 @@
 import { StudentDTO } from '@/types';
 
-const API_BASE_URL = (import.meta as any).env.VITE_REACT_APP_AUTH_URL || 'http://localhost:8086';
+const API_BASE_URL = 'http://localhost:8086';
 
 // Define a simple Optional type to better handle null/undefined values
 export interface Optional<T> {

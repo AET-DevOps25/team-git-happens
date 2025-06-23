@@ -1,6 +1,6 @@
 import { Review } from "../types";
 
-const API_BASE_URL = (import.meta as any).env.VITE_REACT_APP_REVIEW_URL || 'http://localhost:8087';
+const API_BASE_URL = 'http://localhost:8087';
 
 export const ReviewService = {
   getReviewsByCourseId: async (courseId: string): Promise<Review[]> => {
