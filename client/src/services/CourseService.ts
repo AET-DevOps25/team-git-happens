@@ -1,7 +1,7 @@
 import { CourseDTO, StudentDTO } from "../types";
 import { useAuthStore } from "./AuthService";
 
-const API_BASE_URL = 'http://localhost:8085'; 
+const API_BASE_URL = (import.meta as any).env.VITE_REACT_APP_COURSE_URL || 'http://localhost:8085';
 
 // Helper function for API calls
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
