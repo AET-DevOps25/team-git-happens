@@ -18,29 +18,25 @@ export const ReviewService = {
   },
 
   getAverageRatingByCourseId: async (courseId: string): Promise<number | undefined> => {
+    const response = await fetch(`/courses/${courseId}/average-rating`);
+    if (!response.ok) {
+      if (response.status === 404) {
+        return undefined;
+      }
+      throw new Error(`Failed to fetch average rating for course ${courseId}`);
+    }
+    
+    const rawData = await response.text();
+    
     try {
-      const response = await fetch(`/courses/${courseId}/average-rating`);
-      if (!response.ok) {
-        if (response.status === 404) {
-          return undefined;
-        }
-        throw new Error(`Failed to fetch average rating for course ${courseId}`);
+      const parsed = JSON.parse(rawData);
+      return typeof parsed === 'number' ? parsed : parseFloat(parsed);
+    } catch {
+      const numValue = parseFloat(rawData);
+      if (!isNaN(numValue)) {
+        return numValue;
       }
-      
-      const rawData = await response.text();
-      
-      try {
-        const parsed = JSON.parse(rawData);
-        return typeof parsed === 'number' ? parsed : parseFloat(parsed);
-      } catch {
-        const numValue = parseFloat(rawData);
-        if (!isNaN(numValue)) {
-          return numValue;
-        }
-        throw new Error('Failed to parse average rating');
-      }
-    } catch (error) {
-      throw error;
+      throw new Error('Failed to parse average rating');
     }
   },
 
