@@ -9,7 +9,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   test:
     name: Run Tests
@@ -90,77 +89,41 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: |
-          ghcr.io/${{ github.repository }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable={{is_default_branch}}
+    - name: Build client image
+      run: docker build -t ghcr.io/aet-devops25/team-git-happens/client:${GITHUB_SHA} ./client
 
-    - name: Build and push client image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./client
-        push: true
-        tags: ghcr.io/${{ github.repository }}/client:${{ steps.meta.outputs.version }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+    - name: Push client image
+      run: docker push ghcr.io/aet-devops25/team-git-happens/client:${GITHUB_SHA}
 
-    - name: Build and push course service image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./server/course-service
-        push: true
-        tags: ghcr.io/${{ github.repository }}/course:${{ steps.meta.outputs.version }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+    - name: Build course service image
+      run: docker build -t ghcr.io/aet-devops25/team-git-happens/course:${GITHUB_SHA} ./server/course-service
 
-    - name: Build and push authentication service image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./server/authentication-service
-        push: true
-        tags: ghcr.io/${{ github.repository }}/authentication:${{ steps.meta.outputs.version }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+    - name: Push course service image
+      run: docker push ghcr.io/aet-devops25/team-git-happens/course:${GITHUB_SHA}
 
-    - name: Build and push review service image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./server/review-service
-        push: true
-        tags: ghcr.io/${{ github.repository }}/review:${{ steps.meta.outputs.version }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+    - name: Build authentication service image
+      run: docker build -t ghcr.io/aet-devops25/team-git-happens/authentication:${GITHUB_SHA} ./server/authentication-service
 
-    - name: Build and push recommendation gateway image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./server/recommendation-gateway
-        push: true
-        tags: ghcr.io/${{ github.repository }}/recommendation-gateway:${{ steps.meta.outputs.version }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+    - name: Push authentication service image
+      run: docker push ghcr.io/aet-devops25/team-git-happens/authentication:${GITHUB_SHA}
 
-    - name: Build and push genai service image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./genai-service
-        push: true
-        tags: ghcr.io/${{ github.repository }}/genai:${{ steps.meta.outputs.version }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+    - name: Build review service image
+      run: docker build -t ghcr.io/aet-devops25/team-git-happens/review:${GITHUB_SHA} ./server/review-service
+
+    - name: Push review service image
+      run: docker push ghcr.io/aet-devops25/team-git-happens/review:${GITHUB_SHA}
+
+    - name: Build recommendation gateway image
+      run: docker build -t ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:${GITHUB_SHA} ./server/recommendation-gateway
+
+    - name: Push recommendation gateway image
+      run: docker push ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:${GITHUB_SHA}
+
+    - name: Build genai service image
+      run: docker build -t ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA} ./genai-service
+
+    - name: Push genai service image
+      run: docker push ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA}
 
     - name: Build summary
       run: |
