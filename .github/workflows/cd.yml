@@ -184,6 +184,7 @@ jobs:
           -e "image_tag=${{ steps.deploy-tag.outputs.image_tag }}" \
           -e "db_username=${{ secrets.USERNAME }}" \
           -e "db_password=${{ secrets.PASSWORD }}" \
+          -e "mysql_root_password=${{ secrets.PASSWORD }}" \
           -e "github_username=${{ github.actor }}" \
           -e "github_token=${{ secrets.GITHUB_TOKEN }}" \
           -e "api_url=${{ secrets.API_URL }}" \
