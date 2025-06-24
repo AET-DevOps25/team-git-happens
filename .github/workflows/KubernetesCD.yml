@@ -1,8 +1,9 @@
 name: KubernetesCD
 
-on:
-  workflow_dispatch: 
-
+on: [
+  push,
+  pull_request
+]
 jobs:
   deploy:
     runs-on: ubuntu-latest
