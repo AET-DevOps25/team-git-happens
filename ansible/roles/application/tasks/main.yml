@@ -38,6 +38,7 @@
       - requests
       - docker
       - urllib3<2.0
+      - docker-compose
     executable: pip3
   become: yes
 
