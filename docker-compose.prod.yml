@@ -49,9 +49,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}'
       
       # Flyway configuration - Spring Boot will handle migrations
-      SPRING_FLYWAY_ENABLED: true
-      SPRING_FLYWAY_BASELINE_ON_MIGRATE: true
-      SPRING_FLYWAY_VALIDATE_ON_MIGRATE: true
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_VALIDATE_ON_MIGRATE: "true"
       
       # JPA configuration - validate mode for safety
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
@@ -71,9 +71,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}'
       
       # Flyway configuration - Spring Boot will handle migrations
-      SPRING_FLYWAY_ENABLED: true
-      SPRING_FLYWAY_BASELINE_ON_MIGRATE: true
-      SPRING_FLYWAY_VALIDATE_ON_MIGRATE: true
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_VALIDATE_ON_MIGRATE: "true"
       
       # JPA configuration - validate mode for safety
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
@@ -93,9 +93,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}'
       
       # Flyway configuration - Spring Boot will handle migrations
-      SPRING_FLYWAY_ENABLED: true
-      SPRING_FLYWAY_BASELINE_ON_MIGRATE: true
-      SPRING_FLYWAY_VALIDATE_ON_MIGRATE: true
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_VALIDATE_ON_MIGRATE: "true"
       
       # JPA configuration - validate mode for safety
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
