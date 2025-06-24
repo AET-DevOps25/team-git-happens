@@ -115,7 +115,7 @@ services:
       - genai-service
       
   genai-service:
-    image: ghcr.io/aet-devops25/team-git-happens/genai:${IMAGE_TAG:-latest}
+    image: ghcr.io/aet-devops25/team-git-happens/genai-service:${IMAGE_TAG:-latest}
     container_name: genai_service
     restart: always
     environment:
