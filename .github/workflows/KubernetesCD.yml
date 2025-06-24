@@ -1,7 +1,7 @@
 name: KubernetesCD
 
 on:
-  workflow_dispatch: # Manuell auslösbar – super für Testing!
+  workflow_dispatch: 
 
 jobs:
   deploy:
