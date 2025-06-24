@@ -32,6 +32,14 @@
     group: ec2-user
     mode: '0600'
 
+- name: Install required python libraries
+  pip:
+    name:
+      - requests
+      - docker
+    executable: pip3
+  become: yes
+
 - name: Login to GitHub Container Registry
   docker_login:
     registry: ghcr.io
