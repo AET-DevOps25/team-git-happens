@@ -1,0 +1,62 @@
+name: KubernetesCD
+
+on:
+  workflow_dispatch: # Manuell auslösbar – super für Testing!
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: latest
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.kubeconfig }}" | base64 -d > ~/.kube/config
+
+      - name: Deploy client-app
+        run: |
+          helm upgrade --install client-app ./helm-charts/client-app \
+            --namespace team-git-happens \
+            --create-namespace \
+            --set image.tag=latest
+
+      - name: Deploy authentication-service
+        run: |
+          helm upgrade --install authentication-service ./helm-charts/authentication-service \
+            --namespace team-git-happens \
+            --set image.tag=latest
+
+      - name: Deploy course-service
+        run: |
+          helm upgrade --install course-service ./helm-charts/course-service \
+            --namespace team-git-happens \
+            --set image.tag=latest
+
+      - name: Deploy review-service
+        run: |
+          helm upgrade --install review-service ./helm-charts/review-service \
+            --namespace team-git-happens \
+            --set image.tag=latest
+
+      - name: Deploy recommendation-gateway
+        run: |
+          helm upgrade --install recommendation-gateway ./helm-charts/recommendation-gateway \
+            --namespace team-git-happens \
+            --set image.tag=latest
+
+      - name: Deploy genai-service
+        run: |
+          helm upgrade --install genai-service ./helm-charts/genai-service \
+            --namespace team-git-happens \
+            --set image.tag=latest
