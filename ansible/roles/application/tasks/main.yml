@@ -60,7 +60,7 @@
     - "ghcr.io/aet-devops25/team-git-happens/authentication:{{ image_tag }}"
     - "ghcr.io/aet-devops25/team-git-happens/review:{{ image_tag }}"
     - "ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:{{ image_tag }}"
-    - "ghcr.io/aet-devops25/team-git-happens/genai:{{ image_tag }}"
+    - "ghcr.io/aet-devops25/team-git-happens/genai-service:{{ image_tag }}"
   become: no
   become_user: ec2-user
 
