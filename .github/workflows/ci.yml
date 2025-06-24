@@ -92,6 +92,11 @@ jobs:
     - name: Push client image
       run: docker push ghcr.io/aet-devops25/team-git-happens/client:${GITHUB_SHA}
 
+    - name: Build course-service JAR
+      run: |
+        cd server/course-service
+        ./gradlew build
+
     - name: Build course service image
       run: docker build -t ghcr.io/aet-devops25/team-git-happens/course:${GITHUB_SHA} ./server/course-service
 
