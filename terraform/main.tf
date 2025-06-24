@@ -169,6 +169,10 @@ resource "aws_instance" "app" {
     db_password = var.db_password
   }))
 
+  root_block_device {
+    volume_size = 30 # GB
+  }
+
   tags = {
     Name = "${var.project_name}-${var.environment}"
     Environment = var.environment
