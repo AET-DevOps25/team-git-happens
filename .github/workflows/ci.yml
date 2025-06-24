@@ -103,17 +103,32 @@ jobs:
     - name: Push course service image
       run: docker push ghcr.io/aet-devops25/team-git-happens/course:${GITHUB_SHA}
 
+    - name: Build authentication-service JAR
+      run: |
+        cd server/authentication-service
+        ./gradlew build
+
     - name: Build authentication service image
       run: docker build -t ghcr.io/aet-devops25/team-git-happens/authentication:${GITHUB_SHA} ./server/authentication-service
 
     - name: Push authentication service image
       run: docker push ghcr.io/aet-devops25/team-git-happens/authentication:${GITHUB_SHA}
 
+    - name: Build review-service JAR
+      run: |
+        cd server/review-service
+        ./gradlew build
+
     - name: Build review service image
       run: docker build -t ghcr.io/aet-devops25/team-git-happens/review:${GITHUB_SHA} ./server/review-service
 
     - name: Push review service image
       run: docker push ghcr.io/aet-devops25/team-git-happens/review:${GITHUB_SHA}
+
+    - name: Build recommendation-gateway JAR
+      run: |
+        cd server/recommendation-gateway
+        ./gradlew build
 
     - name: Build recommendation gateway image
       run: docker build -t ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:${GITHUB_SHA} ./server/recommendation-gateway
