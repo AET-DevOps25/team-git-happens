@@ -6,7 +6,7 @@ export interface RecommendedCourse {
   reason: string;
 }
 
-const API_BASE = 'http://localhost:8090';
+const API_BASE = '/recommend';
 
 const RECOMMENDATION_API_URL = `${API_BASE}/api/recommendation`;
 

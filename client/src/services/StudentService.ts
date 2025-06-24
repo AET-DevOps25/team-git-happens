@@ -1,6 +1,6 @@
 import { StudentDTO } from '@/types';
 
-const API_BASE_URL = 'http://localhost:8086';
+const API_BASE_URL = '/auth';
 
 // Define a simple Optional type to better handle null/undefined values
 export interface Optional<T> {
@@ -71,7 +71,7 @@ export const StudentService = {
   getStudentByMatriculationNumber: async (matriculationNumber: string): Promise<Optional<StudentDTO>> => {
     try {
       // Corrected endpoint to match backend implementation
-      const student = await fetchApi<StudentDTO>(`${API_BASE_URL}/auth/students/${matriculationNumber}`);
+      const student = await fetchApi<StudentDTO>(`${API_BASE_URL}/students/${matriculationNumber}`);
       return of(student);
     } catch (error: unknown) {
       const err = error as Error & { status?: number };

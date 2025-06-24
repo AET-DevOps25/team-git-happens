@@ -1,7 +1,7 @@
 import { CourseDTO, CategoryDTO } from "../types";
 import { useAuthStore } from "./AuthService";
 
-const API_BASE_URL = 'http://localhost:8085'; 
+const API_BASE_URL = '/courses'; 
 
 // Helper function for API calls
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
@@ -28,16 +28,16 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
 
 export const CourseService = {
   getAllCourses: async (): Promise<CourseDTO[]> => {
-    return fetchApi<CourseDTO[]>(`${API_BASE_URL}/courses`);
+    return fetchApi<CourseDTO[]>(`${API_BASE_URL}`);
   },
 
   getAllCategories: async (): Promise<CategoryDTO[]> => {
-    return fetchApi<CategoryDTO[]>(`${API_BASE_URL}/categories`);
+    return fetchApi<CategoryDTO[]>(`/categories`);
   },
 
   getCourseById: async (id: string): Promise<CourseDTO | undefined> => {
     try {
-      return await fetchApi<CourseDTO>(`${API_BASE_URL}/courses/${id}`);
+      return await fetchApi<CourseDTO>(`${API_BASE_URL}/${id}`);
     } catch (error: unknown) {
       const err = error as Error & { status?: number };
       if (err.status === 404) {
@@ -53,7 +53,7 @@ export const CourseService = {
     }
     const params = new URLSearchParams();
     ids.forEach(id => params.append('ids', id));
-    return fetchApi<CourseDTO[]>(`${API_BASE_URL}/courses?${params.toString()}`);
+    return fetchApi<CourseDTO[]>(`${API_BASE_URL}?${params.toString()}`);
   },
 
   searchCourses: async (query: string, categoryId?: string): Promise<CourseDTO[]> => {
@@ -64,11 +64,11 @@ export const CourseService = {
     if (categoryId) {
       params.append('categoryId', categoryId); // Assuming backend filters by 'categoryId'
     }
-    return fetchApi<CourseDTO[]>(`${API_BASE_URL}/courses/search?${params.toString()}`);
+    return fetchApi<CourseDTO[]>(`${API_BASE_URL}/search?${params.toString()}`);
   },
 
   createCourse: async (courseData: Omit<CourseDTO, 'id'>): Promise<CourseDTO> => {
-    return fetchApi<CourseDTO>(`${API_BASE_URL}/courses`, {
+    return fetchApi<CourseDTO>(`${API_BASE_URL}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(courseData),
