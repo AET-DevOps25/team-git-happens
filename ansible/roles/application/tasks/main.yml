@@ -37,6 +37,7 @@
     name:
       - requests
       - docker
+      - urllib3<2.0
     executable: pip3
   become: yes
 
