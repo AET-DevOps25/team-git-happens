@@ -21,7 +21,7 @@ interface AuthState {
   updateStudent: (student: Student) => void;
 }
 
-const API_BASE_URL = '/auth';
+const API_BASE_URL = '/api/auth';
 
 export const useAuthStore = create<AuthState>((set) => ({
   student: localStorage.getItem('courseCompassUser')

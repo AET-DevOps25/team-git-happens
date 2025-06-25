@@ -1,7 +1,7 @@
 import { CourseDTO, CategoryDTO } from "../types";
 import { useAuthStore } from "./AuthService";
 
-const API_BASE_URL = '/courses'; 
+const API_BASE_URL = '/api/courses'; 
 
 // Helper function for API calls
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
@@ -32,7 +32,7 @@ export const CourseService = {
   },
 
   getAllCategories: async (): Promise<CategoryDTO[]> => {
-    return fetchApi<CategoryDTO[]>(`/categories`);
+    return fetchApi<CategoryDTO[]>(`/api/categories`);
   },
 
   getCourseById: async (id: string): Promise<CourseDTO | undefined> => {

@@ -2,7 +2,7 @@ import { Review } from "../types";
 
 export const ReviewService = {
   getReviewsByCourseId: async (courseId: string): Promise<Review[]> => {
-    const response = await fetch(`/courses/${courseId}/reviews`);
+    const response = await fetch(`/api/courses/${courseId}/reviews`);
     if (!response.ok) {
       throw new Error(`Failed to fetch reviews for course ${courseId}`);
     }
@@ -10,7 +10,7 @@ export const ReviewService = {
   },
 
   getReviewsByStudentMatrNr: async (studentMatrNr: string): Promise<Review[]> => {
-    const response = await fetch(`/students/${studentMatrNr}/reviews`);
+    const response = await fetch(`/api/students/${studentMatrNr}/reviews`);
     if (!response.ok) {
       throw new Error(`Failed to fetch reviews for student ${studentMatrNr}`);
     }
@@ -18,7 +18,7 @@ export const ReviewService = {
   },
 
   getAverageRatingByCourseId: async (courseId: string): Promise<number | undefined> => {
-    const response = await fetch(`/courses/${courseId}/average-rating`);
+    const response = await fetch(`/api/courses/${courseId}/average-rating`);
     if (!response.ok) {
       if (response.status === 404) {
         return undefined;
@@ -41,7 +41,7 @@ export const ReviewService = {
   },
 
   addReview: async (reviewData: Omit<Review, 'reviewId' | 'createdAt'>): Promise<Review> => {
-    const response = await fetch('/reviews', {
+    const response = await fetch('/api/reviews', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

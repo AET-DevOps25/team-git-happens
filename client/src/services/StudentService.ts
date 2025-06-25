@@ -1,6 +1,6 @@
 import { StudentDTO } from '@/types';
 
-const API_BASE_URL = '/auth';
+const API_BASE_URL = '/api/auth';
 
 // Define a simple Optional type to better handle null/undefined values
 export interface Optional<T> {
