@@ -42,19 +42,59 @@
     executable: pip3
   become: yes
 
-- name: Login to GitHub Container Registry
-  docker_login:
-    registry: ghcr.io
-    username: "{{ github_username }}"
-    password: "{{ github_token }}"
-  become: no
-  become_user: ec2-user
+- name: Ensure ec2-user is in docker group and setup Docker
+  block:
+    - name: Add ec2-user to docker group (ensure it's applied)
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+      become: yes
+    
+    - name: Restart Docker service
+      systemd:
+        name: docker
+        state: restarted
+      become: yes
+      
+    - name: Wait for Docker socket to be ready
+      wait_for:
+        path: /var/run/docker.sock
+        timeout: 30
+      become: yes
+      
+    - name: Set Docker socket permissions
+      file:
+        path: /var/run/docker.sock
+        owner: root
+        group: docker
+        mode: '0664'
+      become: yes
+
+- name: Test Docker access
+  shell: docker version
+  become: yes
+  register: docker_test
+
+- name: Debug Docker test result
+  debug:
+    var: docker_test
+
+- name: Login to GitHub Container Registry using shell command
+  shell: |
+    echo "{{ github_token }}" | docker login ghcr.io -u "{{ github_username }}" --password-stdin
+  become: yes
+  no_log: true
+  register: docker_login_result
+
+- name: Debug login result
+  debug:
+    var: docker_login_result
+  when: docker_login_result.rc != 0
 
 - name: Pull latest Docker images
-  docker_image:
-    name: "{{ item }}"
-    source: pull
-    state: present
+  shell: |
+    docker pull "{{ item }}"
   loop:
     - "ghcr.io/aet-devops25/team-git-happens/client:{{ image_tag }}"
     - "ghcr.io/aet-devops25/team-git-happens/course:{{ image_tag }}"
@@ -62,25 +102,34 @@
     - "ghcr.io/aet-devops25/team-git-happens/review:{{ image_tag }}"
     - "ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:{{ image_tag }}"
     - "ghcr.io/aet-devops25/team-git-happens/genai-service:{{ image_tag }}"
-  become: no
-  become_user: ec2-user
+  become: yes
 
 - name: Stop existing application (if any)
-  docker_compose:
-    project_src: "{{ app_dir }}"
-    state: absent
-  become: no
-  become_user: ec2-user
+  shell: |
+    cd "{{ app_dir }}"
+    /usr/local/bin/docker-compose down || docker-compose down || true
+  become: yes
   ignore_errors: yes
 
 - name: Start application with docker-compose
-  docker_compose:
-    project_src: "{{ app_dir }}"
-    state: present
-    pull: yes
-  become: no
-  become_user: ec2-user
+  shell: |
+    cd "{{ app_dir }}"
+    /usr/local/bin/docker-compose up -d --remove-orphans || docker-compose up -d --remove-orphans
+  become: yes
   register: docker_compose_result
+
+- name: Show docker-compose output
+  debug:
+    var: docker_compose_result
+
+- name: Check running containers
+  shell: docker ps
+  become: yes
+  register: docker_ps_result
+
+- name: Show running containers
+  debug:
+    var: docker_ps_result.stdout_lines
 
 - name: Wait for application to be ready
   uri:
@@ -102,4 +151,4 @@
 
 - name: Display application status
   debug:
-    msg: "Application deployment completed. Services: {{ docker_compose_result.services.keys() | list }}"
+    msg: "Application deployment completed. Docker-compose output: {{ docker_compose_result.stdout if docker_compose_result.stdout is defined else 'No output' }}"
