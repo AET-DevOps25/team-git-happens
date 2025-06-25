@@ -168,11 +168,6 @@ Main/Develop → CI (test + build + push) → CD Cloud (deploy)
 - Service mesh integration
 - Advanced deployment strategies (blue-green, canary)
 
-### **Multi-Cloud Support** (Planned):
-- Azure Container Instances
-- Google Cloud Run
-- Hybrid cloud deployments
-
 ## 🔧 **Alternative Approaches**
 
 ### **Monolithic Pipeline**:
