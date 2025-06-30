@@ -24,7 +24,7 @@ jobs:
       - name: Configure kubeconfig
         run: |
           mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+          echo "${{ secrets.KUBECONFIGTEST }}" > ~/.kube/config
 
       - name: Delete existing MySQL
         run: |
