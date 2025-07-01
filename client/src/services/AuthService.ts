@@ -21,8 +21,7 @@ interface AuthState {
   updateStudent: (student: Student) => void;
 }
 
-// Use relative paths in production; fallback to localhost in development
-const API_BASE_URL = import.meta.env.DEV ? 'http://localhost:8086' : '';
+const API_BASE_URL = 'http://localhost:8086';
 
 export const useAuthStore = create<AuthState>((set, get) => ({ // Added get
   student: localStorage.getItem('courseCompassUser')
