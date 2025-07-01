@@ -67,6 +67,7 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://client-app.student.k8s.aet.cit.tum.de"
     nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE"
     nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
   hosts:
     - host: authentication.student.k8s.aet.cit.tum.de
       paths:
