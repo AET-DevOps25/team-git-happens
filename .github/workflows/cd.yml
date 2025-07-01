@@ -1,9 +1,6 @@
 name: CD - Continuous Deployment on Cloud
 
 on:
-  repository_dispatch:
-    types:
-      - dev-deploy
   workflow_dispatch:
     inputs:
       environment:
