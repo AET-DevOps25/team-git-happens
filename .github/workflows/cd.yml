@@ -12,10 +12,6 @@ on:
     workflows: ["CI - Continuous Integration"]
     types:
       - completed
-    branches:
-      - main
-      - develop
-      - deployment-ec2
   
   workflow_dispatch:
     inputs:
@@ -48,7 +44,7 @@ jobs:
   terraform:
     name: Terraform Infrastructure
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event_name == 'workflow_run'
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     
     outputs:
       ec2-ip: ${{ steps.output.outputs.ec2_public_ip }}
@@ -178,7 +174,7 @@ jobs:
       run: |
         if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
           echo "image_tag=${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "deployment-ec2"]]; then 
+        elif [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "deployment-ec2" ]]; then 
           echo "image_tag=latest" >> $GITHUB_OUTPUT
         else
           echo "image_tag=staging" >> $GITHUB_OUTPUT
