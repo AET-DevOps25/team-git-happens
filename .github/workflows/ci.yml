@@ -194,13 +194,12 @@ jobs:
     if: ${{ success() }}
     steps:
       - name: Dispatch CD workflow
-        uses: peter-evans/workflow-dispatch@v2
+        uses: adityakar/workflow-dispatcher@v1.0
         with:
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          workflow: cd.yml
-          ref: ${{ github.ref_name }}
-          inputs: |
-            environment: staging
-            image_tag: ${{ github.sha }}
-            destroy: false
+          event_type: dev-deploy
+          client_payload: '{"environment":"staging","image_tag":"latest","destroy":"false"}'
+          wait_time: 5
+          max_time: 180
