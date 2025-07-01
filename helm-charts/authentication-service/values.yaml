@@ -73,7 +73,7 @@ ingress:
   hosts:
     - host: authentication.student.k8s.aet.cit.tum.de
       paths:
-        - path: /
+        - path: /api/auth
           pathType: Prefix
   tls:
     - secretName: authentication-tls
