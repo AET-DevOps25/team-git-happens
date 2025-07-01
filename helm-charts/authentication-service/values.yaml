@@ -59,7 +59,22 @@ service:
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: true
-  host: authentication.student.k8s.aet.cit.tum.de
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "$http_origin"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+  hosts:
+    - host: authentication.student.k8s.aet.cit.tum.de
+      paths:
+        - path: /auth
+          pathType: Prefix
+  tls:
+    - secretName: authentication-tls
+      hosts:
+        - authentication.student.k8s.aet.cit.tum.de
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
