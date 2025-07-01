@@ -5,10 +5,16 @@ metadata:
   namespace: team-git-happens
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "$http_origin"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, PUT, POST, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+
 spec:
   ingressClassName: nginx
   rules:
-    - host: client-app.student.k8s.aet.cit.tum.de
+    - host: k83-client-app.student.k8s.aet.cit.tum.de
       http:
         paths:
           - path: /auth
