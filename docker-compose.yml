@@ -97,6 +97,7 @@ services:
       LOGGING_LEVEL_ORG_FLYWAYDB: DEBUG
 
   genai-service:
+    image: ghcr.io/aet-devops25/team-git-happens/genai-service:latest
     build:
       context: ./genai-service
       dockerfile: Dockerfile
@@ -112,6 +113,7 @@ services:
       - review-service
  
   recommendation-gateway:
+    image: ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest
     build:
       context: ./server/recommendation-gateway     # Pfad zu deinem Dockerfile
       dockerfile: Dockerfile
