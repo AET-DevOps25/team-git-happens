@@ -6,10 +6,8 @@ metadata:
   labels:
     {{- include "authentication-service.labels" . | nindent 4 }}
   annotations:
+    # enable CORS via user-defined annotations below
     nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://client-app.student.k8s.aet.cit.tum.de"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
     {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
