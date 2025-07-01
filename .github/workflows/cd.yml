@@ -2,12 +2,16 @@ name: CD - Continuous Deployment on Cloud
 
 on:
   # Trigger on push to specific branches (more reliable than workflow_run)
-  push:
-    branches: [ main, develop, deployment-ec2 ]
-    paths-ignore:
-      - 'README.md'
-      - 'docs/**'
-      - '*.md'
+  #push:
+  #  branches: [ main, develop, deployment-ec2 ]
+    # paths-ignore:
+    #   - 'README.md'
+    #   - 'docs/**'
+    #   - '*.md'
+  workflow_run:
+    workflows: ["CI - Continuous Integration"]
+    types:
+      - completed
   
   workflow_dispatch:
     inputs:
@@ -170,7 +174,7 @@ jobs:
       run: |
         if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
           echo "image_tag=${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.ref_name }}" == "main" ]]; then
+        elif [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "deployment-ec2"]]; then 
           echo "image_tag=latest" >> $GITHUB_OUTPUT
         else
           echo "image_tag=staging" >> $GITHUB_OUTPUT
