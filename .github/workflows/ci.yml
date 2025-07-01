@@ -193,13 +193,12 @@ jobs:
     needs: build
     if: ${{ success() }}
     steps:
-      - name: Dispatch CD workflow
-        uses: adityakar/workflow-dispatcher@v1.0
+      - name: Trigger Repository Dispatch for CD
+        uses: dlekhah/repository-dispatcher-monitor@v1
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          event: dev-deploy
           owner: ${{ github.repository_owner }}
           repo: ${{ github.event.repository.name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          event_type: dev-deploy
-          client_payload: '{"environment":"staging","image_tag":"latest","destroy":"false"}'
-          wait_time: 5
-          max_time: 180
+          inputs: '{"environment":"staging","image_tag":"latest","destroy":"false"}'
+          status_refresh_time: 5
