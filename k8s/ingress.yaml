@@ -25,14 +25,14 @@ spec:
                 name: course-service
                 port:
                   number: 8080
-          - path: /api/review
+          - path: /api/reviews
             pathType: Prefix
             backend:
               service:
                 name: review-service
                 port:
                   number: 8080
-          - path: /api/recommend
+          - path: /api/recommendation
             pathType: Prefix
             backend:
               service:
@@ -53,14 +53,14 @@ spec:
                 name: course-service
                 port:
                   number: 8080
-          - path: /review
+          - path: /reviews
             pathType: Prefix
             backend:
               service:
                 name: review-service
                 port:
                   number: 8080
-          - path: /recommend
+          - path: /recommendation
             pathType: Prefix
             backend:
               service:
