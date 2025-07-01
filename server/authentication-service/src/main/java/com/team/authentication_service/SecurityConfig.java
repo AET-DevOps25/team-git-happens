@@ -28,7 +28,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Collections.singletonList("https://client-app.student.k8s.aet.cit.tum.de"));
+        // allow client-app subdomains (incl. k83-client-app) via origin patterns
+        config.setAllowedOriginPatterns(Arrays.asList(
+            "https://client-app.student.k8s.aet.cit.tum.de",
+            "https://k83-client-app.student.k8s.aet.cit.tum.de"
+        ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowCredentials(true);
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
