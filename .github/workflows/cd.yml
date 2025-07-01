@@ -12,6 +12,10 @@ on:
     workflows: ["CI - Continuous Integration"]
     types:
       - completed
+    branches:
+      - main
+      - develop
+      - deployment-ec2
   
   workflow_dispatch:
     inputs:
