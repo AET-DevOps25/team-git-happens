@@ -16,8 +16,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
             .allowedOriginPatterns(
                 "http://localhost:3000",
-                "https://client-app.student.k8s.aet.cit.tum.de",
-                "https://k83-client-app.student.k8s.aet.cit.tum.de"
+                "http://client-app.student.k8s.aet.cit.tum.de",
+                "http://k83-client-app.student.k8s.aet.cit.tum.de"
             )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("Authorization", "Content-Type")
