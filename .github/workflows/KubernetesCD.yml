@@ -43,34 +43,34 @@ jobs:
           helm upgrade --install client-app ./helm-charts/client-app \
             --namespace team-git-happens \
             --create-namespace \
-            --set image.tag=f94324c46256436bac64562912187f7b79e2bcef
+            --set image.tag=latest
 
       - name: Deploy authentication-service
         run: |
           helm upgrade --install authentication-service ./helm-charts/authentication-service \
             --namespace team-git-happens \
-            --set image.tag=f94324c46256436bac64562912187f7b79e2bcef
+            --set image.tag=latest
 
       - name: Deploy course-service
         run: |
           helm upgrade --install course-service ./helm-charts/course-service \
             --namespace team-git-happens \
-            --set image.tag=f94324c46256436bac64562912187f7b79e2bcef
+            --set image.tag=latest
 
       - name: Deploy review-service
         run: |
           helm upgrade --install review-service ./helm-charts/review-service \
             --namespace team-git-happens \
-            --set image.tag=f94324c46256436bac64562912187f7b79e2bcef
+            --set image.tag=latest
 
       - name: Deploy recommendation-gateway
         run: |
           helm upgrade --install recommendation-gateway ./helm-charts/recommendation-gateway \
             --namespace team-git-happens \
-            --set image.tag=f94324c46256436bac64562912187f7b79e2bcef
+            --set image.tag=latest
 
       - name: Deploy genai-service
         run: |
           helm upgrade --install genai-service ./helm-charts/genai-service \
             --namespace team-git-happens \
-            --set image.tag=f94324c46256436bac64562912187f7b79e2bcef
+            --set image.tag=latest
