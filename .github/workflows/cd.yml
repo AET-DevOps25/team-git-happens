@@ -44,7 +44,7 @@ jobs:
   terraform:
     name: Terraform Infrastructure
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event_name == 'workflow_run'
     
     outputs:
       ec2-ip: ${{ steps.output.outputs.ec2_public_ip }}
