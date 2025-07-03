@@ -1,0 +1,10 @@
+---
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: enable course-compass service
+  systemd:
+    name: course-compass
+    enabled: yes
+    state: started

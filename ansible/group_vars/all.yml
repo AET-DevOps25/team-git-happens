@@ -1,0 +1,16 @@
+---
+# Group variables for all EC2 instances
+ansible_user: ec2-user
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+
+# Application variables
+app_dir: /opt/course-compass
+docker_compose_version: "2.23.0"
+
+# Will be overridden by pipeline variables
+image_tag: "latest"
+environment: "prod"
+
+# Database configuration (will be provided by Terraform output)
+# db_username: "{{ vault_db_username }}"
+# db_password: "{{ vault_db_password }}" # Used for both root and application user

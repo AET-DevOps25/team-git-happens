@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Compass, BookOpen, Star, ArrowRight, GraduationCap } from 'lucide-react';
+import { Compass, BookOpen, Star, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '@/services/AuthService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 

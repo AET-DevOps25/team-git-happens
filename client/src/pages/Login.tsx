@@ -16,7 +16,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const from = (location.state as any)?.from?.pathname || '/';
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

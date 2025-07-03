@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { CourseService } from '@/services/CourseService';
-import { CourseDTO, CategoryDTO } from '@/types'; // Import CourseDTO and CategoryDTO
+import { CourseDTO } from '@/types';
 import CourseCard from '@/components/CourseCard';
 import Spinner from '@/components/Spinner';
 import { Search, Filter, X } from 'lucide-react';
@@ -37,12 +37,7 @@ const [courses, setCourses] = useState<CourseDTO[]>([]); // Use CourseDTO
     
     loadCourses();
   }, []);
-  
-  useEffect(() => {
-    filterCourses();
-  }, [searchQuery, selectedCategories]); // Changed from selectedTags
-  
-  const filterCourses = () => {
+  const filterCourses = useCallback(() => {
     let filtered = [...courses];
     
     // Filter by search query
@@ -65,7 +60,11 @@ const [courses, setCourses] = useState<CourseDTO[]>([]); // Use CourseDTO
     }
     
     setFilteredCourses(filtered);
-  };
+  }, [courses, searchQuery, selectedCategories]);
+  
+  useEffect(() => {
+    filterCourses();
+  }, [filterCourses]);
   
   const toggleCategory = (categoryName: string) => { // Renamed from toggleTag
     setSelectedCategories(prev => 

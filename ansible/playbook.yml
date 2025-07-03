@@ -1,0 +1,12 @@
+---
+- name: Deploy Course Compass Application
+  hosts: ec2_instances
+  become: yes
+  gather_facts: yes
+  vars:
+    app_dir: /opt/course-compass
+    docker_compose_version: "2.23.0"
+    
+  roles:
+    - docker
+    - application

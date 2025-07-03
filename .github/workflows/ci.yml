@@ -1,0 +1,210 @@
+name: CI - Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop, deployment-ec2 ]
+  #pull_request:
+  #  branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: client/package-lock.json
+
+    - name: Install client dependencies
+      run: |
+        cd client
+        npm ci
+
+    - name: Run client linting
+      run: |
+        cd client
+        npm run lint
+
+    - name: Run client tests
+      run: |
+        cd client
+        npm test -- --coverage --watchAll=false
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Test Spring Boot services
+      run: |
+        cd server/course-service
+        ./gradlew test
+        cd ../authentication-service
+        ./gradlew test
+        cd ../review-service
+        ./gradlew test
+        cd ../recommendation-gateway
+        ./gradlew test
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |
+          client/coverage/
+          server/*/build/reports/tests/
+
+  build:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev-branch' || github.ref == 'refs/heads/deployment-ec2'
+    
+    outputs:
+      image-tag: latest
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build client image (with latest tag)
+      run: |
+        docker build \
+          -t ghcr.io/aet-devops25/team-git-happens/client:${GITHUB_SHA} \
+          -t ghcr.io/aet-devops25/team-git-happens/client:latest \
+          ./client
+
+    - name: Push client images
+      run: |
+        docker push ghcr.io/aet-devops25/team-git-happens/client:${GITHUB_SHA}
+        docker push ghcr.io/aet-devops25/team-git-happens/client:latest
+
+    - name: Build course-service JAR
+      run: |
+        cd server/course-service
+        ./gradlew build
+
+    - name: Build course service image (with latest tag)
+      run: |
+        docker build \
+          -t ghcr.io/aet-devops25/team-git-happens/course:${GITHUB_SHA} \
+          -t ghcr.io/aet-devops25/team-git-happens/course:latest \
+          ./server/course-service
+
+    - name: Push course service images
+      run: |
+        docker push ghcr.io/aet-devops25/team-git-happens/course:${GITHUB_SHA}
+        docker push ghcr.io/aet-devops25/team-git-happens/course:latest
+
+    - name: Build authentication-service JAR
+      run: |
+        cd server/authentication-service
+        ./gradlew build
+
+    - name: Build authentication service image (with latest tag)
+      run: |
+        docker build \
+          -t ghcr.io/aet-devops25/team-git-happens/authentication:${GITHUB_SHA} \
+          -t ghcr.io/aet-devops25/team-git-happens/authentication:latest \
+          ./server/authentication-service
+
+    - name: Push authentication service images
+      run: |
+        docker push ghcr.io/aet-devops25/team-git-happens/authentication:${GITHUB_SHA}
+        docker push ghcr.io/aet-devops25/team-git-happens/authentication:latest
+
+    - name: Build review-service JAR
+      run: |
+        cd server/review-service
+        ./gradlew build
+
+    - name: Build review service image (with latest tag)
+      run: |
+        docker build \
+          -t ghcr.io/aet-devops25/team-git-happens/review:${GITHUB_SHA} \
+          -t ghcr.io/aet-devops25/team-git-happens/review:latest \
+          ./server/review-service
+
+    - name: Push review service images
+      run: |
+        docker push ghcr.io/aet-devops25/team-git-happens/review:${GITHUB_SHA}
+        docker push ghcr.io/aet-devops25/team-git-happens/review:latest
+
+    - name: Build recommendation-gateway JAR
+      run: |
+        cd server/recommendation-gateway
+        ./gradlew build
+
+    - name: Build recommendation gateway image (with latest tag)
+      run: |
+        docker build \
+          -t ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:${GITHUB_SHA} \
+          -t ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest \
+          ./server/recommendation-gateway
+
+    - name: Push recommendation gateway images
+      run: |
+        docker push ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:${GITHUB_SHA}
+        docker push ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest
+
+    - name: Build genai service image (with latest tag)
+      run: |
+        docker build \
+          -t ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA} \
+          -t ghcr.io/aet-devops25/team-git-happens/genai-service:latest \
+          ./genai-service
+
+    - name: Push genai service images
+      run: |
+        docker push ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA}
+        docker push ghcr.io/aet-devops25/team-git-happens/genai-service:latest
+
+    - name: Build summary
+      run: |
+        echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Image Tag**: latest" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Images Built**: 6 application images" >> $GITHUB_STEP_SUMMARY
+        echo "- **Migration Strategy**: Spring Boot embedded Flyway" >> $GITHUB_STEP_SUMMARY
+
+  trigger-cd:
+    name: Trigger CD Workflow
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ success() }}
+    steps:
+      - name: Dispatch CD via GitHub API
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'cd.yml',
+              ref: context.ref.replace('refs/heads/', ''),
+              inputs: {
+                environment: 'staging',
+                image_tag: 'latest',
+                destroy: 'false'
+              }
+            });

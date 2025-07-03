@@ -385,6 +385,7 @@ sketch
 .env.test.local
 .env.production.local
 *.env
+*.env.*
 
 # API Keys and secrets
 *.key
@@ -403,3 +404,33 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+server/authentication-service/.gradle/8.13/executionHistory/executionHistory.lock
+server/authentication-service/.gradle/8.13/fileHashes/fileHashes.lock
+server/authentication-service/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+server/recommendation-gateway/.gradle/8.13/executionHistory/executionHistory.lock
+server/recommendation-gateway/.gradle/8.13/executionHistory/executionHistory.bin
+server/recommendation-gateway/.gradle/8.13/fileHashes/fileHashes.lock
+server/recommendation-gateway/.gradle/8.13/fileHashes/fileHashes.bin
+server/recommendation-gateway/.gradle/8.13/fileHashes/resourceHashesCache.bin
+server/recommendation-gateway/.gradle/buildOutputCleanup/outputFiles.bin
+server/recommendation-gateway/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+server/review-service/.gradle/8.13/executionHistory/executionHistory.bin
+server/review-service/.gradle/8.13/executionHistory/executionHistory.lock
+server/review-service/.gradle/8.13/fileHashes/fileHashes.bin
+server/review-service/.gradle/8.13/fileHashes/fileHashes.lock
+server/review-service/.gradle/8.13/fileHashes/resourceHashesCache.bin
+server/review-service/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+
+# Gradle build files
+*/bin/
+**/bin/
+.gradle/
+**/.gradle/
+*.lock
+build/
+**/build/
+.gradletasknamecache
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+.kotlintest/
