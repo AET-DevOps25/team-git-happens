@@ -21,6 +21,7 @@ interface AuthState {
   updateStudent: (student: Student) => void;
 }
 
+
 const API_BASE_URL = 'http://localhost:8086';
 
 export const useAuthStore = create<AuthState>((set, get) => ({ // Added get
