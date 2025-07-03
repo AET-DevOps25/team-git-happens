@@ -1,9 +1,22 @@
 name: KubernetesCD
 
-on: [
-  push,
-  pull_request
-]
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - prod
+      image_tag:
+        description: 'Docker image tag to deploy'
+        required: false
+        default: 'latest'
+        type: string
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
