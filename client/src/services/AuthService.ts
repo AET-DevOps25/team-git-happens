@@ -21,7 +21,7 @@ interface AuthState {
   updateStudent: (student: Student) => void;
 }
 
-const API_BASE_URL = 'https://k83-client-app.student.k8s.aet.cit.tum.de/api';
+const API_BASE_URL = 'https://k83-client-app.student.k8s.aet.cit.tum.de';
 
 export const useAuthStore = create<AuthState>((set, get) => ({ // Added get
   student: localStorage.getItem('courseCompassUser')
