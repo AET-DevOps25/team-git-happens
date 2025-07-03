@@ -9,7 +9,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/aet-devops25/team-git-happens/course
   pullPolicy: Always
-  tag: "latest" 
+  tag: "521d9b6e7d2b5cf71c3133b2fb60e02c46ad0e06" 
 
 
 
