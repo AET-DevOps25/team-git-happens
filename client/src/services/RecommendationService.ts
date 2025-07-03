@@ -6,6 +6,7 @@ export interface RecommendedCourse {
   reason: string;
 }
 
+
 const API_BASE = '/api/recommend';
 
 const RECOMMENDATION_API_URL = `${API_BASE}/api/recommendation`;
