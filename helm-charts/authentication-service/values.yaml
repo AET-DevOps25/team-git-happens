@@ -67,10 +67,13 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
   hosts:
-    - host: authentication.student.k8s.aet.cit.tum.de
+    - host: k83-client-app.student.k8s.aet.cit.tum.de
       paths:
-        - path: /auth
+        - path: /api/auth
           pathType: Prefix
+          service:
+            name: authentication-service
+            port: 8080
   tls:
     - secretName: authentication-tls
       hosts:
