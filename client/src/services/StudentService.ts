@@ -1,6 +1,6 @@
 import { StudentDTO } from '@/types';
 
-const API_BASE_URL = 'http://localhost:8086';
+const API_BASE_URL = '/api/auth';
 
 // Define a simple Optional type to better handle null/undefined values
 export interface Optional<T> {
@@ -35,8 +35,8 @@ export function empty<T>(): Optional<T> {
     isPresent: () => false,
     get: () => { throw new Error('Value is not present'); },
     orElse: (defaultValue: T) => defaultValue,
-    map: <U>(_: (value: T) => U) => empty<U>(),
-    flatMap: <U>(_: (value: T) => Optional<U>) => empty<U>(),
+    map: <U>() => empty<U>(),
+    flatMap: <U>() => empty<U>(),
   };
 }
 
@@ -49,10 +49,10 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     try {
       const errorData = await response.json();
       errorMessage = errorData.message || errorData.error || errorMessage;
-    } catch (e) {
+    } catch {
       // Ignore if response body is not JSON or empty
     }
-    const error = new Error(errorMessage) as any;
+    const error = new Error(errorMessage) as Error & { status: number };
     error.status = response.status;
     throw error;
   }
@@ -71,10 +71,11 @@ export const StudentService = {
   getStudentByMatriculationNumber: async (matriculationNumber: string): Promise<Optional<StudentDTO>> => {
     try {
       // Corrected endpoint to match backend implementation
-      const student = await fetchApi<StudentDTO>(`${API_BASE_URL}/auth/students/${matriculationNumber}`);
+      const student = await fetchApi<StudentDTO>(`${API_BASE_URL}/students/${matriculationNumber}`);
       return of(student);
-    } catch (error: any) {
-      if (error.status === 404) {
+    } catch (error: unknown) {
+      const err = error as Error & { status?: number };
+      if (err.status === 404) {
         console.warn(`Student with matriculation number ${matriculationNumber} not found.`);
         return empty<StudentDTO>();
       }

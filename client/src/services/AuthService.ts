@@ -22,9 +22,9 @@ interface AuthState {
 }
 
 
-const API_BASE_URL = 'http://localhost:8086';
+const API_BASE_URL = '/api/auth';
 
-export const useAuthStore = create<AuthState>((set, get) => ({ // Added get
+export const useAuthStore = create<AuthState>((set) => ({
   student: localStorage.getItem('courseCompassUser')
     ? JSON.parse(localStorage.getItem('courseCompassUser') || '{}')
     : null,
@@ -43,7 +43,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({ // Added get
         return false;
       }
 
-      const response = await fetch(`${API_BASE_URL}/auth/login/email`, {
+      const response = await fetch(`${API_BASE_URL}/login/email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({ // Added get
   register: async (payload: RegisterPayload) => {
     set({ loading: true, error: null }); // Set loading true, clear previous errors
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

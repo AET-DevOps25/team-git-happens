@@ -1,0 +1,58 @@
+---
+# Docker role tasks
+- name: Update system packages
+  yum:
+    name: "*"
+    state: latest
+    update_cache: yes
+
+- name: Install required packages
+  yum:
+    name:
+      - docker
+      - git
+      - curl
+      - wget
+    state: present
+
+- name: Start and enable Docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add ec2-user to docker group
+  user:
+    name: ec2-user
+    groups: docker
+    append: yes
+
+- name: Install Docker Compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Create symbolic link for docker-compose
+  file:
+    src: /usr/local/bin/docker-compose
+    dest: /usr/bin/docker-compose
+    state: link
+
+- name: Verify Docker installation
+  command: docker --version
+  register: docker_version
+
+- name: Verify Docker Compose installation
+  command: docker-compose --version
+  register: docker_compose_version_output
+
+- name: Display Docker version
+  debug:
+    msg: "{{ docker_version.stdout }}"
+
+- name: Display Docker Compose version
+  debug:
+    msg: "{{ docker_compose_version_output.stdout }}"

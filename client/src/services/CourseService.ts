@@ -1,7 +1,7 @@
-import { CourseDTO, StudentDTO, CategoryDTO } from "../types";
+import { CourseDTO, CategoryDTO } from "../types";
 import { useAuthStore } from "./AuthService";
 
-const API_BASE_URL = 'http://localhost:8085'; 
+const API_BASE_URL = '/api/courses'; 
 
 // Helper function for API calls
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
@@ -13,10 +13,10 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
       // Try to parse error message from backend
       const errorData = await response.json();
       errorMessage = errorData.message || errorData.error || errorMessage;
-    } catch (e) {
+    } catch {
       // Ignore if response body is not JSON or empty
     }
-    const error = new Error(errorMessage) as any; // Cast to any to add status
+    const error = new Error(errorMessage) as Error & { status: number };
     error.status = response.status; // Attach status to error object for specific handling
     throw error;
   }
@@ -28,18 +28,19 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
 
 export const CourseService = {
   getAllCourses: async (): Promise<CourseDTO[]> => {
-    return fetchApi<CourseDTO[]>(`${API_BASE_URL}/courses`);
+    return fetchApi<CourseDTO[]>(`${API_BASE_URL}`);
   },
 
   getAllCategories: async (): Promise<CategoryDTO[]> => {
-    return fetchApi<CategoryDTO[]>(`${API_BASE_URL}/categories`);
+    return fetchApi<CategoryDTO[]>(`/api/categories`);
   },
 
   getCourseById: async (id: string): Promise<CourseDTO | undefined> => {
     try {
-      return await fetchApi<CourseDTO>(`${API_BASE_URL}/courses/${id}`);
-    } catch (error: any) {
-      if (error.status === 404) {
+      return await fetchApi<CourseDTO>(`${API_BASE_URL}/${id}`);
+    } catch (error: unknown) {
+      const err = error as Error & { status?: number };
+      if (err.status === 404) {
         return undefined; // Return undefined if course not found (404)
       }
       throw error; // Re-throw other errors
@@ -52,7 +53,7 @@ export const CourseService = {
     }
     const params = new URLSearchParams();
     ids.forEach(id => params.append('ids', id));
-    return fetchApi<CourseDTO[]>(`${API_BASE_URL}/courses?${params.toString()}`);
+    return fetchApi<CourseDTO[]>(`${API_BASE_URL}?${params.toString()}`);
   },
 
   searchCourses: async (query: string, categoryId?: string): Promise<CourseDTO[]> => {
@@ -63,11 +64,11 @@ export const CourseService = {
     if (categoryId) {
       params.append('categoryId', categoryId); // Assuming backend filters by 'categoryId'
     }
-    return fetchApi<CourseDTO[]>(`${API_BASE_URL}/courses/search?${params.toString()}`);
+    return fetchApi<CourseDTO[]>(`${API_BASE_URL}/search?${params.toString()}`);
   },
 
   createCourse: async (courseData: Omit<CourseDTO, 'id'>): Promise<CourseDTO> => {
-    return fetchApi<CourseDTO>(`${API_BASE_URL}/courses`, {
+    return fetchApi<CourseDTO>(`${API_BASE_URL}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(courseData),

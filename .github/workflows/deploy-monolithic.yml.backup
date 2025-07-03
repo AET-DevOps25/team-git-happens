@@ -1,0 +1,357 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - staging
+        - prod
+      destroy:
+        description: 'Destroy infrastructure'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  AWS_REGION: us-east-1
+  TERRAFORM_VERSION: 1.6.0
+  ANSIBLE_VERSION: 8.0.0
+
+jobs:
+  # Test and Build Jobs
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: client/package-lock.json
+
+    - name: Install client dependencies
+      run: |
+        cd client
+        npm ci
+
+    - name: Run client tests
+      run: |
+        cd client
+        npm test -- --coverage --watchAll=false
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Test Spring Boot services
+      run: |
+        cd server/course-service
+        ./gradlew test
+        cd ../authentication-service
+        ./gradlew test
+        cd ../review-service
+        ./gradlew test
+        cd ../recommendation-gateway
+        ./gradlew test
+
+  build:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    needs: [test]
+    
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ghcr.io/${{ github.repository }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push client image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./client
+        push: true
+        tags: ghcr.io/${{ github.repository }}/client:${{ steps.meta.outputs.version }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push course service image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./server/course-service
+        push: true
+        tags: ghcr.io/${{ github.repository }}/course:${{ steps.meta.outputs.version }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push authentication service image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./server/authentication-service
+        push: true
+        tags: ghcr.io/${{ github.repository }}/authentication:${{ steps.meta.outputs.version }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push review service image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./server/review-service
+        push: true
+        tags: ghcr.io/${{ github.repository }}/review:${{ steps.meta.outputs.version }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push recommendation gateway image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./server/recommendation-gateway
+        push: true
+        tags: ghcr.io/${{ github.repository }}/recommendation-gateway:${{ steps.meta.outputs.version }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push flyway course migrations image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./server/flyway-course.Dockerfile
+        push: true
+        tags: ghcr.io/${{ github.repository }}/flyway-course:${{ steps.meta.outputs.version }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push flyway authentication migrations image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./server/flyway-authentication.Dockerfile
+        push: true
+        tags: ghcr.io/${{ github.repository }}/flyway-authentication:${{ steps.meta.outputs.version }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push flyway review migrations image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./server/flyway-review.Dockerfile
+        push: true
+        tags: ghcr.io/${{ github.repository }}/flyway-review:${{ steps.meta.outputs.version }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push genai service image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./genai-service
+        push: true
+        tags: ghcr.io/${{ github.repository }}/genai:${{ steps.meta.outputs.version }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # Infrastructure Deployment
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: always() && (needs.build.result == 'success' || github.event.inputs.destroy == 'true')
+    
+    outputs:
+      ec2-ip: ${{ steps.output.outputs.ec2_public_ip }}
+      app-url: ${{ steps.output.outputs.application_url }}
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
+        terraform_wrapper: false
+
+    - name: Determine environment
+      id: env
+      run: |
+        if [[ "${{ github.event.inputs.environment }}" != "" ]]; then
+          echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          echo "environment=prod" >> $GITHUB_OUTPUT
+        else
+          echo "environment=dev" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Terraform Init
+      working-directory: ./terraform
+      run: terraform init
+
+    - name: Terraform Plan
+      working-directory: ./terraform
+      if: github.event.inputs.destroy != 'true'
+      run: |
+        terraform plan \
+          -var-file="${{ steps.env.outputs.environment }}.tfvars" \
+          -var="db_username=${{ secrets.USERNAME }}" \
+          -var="db_password=${{ secrets.PASSWORD }}" \
+          -var="image_tag=${{ needs.build.outputs.image-tag || 'latest' }}" \
+          -out=tfplan
+
+    - name: Terraform Apply
+      working-directory: ./terraform
+      if: github.event.inputs.destroy != 'true'
+      run: terraform apply -auto-approve tfplan
+
+    - name: Terraform Destroy
+      working-directory: ./terraform
+      if: github.event.inputs.destroy == 'true'
+      run: |
+        terraform destroy -auto-approve \
+          -var-file="${{ steps.env.outputs.environment }}.tfvars" \
+          -var="db_username=${{ secrets.USERNAME }}" \
+          -var="db_password=${{ secrets.PASSWORD }}" \
+          -var="image_tag=latest"
+
+    - name: Get Terraform outputs
+      id: output
+      working-directory: ./terraform
+      if: github.event.inputs.destroy != 'true'
+      run: |
+        echo "ec2_public_ip=$(terraform output -raw ec2_public_ip)" >> $GITHUB_OUTPUT
+        echo "application_url=$(terraform output -raw application_url)" >> $GITHUB_OUTPUT
+
+  # Application Configuration with Ansible
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    needs: [terraform, build]
+    if: needs.terraform.result == 'success' && github.event.inputs.destroy != 'true'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Ansible
+      run: |
+        python -m pip install --upgrade pip
+        pip install ansible==${{ env.ANSIBLE_VERSION }}
+        pip install boto3 botocore
+
+    - name: Configure SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ needs.terraform.outputs.ec2-ip }} >> ~/.ssh/known_hosts
+
+    - name: Create Ansible inventory
+      run: |
+        mkdir -p ansible/inventory
+        cat > ansible/inventory/hosts << EOF
+        [ec2_instances]
+        ${{ needs.terraform.outputs.ec2-ip }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/id_rsa
+        
+        [ec2_instances:vars]
+        ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+        EOF
+
+    - name: Wait for EC2 instances to be ready
+      run: |
+        echo "Waiting for ${{ needs.terraform.outputs.ec2-ip }} to be ready..."
+        while ! nc -z ${{ needs.terraform.outputs.ec2-ip }} 22; do
+          sleep 10
+        done
+        echo "${{ needs.terraform.outputs.ec2-ip }} is ready"
+
+    - name: Deploy application with Ansible
+      working-directory: ./ansible
+      run: |
+        ansible-playbook -i inventory/hosts playbook.yml \
+          -e "image_tag=${{ needs.build.outputs.image-tag || 'latest' }}" \
+          -e "db_username=${{ secrets.USERNAME }}" \
+          -e "db_password=${{ secrets.PASSWORD }}" \
+          -e "github_username=${{ github.actor }}" \
+          -e "github_token=${{ secrets.GITHUB_TOKEN }}" \
+          -e "api_url=${{ secrets.API_URL }}" \
+          -e "api_key=${{ secrets.API_KEY }}" \
+          -e "model=${{ secrets.MODEL }}" \
+          -v
+
+    - name: Health check
+      run: |
+        echo "Waiting for application to be ready..."
+        sleep 60
+        
+        echo "Checking health of ${{ needs.terraform.outputs.ec2-ip }}..."
+        curl -f http://${{ needs.terraform.outputs.ec2-ip }}/ || echo "Health check failed"
+
+    - name: Deploy summary
+      run: |
+        echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Environment**: ${{ github.event.inputs.environment || 'auto-detected' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Image Tag**: ${{ needs.build.outputs.image-tag || 'latest' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Application URL**: ${{ needs.terraform.outputs.app-url }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **EC2 Instance**: ${{ needs.terraform.outputs.ec2-ip }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Database**: Containerized MySQL" >> $GITHUB_STEP_SUMMARY

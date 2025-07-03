@@ -6,23 +6,25 @@ services:
     container_name: mysql_server
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD:-githappens!}'  # Use environment variable or default
-    ports:
-      - "3306:3306"  # Only expose if needed for external access
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD:-githappens!}'
+      MYSQL_DATABASE: course_compass
+      MYSQL_USER: '${DB_USERNAME:-admin}'
+      MYSQL_PASSWORD: '${DB_PASSWORD:-githappens!}'
+    ports: []  # Remove external port exposure for security
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d  # Only needs the init scripts
     networks:
       - app_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-githappens!}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD:-githappens!}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
 
   client-app:
-    image: ${DOCKER_REGISTRY}/team-git-happens-client:${IMAGE_TAG:-latest}  # Your pre-built client image
+    image: ghcr.io/aet-devops25/team-git-happens/client:${IMAGE_TAG:-latest}  # Your pre-built client image
     container_name: client_app
     restart: always
     ports:
@@ -35,7 +37,7 @@ services:
       - review-service
 
   course-service:
-    image: ${DOCKER_REGISTRY}/team-git-happens-course-service:${IMAGE_TAG:-latest}  # Your pre-built image
+    image: ghcr.io/aet-devops25/team-git-happens/course:${IMAGE_TAG:-latest}
     container_name: course_service_app
     restart: always
     depends_on:
@@ -43,16 +45,21 @@ services:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/course_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-githappens!}
+      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME:-admin}'
+      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}'
+      
+      # Flyway configuration - Spring Boot will handle migrations
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_VALIDATE_ON_MIGRATE: "true"
+      
+      # JPA configuration - validate mode for safety
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_FLYWAY_ENABLED: true
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
     networks:
       - app_network
 
   authentication-service:
-    image: ${DOCKER_REGISTRY}/team-git-happens-auth-service:${IMAGE_TAG:-latest}  # Your pre-built image
+    image: ghcr.io/aet-devops25/team-git-happens/authentication:${IMAGE_TAG:-latest}
     container_name: authentication_service_app
     restart: always
     depends_on:
@@ -60,16 +67,21 @@ services:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/auth_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-githappens!}
+      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME:-admin}'
+      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}'
+      
+      # Flyway configuration - Spring Boot will handle migrations
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_VALIDATE_ON_MIGRATE: "true"
+      
+      # JPA configuration - validate mode for safety
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_FLYWAY_ENABLED: true
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
     networks:
       - app_network
 
   review-service:
-    image: ${DOCKER_REGISTRY}/team-git-happens-review-service:${IMAGE_TAG:-latest}  # Your pre-built image
+    image: ghcr.io/aet-devops25/team-git-happens/review:${IMAGE_TAG:-latest}
     container_name: review_service_app
     restart: always
     depends_on:
@@ -77,60 +89,39 @@ services:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/review_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-githappens!}
+      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME:-admin}'
+      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}'
+      
+      # Flyway configuration - Spring Boot will handle migrations
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_VALIDATE_ON_MIGRATE: "true"
+      
+      # JPA configuration - validate mode for safety
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_FLYWAY_ENABLED: true
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
     networks:
       - app_network
-
-  # Flyway migration containers - for the first deployment or migrations
-  flyway_course:
-    image: flyway/flyway:9
-    command: migrate
-    depends_on:
-      db:
-        condition: service_healthy
+      
+  recommendation-gateway:
+    image: ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:${IMAGE_TAG:-latest}
+    container_name: recommendation_gateway
+    restart: always
     environment:
-      FLYWAY_URL: jdbc:mysql://mysql_server:3306/course_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      FLYWAY_USER: admin
-      FLYWAY_PASSWORD: ${DB_PASSWORD:-githappens!}
-      FLYWAY_CLEAN_DISABLED: "true"  # For production, disable clean
-    volumes:
-      - ./migrations/course:/flyway/sql  # Directory to store SQL migration files
+      SERVER_PORT: 8080
+      GENAI_API_URL: http://genai_service:8000
     networks:
       - app_network
-
-  flyway_authentication:
-    image: flyway/flyway:9
-    command: migrate
     depends_on:
-      db:
-        condition: service_healthy
+      - genai-service
+      
+  genai-service:
+    image: ghcr.io/aet-devops25/team-git-happens/genai-service:${IMAGE_TAG:-latest}
+    container_name: genai_service
+    restart: always
     environment:
-      FLYWAY_URL: jdbc:mysql://mysql_server:3306/auth_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      FLYWAY_USER: admin
-      FLYWAY_PASSWORD: ${DB_PASSWORD:-githappens!}
-      FLYWAY_CLEAN_DISABLED: "true"
-    volumes:
-      - ./migrations/auth:/flyway/sql  # Directory to store SQL migration files
-    networks:
-      - app_network
-
-  flyway_review:
-    image: flyway/flyway:9
-    command: migrate
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      FLYWAY_URL: jdbc:mysql://mysql_server:3306/review_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      FLYWAY_USER: admin
-      FLYWAY_PASSWORD: ${DB_PASSWORD:-githappens!}
-      FLYWAY_CLEAN_DISABLED: "true"
-    volumes:
-      - ./migrations/review:/flyway/sql  # Directory to store SQL migration files
+      API_URL: ${API_URL:-https://api.openai.com/v1/chat/completions}
+      API_KEY: ${API_KEY:-your_openai_api_key}
+      MODEL: ${MODEL:-gpt-3.5-turbo}
     networks:
       - app_network
 

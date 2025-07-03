@@ -4,12 +4,22 @@ import { BrowserRouter } from 'react-router-dom';
 import Recommend from './Recommend';
 import { CourseService } from '../services/CourseService';
 import { RecommendationService } from '../services/RecommendationService';
-import { CategoryDTO, CourseDTO, UserPreferences } from '../types';
+import { CategoryDTO, CourseDTO } from '../types';
 import { RecommendedCourse } from '../services/RecommendationService';
+import { toast } from 'sonner';
 
 // Mock services
 jest.mock('../services/CourseService');
 jest.mock('../services/RecommendationService');
+
+// Mock sonner toast
+jest.mock('sonner', () => ({
+  toast: {
+    error: jest.fn(),
+    success: jest.fn(),
+    info: jest.fn(),
+  },
+}));
 
 const mockGetAllCategories = CourseService.getAllCategories as jest.Mock;
 const mockGetRecommendationsFromPreferences = RecommendationService.getRecommendationsFromPreferences as jest.Mock;
@@ -144,7 +154,7 @@ describe('Recommend Page', () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(require('sonner').toast.error).toHaveBeenCalledWith('Please select at least one category');
+        expect(toast.error).toHaveBeenCalledWith('Please select at least one category');
       });
     });
 
@@ -171,7 +181,7 @@ describe('Recommend Page', () => {
 
       // Wait for the validation error
       await waitFor(() => {
-        expect(require('sonner').toast.error).toHaveBeenCalledWith('Please provide a description');
+        expect(toast.error).toHaveBeenCalledWith('Please provide a description');
       });
 
       // The API should not have been called since validation failed
@@ -303,7 +313,7 @@ describe('Recommend Page', () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(require('sonner').toast.info).toHaveBeenCalledWith('No courses match your preferences. Try selecting different options.');
+        expect(toast.info).toHaveBeenCalledWith('No courses match your preferences. Try selecting different options.');
       });
 
       await waitFor(() => {
@@ -324,7 +334,7 @@ describe('Recommend Page', () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(require('sonner').toast.error).toHaveBeenCalledWith('Failed to generate recommendations');
+        expect(toast.error).toHaveBeenCalledWith('Failed to generate recommendations');
       });
     });
   });
@@ -385,7 +395,7 @@ describe('Recommend Page', () => {
       });
 
       await waitFor(() => {
-        expect(require('sonner').toast.error).toHaveBeenCalledWith('Failed to load categories');
+        expect(toast.error).toHaveBeenCalledWith('Failed to load categories');
       });
     });
   });

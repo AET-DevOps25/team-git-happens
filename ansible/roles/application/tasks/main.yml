@@ -1,0 +1,105 @@
+---
+# Application role tasks
+- name: Create application directory
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+    mode: '0755'
+
+- name: Copy docker-compose.prod.yml to server
+  copy:
+    src: ../../../docker-compose.prod.yml
+    dest: "{{ app_dir }}/docker-compose.yml"
+    owner: ec2-user
+    group: ec2-user
+    mode: '0644'
+
+- name: Copy MySQL initialization scripts
+  copy:
+    src: ../../../server/mysql-init/
+    dest: "{{ app_dir }}/mysql-init/"
+    owner: ec2-user
+    group: ec2-user
+    mode: '0644'
+
+- name: Create environment file
+  template:
+    src: env.j2
+    dest: "{{ app_dir }}/.env"
+    owner: ec2-user
+    group: ec2-user
+    mode: '0600'
+
+- name: Install required python libraries
+  pip:
+    name:
+      - requests
+      - docker
+      - urllib3<2.0
+      - docker-compose
+    executable: pip3
+  become: yes
+
+- name: Login to GitHub Container Registry
+  docker_login:
+    registry: ghcr.io
+    username: "{{ github_username }}"
+    password: "{{ github_token }}"
+  become: no
+  become_user: ec2-user
+
+- name: Pull latest Docker images
+  docker_image:
+    name: "{{ item }}"
+    source: pull
+    state: present
+  loop:
+    - "ghcr.io/aet-devops25/team-git-happens/client:{{ image_tag }}"
+    - "ghcr.io/aet-devops25/team-git-happens/course:{{ image_tag }}"
+    - "ghcr.io/aet-devops25/team-git-happens/authentication:{{ image_tag }}"
+    - "ghcr.io/aet-devops25/team-git-happens/review:{{ image_tag }}"
+    - "ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:{{ image_tag }}"
+    - "ghcr.io/aet-devops25/team-git-happens/genai-service:{{ image_tag }}"
+  become: no
+  become_user: ec2-user
+
+- name: Stop existing application (if any)
+  docker_compose:
+    project_src: "{{ app_dir }}"
+    state: absent
+  become: no
+  become_user: ec2-user
+  ignore_errors: yes
+
+- name: Start application with docker-compose
+  docker_compose:
+    project_src: "{{ app_dir }}"
+    state: present
+    pull: yes
+  become: no
+  become_user: ec2-user
+  register: docker_compose_result
+
+- name: Wait for application to be ready
+  uri:
+    url: "http://localhost"
+    method: GET
+    status_code: 200
+  retries: 30
+  delay: 10
+  ignore_errors: yes
+
+- name: Create systemd service for application
+  template:
+    src: course-compass.service.j2
+    dest: /etc/systemd/system/course-compass.service
+    mode: '0644'
+  notify:
+    - reload systemd
+    - enable course-compass service
+
+- name: Display application status
+  debug:
+    msg: "Application deployment completed. Services: {{ docker_compose_result.services.keys() | list }}"
