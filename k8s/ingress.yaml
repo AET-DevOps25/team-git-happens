@@ -1,7 +1,7 @@
 http:
 -        paths:
 -          # API routes
--          - path: /api/auth
+-          - path: /auth
 -            pathType: Prefix
 -            backend:
 -              service:
