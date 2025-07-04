@@ -66,14 +66,20 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+  # hosts:
+  #   - host: k83-client-app.student.k8s.aet.cit.tum.de
+  #     paths:
+  #       - path: /api/auth
+  #         pathType: Prefix
+  #         service:
+  #           name: authentication-service
+  #           port: 8080
+
   hosts:
-    - host: k83-client-app.student.k8s.aet.cit.tum.de
+    - host: chart-example.local
       paths:
-        - path: /api/auth
-          pathType: Prefix
-          service:
-            name: authentication-service
-            port: 8080
+        - path: /
+          pathType: ImplementationSpecific
   tls:
     - secretName: authentication-tls
       hosts:
