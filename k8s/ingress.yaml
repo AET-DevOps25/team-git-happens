@@ -1,0 +1,39 @@
+http:
+-        paths:
+-          # API routes
+-          - path: /api/auth
+-            pathType: Prefix
+-            backend:
+-              service:
+-                name: authentication-service
+-                port:
+-                  number: 8080
+-          - path: /api/courses
+-            pathType: Prefix
+-            backend:
+-              service:
+-                name: course-service
+-                port:
+-                  number: 8080
+-          - path: /api/review
+-            pathType: Prefix
+-            backend:
+-              service:
+-                name: review-service
+-                port:
+-                  number: 8080
+-          - path: /api/recommendation
+-            pathType: Prefix
+-            backend:
+-              service:
+-                name: recommendation-gateway
+-                port:
+-                  number: 8080
+-          # Catch-all for SPA routes
+-          - path: /
+-            pathType: Prefix
+-            backend:
+-              service:
+-                name: client-app
+-                port:
+-                  number: 80
