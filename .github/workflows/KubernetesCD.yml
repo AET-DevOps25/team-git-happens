@@ -59,6 +59,7 @@ jobs:
             --namespace team-git-happens \
             --create-namespace \
             --set image.tag=latest
+            --set ingress.enabled=false
 
       - name: Deploy authentication-service
         run: |

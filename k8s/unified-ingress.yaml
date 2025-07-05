@@ -21,65 +21,65 @@ spec:
     http:
       paths:
       # API Routes (must come before frontend!)
-      - path: /api/auth(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /api/auth
+        pathType: Prefix
         backend:
           service:
             name: authentication-service
             port:
               number: 8080
-      - path: /api/courses(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /api/courses
+        pathType: Prefix
         backend:
           service:
             name: course-service
             port:
               number: 8080
-      - path: /api/categories(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /api/categories
+        pathType: Prefix
         backend:
           service:
             name: course-service
             port:
               number: 8080
-      - path: /api/students(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /api/students
+        pathType: Prefix
         backend:
           service:
             name: review-service
             port:
               number: 8080
-      - path: /api/reviews(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /api/reviews
+        pathType: Prefix
         backend:
           service:
             name: review-service
             port:
               number: 8080
-      - path: /api/recommendations(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /api/recommendations
+        pathType: Prefix
         backend:
           service:
             name: recommendation-gateway
             port:
               number: 8080
-      - path: /api/recommend(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /api/recommend
+        pathType: Prefix
         backend:
           service:
             name: recommendation-gateway
             port:
               number: 8080
-      - path: /api/genai(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /api/genai
+        pathType: Prefix
         backend:
           service:
             name: genai-service
             port:
               number: 8000
       # Frontend (must be last - handles all non-API routes with SPA fallback!)
-      - path: /(.*)
-        pathType: ImplementationSpecific
+      - path: /
+        pathType: Prefix
         backend:
           service:
             name: client-app
