@@ -71,8 +71,6 @@ We use a **separated CI/CD approach** with distinct pipelines for different depl
    - Check ingress status via `kubectl get/describe`
 
 
-### 🔮 **Future: Kubernetes CD Pipeline**
-**Note**: A separate Kubernetes deployment pipeline will be added later for container orchestration deployments.
 
 ## 🎯 **Advantages of Separated Pipelines**
 
