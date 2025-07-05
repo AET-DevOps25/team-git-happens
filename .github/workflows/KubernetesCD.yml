@@ -89,3 +89,15 @@ jobs:
           helm upgrade --install genai-service ./helm-charts/genai-service \
             --namespace team-git-happens \
             --set image.tag=latest
+      
+      - name: Deploy Unified Ingress
+        run: |
+          kubectl apply -f k8s/unified-ingress.yaml
+          
+      - name: Verify deployment
+        run: |
+          kubectl get ingress -n team-git-happens
+          kubectl describe ingress unified-app-ingress -n team-git-happens      
+
+      
+
