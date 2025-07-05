@@ -39,6 +39,44 @@ We use a **separated CI/CD approach** with distinct pipelines for different depl
    - Deploy using `docker-compose.prod.yml`
    - Perform health checks
 
+
+# ☁️ Cloud CD Pipeline (`cd.yml`)
+
+## 🧽 Purpose
+
+Continuous Deployment to AWS Cloud Infrastructure using **Terraform**, **Ansible**, and **Docker Compose**.
+
+## 💼 Name: `Continuous Deployment on Cloud`
+
+- **Type:** Mixed (Push + Manual Dispatch)
+- **Environments:** `staging` | `prod`
+
+---
+
+## 🔧 Triggers
+
+```yaml
+on:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - prod
+      image_tag:
+        description: 'Docker image tag to deploy'
+        required: false
+        default: 'latest'
+        type: string
+
 ### 🔮 **Future: Kubernetes CD Pipeline**
 **Note**: A separate Kubernetes deployment pipeline will be added later for container orchestration deployments.
 
