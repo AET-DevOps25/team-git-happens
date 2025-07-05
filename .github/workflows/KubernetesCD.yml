@@ -52,13 +52,12 @@ jobs:
             --create-namespace \
             -f ./helm-charts/mysql/mysql-values.yaml
 
-
       - name: Deploy client-app
         run: |
           helm upgrade --install client-app ./helm-charts/client-app \
             --namespace team-git-happens \
             --create-namespace \
-            --set image.tag=latest
+            --set image.tag=latest \
             --set ingress.enabled=false
 
       - name: Deploy authentication-service
