@@ -22,42 +22,42 @@ spec:
       paths:
       # API Routes (must come before frontend!)
       - path: /api/auth(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: authentication-service
             port:
               number: 8080
       - path: /api/courses(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: course-service
             port:
               number: 8080
       - path: /api/categories(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: course-service
             port:
               number: 8080
       - path: /api/students(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: review-service
             port:
               number: 8080
       - path: /api/reviews(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: review-service
             port:
               number: 8080
       - path: /api/recommendations(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: recommendation-gateway
@@ -71,7 +71,7 @@ spec:
             port:
               number: 8080
       - path: /api/genai(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: genai-service
@@ -79,7 +79,7 @@ spec:
               number: 8000
       # Frontend (must be last - handles all non-API routes with SPA fallback!)
       - path: /(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: client-app
