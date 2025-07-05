@@ -4,18 +4,13 @@ metadata:
   name: unified-app-ingress
   namespace: team-git-happens
   annotations:
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://k83-client-app.student.k8s.aet.cit.tum.de"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
-    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    cert-manager.io/cluster-issuer: letsencrypt-staging
-    # Handle SPA routing - fallback to index.html for non-API routes
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      location ~* ^(?!/api).+$ {
-        try_files $uri $uri/ /index.html;
-      }
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+        nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+        nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+        cert-manager.io/cluster-issuer: "letsencrypt-staging"
 spec:
   tls:
   - hosts:
@@ -26,49 +21,56 @@ spec:
     http:
       paths:
       # API Routes (must come before frontend!)
-      - path: /api/auth
+      - path: /api/auth(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: authentication-service
             port:
               number: 8080
-      - path: /api/courses
+      - path: /api/courses(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: course-service
             port:
               number: 8080
-      - path: /api/categories
+      - path: /api/categories(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: course-service
             port:
               number: 8080
-      - path: /api/students
+      - path: /api/students(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: review-service
             port:
               number: 8080
-      - path: /api/reviews
+      - path: /api/reviews(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: review-service
             port:
               number: 8080
-      - path: /api/recommendations
+      - path: /api/recommendations(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: recommendation-gateway
             port:
               number: 8080
-      - path: /api/genai
+      - path: /api/recommend(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: recommendation-gateway
+            port:
+              number: 8080
+      - path: /api/genai(/|$)(.*)
         pathType: Prefix
         backend:
           service:
@@ -76,7 +78,7 @@ spec:
             port:
               number: 8000
       # Frontend (must be last - handles all non-API routes with SPA fallback!)
-      - path: /
+      - path: /(.*)
         pathType: Prefix
         backend:
           service:
