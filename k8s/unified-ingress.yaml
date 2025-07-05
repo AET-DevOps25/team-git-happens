@@ -11,6 +11,11 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     cert-manager.io/cluster-issuer: letsencrypt-staging
+    # Handle SPA routing - fallback to index.html for non-API routes
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location ~* ^(?!/api).+$ {
+        try_files $uri $uri/ /index.html;
+      }
 spec:
   tls:
   - hosts:
@@ -20,36 +25,57 @@ spec:
   - host: k83-client-app.student.k8s.aet.cit.tum.de
     http:
       paths:
-      # API Routes (müssen vor dem Frontend stehen!)
-      - path: /auth/
+      # API Routes (must come before frontend!)
+      - path: /api/auth
         pathType: Prefix
         backend:
           service:
             name: authentication-service
             port:
               number: 8080
-      - path: /courses/
+      - path: /api/courses
         pathType: Prefix
         backend:
           service:
             name: course-service
             port:
               number: 8080
-      - path: /reviews/
+      - path: /api/categories
+        pathType: Prefix
+        backend:
+          service:
+            name: course-service
+            port:
+              number: 8080
+      - path: /api/students
         pathType: Prefix
         backend:
           service:
             name: review-service
             port:
               number: 8080
-      - path: /recommendations/
+      - path: /api/reviews
+        pathType: Prefix
+        backend:
+          service:
+            name: review-service
+            port:
+              number: 8080
+      - path: /api/recommendations
         pathType: Prefix
         backend:
           service:
             name: recommendation-gateway
             port:
               number: 8080
-      # Frontend (muss als letztes stehen!)
+      - path: /api/genai
+        pathType: Prefix
+        backend:
+          service:
+            name: genai-service
+            port:
+              number: 8000
+      # Frontend (must be last - handles all non-API routes with SPA fallback!)
       - path: /
         pathType: Prefix
         backend:

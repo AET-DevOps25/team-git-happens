@@ -33,20 +33,41 @@ spec:
                 name: course-service
                 port:
                   number: 8080
-          - path: /api/review(/|$)(.*)
+          - path: /api/reviews(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:
                 name: review-service
                 port:
                   number: 8080
-          - path: /api/recommendation(/|$)(.*)
+          - path: /api/students(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: review-service
+                port:
+                  number: 8080
+          - path: /api/categories(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: course-service
+                port:
+                  number: 8080
+          - path: /api/recommendations(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:
                 name: recommendation-gateway
                 port:
                   number: 8080
+          - path: /api/genai(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: genai-service
+                port:
+                  number: 8000
           # SPA catch-all routes
           - path: /(.*)
             pathType: ImplementationSpecific

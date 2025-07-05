@@ -434,3 +434,4 @@ gradle-app.setting
 !gradle-wrapper.jar
 !gradle-wrapper.properties
 .kotlintest/
+server/review-service/bin/main/application.properties
