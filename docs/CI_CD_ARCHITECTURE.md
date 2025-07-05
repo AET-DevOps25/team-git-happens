@@ -39,43 +39,37 @@ We use a **separated CI/CD approach** with distinct pipelines for different depl
    - Deploy using `docker-compose.prod.yml`
    - Perform health checks
 
+###  **Kubernetes CD Pipeline** (`KubernetesCD.yml`)
+**Purpose**: Continuous Deployment of microservices to Kubernetes using Helm
 
-# ☁️ Cloud CD Pipeline (`cd.yml`)
+**Name**: "Kubernetes Continuous Deployment"
 
-## 🧽 Purpose
+**Triggers**:
+- Manual dispatch (`workflow_dispatch`) with inputs:
+  - `environment`: `staging` | `prod`
+  - `image_tag`: Docker tag (default: `latest`)
 
-Continuous Deployment to AWS Cloud Infrastructure using **Terraform**, **Ansible**, and **Docker Compose**.
+**Environments**: `staging` | `prod`
 
-## 💼 Name: `Continuous Deployment on Cloud`
+**Workflow**:
+1. **Setup Phase**:
+   - Checkout repo, set up `kubectl` & `helm`
+   - Configure kubeconfig using secret
 
-- **Type:** Mixed (Push + Manual Dispatch)
-- **Environments:** `staging` | `prod`
+2. **Pre-Cleanup**:
+   - Uninstall existing MySQL release (if any)
 
----
+3. **Deployment Phase**:
+   - Deploy Bitnami MySQL chart with custom values
+   - Deploy services:
+     - `client-app`, `authentication-service`, `course-service`
+     - `review-service`, `recommendation-gateway`, `genai-service`
+     - All via Helm with `image.tag` from input
+   - Apply unified ingress from `k8s/unified-ingress.yaml`
 
-## 🔧 Triggers
+4. **Verification**:
+   - Check ingress status via `kubectl get/describe`
 
-```yaml
-on:
-  push:
-    branches:
-      - main
-      - develop
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'staging'
-        type: choice
-        options:
-          - staging
-          - prod
-      image_tag:
-        description: 'Docker image tag to deploy'
-        required: false
-        default: 'latest'
-        type: string
 
 ### 🔮 **Future: Kubernetes CD Pipeline**
 **Note**: A separate Kubernetes deployment pipeline will be added later for container orchestration deployments.
