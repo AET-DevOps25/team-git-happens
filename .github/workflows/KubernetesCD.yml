@@ -45,6 +45,10 @@ jobs:
         run: |
           kubectl apply -f k8s/database-secret.yaml
 
+      - name: Deploy client nginx ConfigMap
+        run: |
+          kubectl apply -f k8s/client-nginx-config.yaml
+
       - name: Delete existing MySQL
         run: |
           helm uninstall mysql --namespace team-git-happens || true
