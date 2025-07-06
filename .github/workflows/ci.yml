@@ -86,17 +86,22 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build client image (with latest tag)
-      run: |
-        docker build \
-          -t ghcr.io/aet-devops25/team-git-happens/client:${GITHUB_SHA} \
-          -t ghcr.io/aet-devops25/team-git-happens/client:latest \
-          ./client
 
-    - name: Push client images
-      run: |
-        docker push ghcr.io/aet-devops25/team-git-happens/client:${GITHUB_SHA}
-        docker push ghcr.io/aet-devops25/team-git-happens/client:latest
+    - name: Build and push client image for EC2
+      uses: docker/build-push-action@v5
+      with:
+        context: ./client
+        push: true
+        tags: ghcr.io/aet-devops25/team-git-happens/client:ec2-latest
+
+    - name: Build and push client image for K8s
+      uses: docker/build-push-action@v5
+      with:
+        context: ./client
+        build-args: |
+          NGINX_CONF_FILE=nginx.k8s.conf
+        push: true
+        tags: ghcr.io/aet-devops25/team-git-happens/client:k8s-latest
 
     - name: Build course-service JAR
       run: |

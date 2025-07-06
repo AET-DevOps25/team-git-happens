@@ -57,7 +57,7 @@ jobs:
           helm upgrade --install client-app ./helm-charts/client-app \
             --namespace team-git-happens \
             --create-namespace \
-            --set image.tag=latest \
+            --set image.tag=k8s-latest \
             --set ingress.enabled=false
 
       - name: Deploy authentication-service

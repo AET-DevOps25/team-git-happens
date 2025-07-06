@@ -24,7 +24,7 @@ services:
       start_period: 30s
 
   client-app:
-    image: ghcr.io/aet-devops25/team-git-happens/client:${IMAGE_TAG:-latest}  # Your pre-built client image
+    image: ghcr.io/aet-devops25/team-git-happens/client:ec2-latest
     container_name: client_app
     restart: always
     ports:
