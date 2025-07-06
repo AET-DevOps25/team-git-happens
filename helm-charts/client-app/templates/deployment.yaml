@@ -48,6 +48,9 @@ spec:
             - name: nginx-config
               mountPath: /etc/nginx/conf.d/default.conf
               subPath: nginx.conf
+          {{- with .Values.additionalVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
@@ -60,14 +63,10 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
       volumes:
         - name: nginx-config
           configMap:
             name: {{ include "client-app.fullname" . }}-nginx-config
-      {{- with .Values.volumes }}
+      {{- with .Values.additionalVolumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
