@@ -1,4 +1,3 @@
-INSERT INTO course(id, title, description, credits) VALUES ('IN2108', 'Master's Thesis', 'Imported from TUM Curriculum', 10);
 INSERT INTO course(id, title, description, credits) VALUES ('EI78077', 'Dodo Alive!', 'Imported from TUM Curriculum', 10);
 INSERT INTO course(id, title, description, credits) VALUES ('IN4314', 'Applied Deep Learning in Medicine', 'Imported from TUM Curriculum', 10);
 INSERT INTO course(id, title, description, credits) VALUES ('EI78043', 'Cybathlon Challenge: Mechanism Design & Control', 'Imported from TUM Curriculum', 10);
@@ -52,8 +51,7 @@ INSERT INTO course(id, title, description, credits) VALUES ('IN4354', 'Masterpra
 INSERT INTO course(id, title, description, credits) VALUES ('IN4289', 'Masterpraktikum', 'Imported from TUM Curriculum', 10);
 INSERT INTO course(id, title, description, credits) VALUES ('IN4300', 'Masterpraktikum', 'Imported from TUM Curriculum', 10);
 INSERT INTO course(id, title, description, credits) VALUES ('IN4381', 'Master Practical Course', 'Imported from TUM Curriculum', 10);
-INSERT INTO course(id, title, description, credits) VALUES ('IN4265', 'Masterpraktikum – Embedded Web', 'Imported from TUM Curriculum', 10);
-INSERT INTO course(id, title, description, credits) VALUES ('IN4372', 'Master', 'Imported from TUM Curriculum', 10);
++INSERT INTO course(id, title, description, credits) VALUES ('IN4372', 'Master', 'Imported from TUM Curriculum', 10);
 INSERT INTO course(id, title, description, credits) VALUES ('IN4385', 'Masterpraktikum', 'Imported from TUM Curriculum', 10);
 INSERT INTO course(id, title, description, credits) VALUES ('IN4266', 'Master', 'Imported from TUM Curriculum', 10);
 INSERT INTO course(id, title, description, credits) VALUES ('IN4346', 'Master', 'Imported from TUM Curriculum', 10);
