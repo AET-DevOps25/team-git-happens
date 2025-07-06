@@ -1,6 +1,6 @@
 auth:
   rootPassword: rootPass123
-  database: course_db
+  dbPassword: "CHANGE-ME-IN-PRODUCTION" # Will be overridden by the secret in production
 
 initdbScripts:
   01-init-databases.sql: |-
@@ -8,7 +8,7 @@ initdbScripts:
     CREATE DATABASE IF NOT EXISTS auth_db;
     CREATE DATABASE IF NOT EXISTS review_db;
 
-    CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED BY 'githappens!';
+    CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED BY '{{ .Values.dbPassword }}';
     GRANT ALL PRIVILEGES ON course_db.* TO 'admin'@'%';
     GRANT ALL PRIVILEGES ON auth_db.* TO 'admin'@'%';
     GRANT ALL PRIVILEGES ON review_db.* TO 'admin'@'%';
