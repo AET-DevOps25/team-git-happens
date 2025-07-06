@@ -9,6 +9,7 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
     cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   tls:
   - hosts:
@@ -18,71 +19,7 @@ spec:
   - host: k83-client-app.student.k8s.aet.cit.tum.de
     http:
       paths:
-      # API Routes (must come before frontend!)
-      - path: /api/auth
-        pathType: Prefix
-        backend:
-          service:
-            name: authentication-service
-            port:
-              number: 8080
-      - path: /api/courses
-        pathType: Prefix
-        backend:
-          service:
-            name: course-service
-            port:
-              number: 8080
-      - path: /api/categories
-        pathType: Prefix
-        backend:
-          service:
-            name: course-service
-            port:
-              number: 8080
-      - path: /api/students
-        pathType: Prefix
-        backend:
-          service:
-            name: review-service
-            port:
-              number: 8080
-      - path: /api/reviews
-        pathType: Prefix
-        backend:
-          service:
-            name: review-service
-            port:
-              number: 8080
-      - path: /api/recommendations
-        pathType: Prefix
-        backend:
-          service:
-            name: recommendation-gateway
-            port:
-              number: 8080
-      - path: /api/recommend
-        pathType: Prefix
-        backend:
-          service:
-            name: recommendation-gateway
-            port:
-              number: 8080
-      - path: /api/genai
-        pathType: Prefix
-        backend:
-          service:
-            name: genai-service
-            port:
-              number: 8000
-      - path: /assets
-        pathType: Prefix
-        backend:
-          service:
-            name: client-app
-            port:
-              number: 80      
-      # Frontend (must be last - handles all non-API routes with SPA fallback!)
+      # Frontend handles everything, including API routes
       - path: /
         pathType: Prefix
         backend:
