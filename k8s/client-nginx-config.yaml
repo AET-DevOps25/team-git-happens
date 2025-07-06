@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: client-nginx-config
+  namespace: team-git-happens
+data:
+  nginx.conf: |
+    server {
+        listen 80;
+        root /usr/share/nginx/html;
+        index index.html;
+        
+        # API routes - proxy to backend services
+        location /api/courses {
+            proxy_pass http://course-service:8080/courses;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /api/categories {
+            proxy_pass http://course-service:8080/categories;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # More specific location for course reviews and ratings
+        location ~ ^/api/courses/([^/]+)/(reviews|average-rating) {
+            proxy_pass http://review-service:8080/courses/$1/$2;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Location for student reviews
+        location ~ ^/api/students/([^/]+)/reviews {
+            proxy_pass http://review-service:8080/students/$1/reviews;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /api/auth {
+            proxy_pass http://authentication-service:8080/auth;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /api/reviews {
+            proxy_pass http://review-service:8080/reviews;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /api/recommend/ {
+            proxy_pass http://recommendation-gateway:8080/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /api/genai {
+            proxy_pass http://genai-service:8000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # SPA fallback for React routes
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+        
+        # Optional: Add cache control headers for static assets
+        location ~* \.(?:css|js|jpg|jpeg|gif|png|ico|woff|woff2|ttf|eot|svg)$ {
+            expires 1y;
+            add_header Cache-Control "public";
+        }
+    }
