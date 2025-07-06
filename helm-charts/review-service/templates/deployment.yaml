@@ -56,7 +56,8 @@ spec:
             - name: SPRING_FLYWAY_ENABLED
               value: "{{ .Values.env.SPRING_FLYWAY_ENABLED }}"
             - name: SPRING_FLYWAY_BASELINE_ON_MIGRATE
-              value: "{{ .Values.env.SPRING_FLYWAY_BASELINE_ON_MIGRATE"
+              value: "{{ .Values.env.SPRING_FLYWAY_BASELINE_ON_MIGRATE }}"
+
 
 
           {{- with .Values.livenessProbe }}
