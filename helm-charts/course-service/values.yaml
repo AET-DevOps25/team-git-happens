@@ -120,9 +120,15 @@ env:
   - name: SPRING_DATASOURCE_URL
     value: jdbc:mysql://mysql.team-git-happens.svc.cluster.local:3306/course_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   - name: SPRING_DATASOURCE_USERNAME
-    value: myuser
+    valueFrom:
+      secretKeyRef:
+        name: database-secret
+        key: username
   - name: SPRING_DATASOURCE_PASSWORD
-    value: mypass
+    valueFrom:
+      secretKeyRef:
+        name: database-secret
+        key: password
   - name: SPRING_JPA_HIBERNATE_DDL_AUTO
     value: validate
   - name: SPRING_FLYWAY_ENABLED
@@ -135,4 +141,4 @@ env:
 initContainers:
   - name: wait-for-mysql
     image: busybox
-    command: ['sh', '-c', 'until nc -z mysql 3306; do echo waiting for mysql; sleep 2; done;']
+    command: ['sh', '-c', 'until nc -z mysql.team-git-happens.svc.cluster.local 3306; do echo waiting for mysql; sleep 2; done;']

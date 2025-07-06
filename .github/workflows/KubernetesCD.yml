@@ -41,6 +41,10 @@ jobs:
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
 
+      - name: Create database secret
+        run: |
+          kubectl apply -f k8s/database-secret.yaml
+
       - name: Delete existing MySQL
         run: |
           helm uninstall mysql --namespace team-git-happens || true
