@@ -59,6 +59,25 @@ service:
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: false
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "$http_origin"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+  hosts:
+    - host: k83-client-app.student.k8s.aet.cit.tum.de
+      paths:
+        - path: /api/auth
+          pathType: Prefix
+          service:
+            name: authentication-service
+            port: 8080
+  tls:
+    - secretName: authentication-tls
+      hosts:
+        - authentication.student.k8s.aet.cit.tum.de
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -106,8 +125,6 @@ affinity: {}
 env:
   SPRING_DATASOURCE_URL: jdbc:mysql://mysql.team-git-happens.svc.cluster.local:3306/auth_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   SPRING_DATASOURCE_USERNAME: admin
-  SPRING_DATASOURCE_PASSWORD: "{{ .Values.dbPassword }}"
+  SPRING_DATASOURCE_PASSWORD: githappens!
   SPRING_JPA_HIBERNATE_DDL_AUTO: update
   SPRING_FLYWAY_ENABLED: "true"
-
-dbPassword: "CHANGE-ME-IN-PRODUCTION" # Will be overridden by the secret in production

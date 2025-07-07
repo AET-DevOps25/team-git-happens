@@ -59,7 +59,19 @@ service:
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: false
-
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -108,9 +120,15 @@ env:
   - name: SPRING_DATASOURCE_URL
     value: jdbc:mysql://mysql.team-git-happens.svc.cluster.local:3306/course_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   - name: SPRING_DATASOURCE_USERNAME
-    value: admin
+    valueFrom:
+      secretKeyRef:
+        name: database-secret
+        key: username
   - name: SPRING_DATASOURCE_PASSWORD
-    value: "{{ .Values.dbPassword }}"
+    valueFrom:
+      secretKeyRef:
+        name: database-secret
+        key: password
   - name: SPRING_JPA_HIBERNATE_DDL_AUTO
     value: validate
   - name: SPRING_FLYWAY_ENABLED
@@ -119,9 +137,6 @@ env:
     value: "true"
   - name: REVIEW_SERVICE_URL
     value: http://review-service.team-git-happens.svc.cluster.local:8080
-
-# Database password - MUST be provided via --set dbPassword=... in CI/CD
-dbPassword: "PLACEHOLDER-CHANGE-ME"
 
 initContainers:
   - name: wait-for-mysql

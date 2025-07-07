@@ -69,8 +69,7 @@ jobs:
         run: |
           helm upgrade --install authentication-service ./helm-charts/authentication-service \
             --namespace team-git-happens \
-            --set image.tag=latest \
-            --set dbPassword="${{ secrets.DB_PASSWORD }}"
+            --set image.tag=latest
 
       - name: Deploy course-service
         run: |
@@ -83,8 +82,7 @@ jobs:
         run: |
           helm upgrade --install review-service ./helm-charts/review-service \
             --namespace team-git-happens \
-            --set image.tag=latest \
-            --set dbPassword="${{ secrets.DB_PASSWORD }}"
+            --set image.tag=latest
 
       - name: Deploy recommendation-gateway
         run: |

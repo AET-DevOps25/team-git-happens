@@ -120,10 +120,6 @@ affinity: {}
 env:
   SPRING_DATASOURCE_URL: jdbc:mysql://mysql.team-git-happens.svc.cluster.local:3306/review_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   SPRING_DATASOURCE_USERNAME: admin
-  SPRING_DATASOURCE_PASSWORD: "{{ .Values.dbPassword }}"
-  SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+  SPRING_DATASOURCE_PASSWORD: githappens!
+  SPRING_JPA_HIBERNATE_DDL_AUTO: update
   SPRING_FLYWAY_ENABLED: "true"
-  SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
-
-# Database password - MUST be provided via --set dbPassword=... in CI/CD
-dbPassword: "PLACEHOLDER-CHANGE-ME"
