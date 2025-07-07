@@ -125,6 +125,6 @@ affinity: {}
 env:
   SPRING_DATASOURCE_URL: jdbc:mysql://mysql.team-git-happens.svc.cluster.local:3306/auth_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   SPRING_DATASOURCE_USERNAME: admin
-  SPRING_DATASOURCE_PASSWORD: githappens!
+  SPRING_DATASOURCE_PASSWORD: "githappens!"
   SPRING_JPA_HIBERNATE_DDL_AUTO: update
   SPRING_FLYWAY_ENABLED: "true"
