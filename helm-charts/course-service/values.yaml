@@ -111,11 +111,10 @@ env:
   SPRING_JPA_HIBERNATE_DDL_AUTO: validate
   SPRING_FLYWAY_ENABLED: "true"
   SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+  REVIEW_SERVICE_URL: http://review-service.team-git-happens.svc.cluster.local:8080
 
 # Database password - MUST be provided via --set dbPassword=... in CI/CD
 dbPassword: "PLACEHOLDER-CHANGE-ME"
-  - name: REVIEW_SERVICE_URL
-    value: http://review-service.team-git-happens.svc.cluster.local:8080
 
 initContainers:
   - name: wait-for-mysql
