@@ -56,10 +56,26 @@ service:
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   port: 8000
 
-env:
-  API_URL: "https://gpu.aet.cit.tum.de/api/chat/completions"
-  API_KEY: "sk-ff43f94616914334bc2379daf223bac5"
-  MODEL: "llama3.3:latest"
+# Environment variables - credentials will come from secrets
+env: {}
+
+# GenAI credentials from secret
+extraEnv:
+  - name: API_URL
+    valueFrom:
+      secretKeyRef:
+        name: genai-secret
+        key: API_URL
+  - name: API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: genai-secret
+        key: API_KEY
+  - name: MODEL
+    valueFrom:
+      secretKeyRef:
+        name: genai-secret
+        key: MODEL
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:

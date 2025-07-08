@@ -19,7 +19,7 @@ We use a **separated CI/CD approach** with distinct pipelines for different depl
    - Build and push Docker images to GHCR with `${GITHUB_SHA}` tags
    - Images: client, course, authentication, review, recommendation-gateway, genai-service
 
-### ☁️ **Cloud CD Pipeline** (`cd.yml`)
+### ☁️ **Cloud CD Pipeline** (`cd-ec2.yml`)
 **Purpose**: Continuous Deployment to AWS Cloud Infrastructure
 **Name**: "Continuous Deployment on Cloud"
 **Triggers**:

@@ -205,7 +205,7 @@ jobs:
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: 'KubernetesCD.yml',
+              workflow_id: 'cd-k8s.yml',
               ref: context.ref.replace('refs/heads/', ''),
               inputs: {
                 environment: 'staging',
@@ -226,7 +226,7 @@ jobs:
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: 'cd.yml',
+              workflow_id: 'cd-ec2.yml',
               ref: context.ref.replace('refs/heads/', ''),
               inputs: {
                 environment: 'staging',

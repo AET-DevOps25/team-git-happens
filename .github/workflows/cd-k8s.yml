@@ -1,4 +1,4 @@
-name: KubernetesCD
+name: CD - Continuous Deployment on Kubernetes
 
 on:
   workflow_dispatch:
@@ -95,6 +95,14 @@ jobs:
             --namespace team-git-happens \
             --set image.tag=latest
 
+      - name: Create GenAI secret
+        run: |
+          kubectl create secret generic genai-secret --namespace team-git-happens \
+            --from-literal=API_URL="${{ secrets.API_URL }}" \
+            --from-literal=API_KEY="${{ secrets.API_KEY }}" \
+            --from-literal=MODEL="${{ secrets.MODEL }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
       - name: Deploy genai-service
         run: |
           helm upgrade --install genai-service ./helm-charts/genai-service \
@@ -111,4 +119,3 @@ jobs:
           kubectl describe ingress unified-app-ingress -n team-git-happens      
 
       
-

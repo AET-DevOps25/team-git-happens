@@ -44,13 +44,21 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          # Environment variables
           env:
-            - name: API_URL
-              value: {{ .Values.env.API_URL | quote }}
-            - name: API_KEY
-              value: {{ .Values.env.API_KEY | quote }}
-            - name: MODEL
-              value: {{ .Values.env.MODEL | quote }}
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- range .Values.extraEnv }}
+            - name: {{ .name }}
+              {{- if .value }}
+              value: {{ .value | quote }}
+              {{- else if .valueFrom }}
+              valueFrom:
+                {{- toYaml .valueFrom | nindent 16 }}
+              {{- end }}
+            {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
