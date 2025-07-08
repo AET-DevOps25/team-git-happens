@@ -227,7 +227,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'cd-ec2.yml',
-              ref: context.ref.replace('refs/heads/', ''),
+              ref: 'k8s',
               inputs: {
                 environment: 'staging',
                 image_tag: 'latest',
