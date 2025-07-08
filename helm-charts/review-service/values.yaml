@@ -1,0 +1,85 @@
+# Default values for review-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This will set the replicaset count
+replicaCount: 1
+
+# Container image configuration
+image:
+  repository: ghcr.io/aet-devops25/team-git-happens/review
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+# Image pull secrets for private registries
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: "review-service"
+
+# Service account settings
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+# Pod-level annotations and labels
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+securityContext: {}
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8080
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+resources: {}
+
+# Probes
+livenessProbe: null
+readinessProbe: null
+
+# Autoscaling
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+# Volumes
+volumes: []
+volumeMounts: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Environment variables (same format as authentication service)
+env:
+  SPRING_DATASOURCE_URL: jdbc:mysql://mysql.team-git-happens.svc.cluster.local:3306/review_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  SPRING_FLYWAY_ENABLED: "true"
+
+# Database credentials from secret
+extraEnv:
+  - name: SPRING_DATASOURCE_USERNAME
+    value: "admin"
+  - name: SPRING_DATASOURCE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: mysql
+        key: mysql-password

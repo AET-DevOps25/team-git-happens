@@ -2,7 +2,7 @@ name: CI - Continuous Integration
 
 on:
   push:
-    branches: [ main, develop, deployment-ec2 ]
+    branches: [ main, develop, k8s ]
   #pull_request:
   #  branches: [ main, develop ]
 
@@ -67,7 +67,7 @@ jobs:
     name: Build and Push Images
     runs-on: ubuntu-latest
     needs: [test]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev-branch' || github.ref == 'refs/heads/deployment-ec2'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev-branch' || github.ref == 'refs/heads/k8s'
     
     outputs:
       image-tag: latest
@@ -86,17 +86,22 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build client image (with latest tag)
-      run: |
-        docker build \
-          -t ghcr.io/aet-devops25/team-git-happens/client:${GITHUB_SHA} \
-          -t ghcr.io/aet-devops25/team-git-happens/client:latest \
-          ./client
 
-    - name: Push client images
-      run: |
-        docker push ghcr.io/aet-devops25/team-git-happens/client:${GITHUB_SHA}
-        docker push ghcr.io/aet-devops25/team-git-happens/client:latest
+    - name: Build and push client image for EC2
+      uses: docker/build-push-action@v5
+      with:
+        context: ./client
+        push: true
+        tags: ghcr.io/aet-devops25/team-git-happens/client:ec2-latest
+
+    - name: Build and push client image for K8s
+      uses: docker/build-push-action@v5
+      with:
+        context: ./client
+        build-args: |
+          NGINX_CONF_FILE=nginx.k8s.conf
+        push: true
+        tags: ghcr.io/aet-devops25/team-git-happens/client:k8s-latest
 
     - name: Build course-service JAR
       run: |
@@ -166,17 +171,17 @@ jobs:
         docker push ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:${GITHUB_SHA}
         docker push ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest
 
-    - name: Build genai service image (with latest tag)
-      run: |
-        docker build \
-          -t ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA} \
-          -t ghcr.io/aet-devops25/team-git-happens/genai-service:latest \
-          ./genai-service
+#    - name: Build genai service image (with latest tag)
+#      run: |
+#        docker build \
+#          -t ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA} \
+#          -t ghcr.io/aet-devops25/team-git-happens/genai-service:latest \
+#          ./genai-service
 
-    - name: Push genai service images
-      run: |
-        docker push ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA}
-        docker push ghcr.io/aet-devops25/team-git-happens/genai-service:latest
+#    - name: Push genai service images
+#      run: |
+#        docker push ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA}
+#        docker push ghcr.io/aet-devops25/team-git-happens/genai-service:latest
 
     - name: Build summary
       run: |
@@ -187,8 +192,29 @@ jobs:
         echo "- **Images Built**: 6 application images" >> $GITHUB_STEP_SUMMARY
         echo "- **Migration Strategy**: Spring Boot embedded Flyway" >> $GITHUB_STEP_SUMMARY
 
-  trigger-cd:
-    name: Trigger CD Workflow
+  trigger-k8s-deployment:
+    name: Trigger K8s CD Workflow
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ success() }}
+    steps:
+      - name: Dispatch CD via GitHub API
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'KubernetesCD.yml',
+              ref: context.ref.replace('refs/heads/', ''),
+              inputs: {
+                environment: 'staging',
+                image_tag: 'latest',
+              }
+            });
+
+  trigger-ec2-deployment:
+    name: Trigger EC2 CD Workflow
     runs-on: ubuntu-latest
     needs: build
     if: ${{ success() }}

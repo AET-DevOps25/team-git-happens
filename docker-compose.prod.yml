@@ -6,10 +6,10 @@ services:
     container_name: mysql_server
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD:-githappens!}'
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
       MYSQL_DATABASE: course_compass
       MYSQL_USER: '${DB_USERNAME:-admin}'
-      MYSQL_PASSWORD: '${DB_PASSWORD:-githappens!}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
     ports: []  # Remove external port exposure for security
     volumes:
       - mysql_data:/var/lib/mysql
@@ -17,14 +17,14 @@ services:
     networks:
       - app_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD:-githappens!}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
 
   client-app:
-    image: ghcr.io/aet-devops25/team-git-happens/client:${IMAGE_TAG:-latest}  # Your pre-built client image
+    image: ghcr.io/aet-devops25/team-git-happens/client:ec2-latest
     container_name: client_app
     restart: always
     ports:
@@ -45,8 +45,8 @@ services:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/course_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME:-admin}'
-      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}'
+      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME}'
+      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD}'
       
       # Flyway configuration - Spring Boot will handle migrations
       SPRING_FLYWAY_ENABLED: "true"
@@ -67,8 +67,8 @@ services:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/auth_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME:-admin}'
-      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}'
+      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME}'
+      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD}'
       
       # Flyway configuration - Spring Boot will handle migrations
       SPRING_FLYWAY_ENABLED: "true"
@@ -89,8 +89,8 @@ services:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_server:3306/review_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME:-admin}'
-      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:-githappens!}'
+      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME}'
+      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD}'
       
       # Flyway configuration - Spring Boot will handle migrations
       SPRING_FLYWAY_ENABLED: "true"
@@ -119,9 +119,9 @@ services:
     container_name: genai_service
     restart: always
     environment:
-      API_URL: ${API_URL:-https://api.openai.com/v1/chat/completions}
-      API_KEY: ${API_KEY:-your_openai_api_key}
-      MODEL: ${MODEL:-gpt-3.5-turbo}
+      API_URL: ${API_URL}
+      API_KEY: ${API_KEY}
+      MODEL: ${MODEL}
     networks:
       - app_network
 

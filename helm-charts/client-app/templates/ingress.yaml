@@ -1,0 +1,52 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "client-app.fullname" . }}
+  labels:
+    {{- include "client-app.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://k83-client-app.student.k8s.aet.cit.tum.de"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
+
+spec:
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: {{ include "client-app.fullname" . }}-tls
+  rules:
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "client-app.fullname" . }}
+              port:
+                number: {{ .Values.service.port }}
+
+       
+
+        - path: /auth(/|$)(.*)
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: authentication-service
+              port:
+                number: 8080
+
+        
+
+        - path: /courses(/|$)(.*)
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: course-service
+              port:
+                number: 8080
+{{- end }}

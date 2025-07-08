@@ -23,8 +23,14 @@ RUN rm -rf ./*
 # Copy built assets from the builder stage
 COPY --from=builder /app/dist .
 
-# Copy custom Nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Define the Nginx configuration file to use
+ARG NGINX_CONF_FILE=nginx.conf
+
+# Remove the default Nginx configuration
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy the selected configuration file into the container
+COPY ${NGINX_CONF_FILE} /etc/nginx/conf.d/default.conf
 
 # Expose port 80
 EXPOSE 80
