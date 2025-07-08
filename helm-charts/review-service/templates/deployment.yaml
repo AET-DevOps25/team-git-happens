@@ -44,18 +44,21 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          # Inject extra environment variables defined in values.yaml
+          # Environment variables
           env:
-            - name: SPRING_DATASOURCE_URL
-              value: "{{ .Values.env.SPRING_DATASOURCE_URL }}"
-            - name: SPRING_DATASOURCE_USERNAME
-              value: "{{ .Values.env.SPRING_DATASOURCE_USERNAME }}"
-            - name: SPRING_DATASOURCE_PASSWORD
-              value: "{{ .Values.env.SPRING_DATASOURCE_PASSWORD }}"
-            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-              value: "{{ .Values.env.SPRING_JPA_HIBERNATE_DDL_AUTO }}"
-            - name: SPRING_FLYWAY_ENABLED
-              value: "{{ .Values.env.SPRING_FLYWAY_ENABLED }}"
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- range .Values.extraEnv }}
+            - name: {{ .name }}
+              {{- if .value }}
+              value: {{ .value | quote }}
+              {{- else if .valueFrom }}
+              valueFrom:
+                {{- toYaml .valueFrom | nindent 16 }}
+              {{- end }}
+            {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
