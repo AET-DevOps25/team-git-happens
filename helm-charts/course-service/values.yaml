@@ -120,15 +120,12 @@ env:
   - name: SPRING_DATASOURCE_URL
     value: jdbc:mysql://mysql.team-git-happens.svc.cluster.local:3306/course_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   - name: SPRING_DATASOURCE_USERNAME
-    valueFrom:
-      secretKeyRef:
-        name: database-secret
-        key: username
+    value: admin
   - name: SPRING_DATASOURCE_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: database-secret
-        key: password
+        name: mysql
+        key: mysql-password
   - name: SPRING_JPA_HIBERNATE_DDL_AUTO
     value: validate
   - name: SPRING_FLYWAY_ENABLED
