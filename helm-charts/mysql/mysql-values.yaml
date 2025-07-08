@@ -1,5 +1,7 @@
 auth:
-  rootPassword: githappens!
+  rootPassword: "githappens!"
+  username: admin
+  password: "githappens!"
   database: course_db
 
 initdbScripts:
