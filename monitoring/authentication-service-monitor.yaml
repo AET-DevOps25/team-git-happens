@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: authentication-service
-  namespace: monitoring
+  namespace: team-git-happens-monitoring
   labels:
     monitoring: "true"
 spec:

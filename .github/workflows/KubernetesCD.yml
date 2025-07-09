@@ -111,7 +111,7 @@ jobs:
       
       - name: Setup Monitoring - Create monitoring namespace
         run: |
-          kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create namespace team-git-happens-monitoring || echo "Namespace team-git-happens-monitoring already exists or cannot be created"
       
       - name: Setup Monitoring - Add Prometheus Helm repository
         run: |
@@ -122,13 +122,13 @@ jobs:
         run: |
           helm upgrade --install prometheus \
             prometheus-community/kube-prometheus-stack \
-            --namespace monitoring \
+            --namespace team-git-happens-monitoring \
             -f ./monitoring/monitoring-values.yaml \
             --timeout 10m
       
       - name: Setup Monitoring - Wait for Prometheus to be ready
         run: |
-          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=prometheus --namespace monitoring --timeout=300s || true
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=prometheus --namespace team-git-happens-monitoring --timeout=300s || true
       
       - name: Setup Monitoring - Apply ServiceMonitors
         run: |
@@ -155,10 +155,10 @@ jobs:
         run: |
           echo "=== MONITORING SETUP VERIFICATION ==="
           echo "Checking monitoring namespace..."
-          kubectl get pods -n monitoring
+          kubectl get pods -n team-git-happens-monitoring
           echo ""
           echo "Checking ServiceMonitors..."
-          kubectl get servicemonitors -n monitoring
+          kubectl get servicemonitors -n team-git-happens-monitoring
           echo ""
           echo "Checking if services have monitoring labels..."
           kubectl get services -n team-git-happens -l monitoring=true
@@ -171,13 +171,13 @@ jobs:
           echo "   🔍 Prometheus: https://k83-client-app.student.k8s.aet.cit.tum.de/prometheus/"
           echo ""
           echo "🔧 Local Access (via port-forward - for troubleshooting only):"
-          echo "   🔍 Prometheus: kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n monitoring"
+          echo "   🔍 Prometheus: kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n team-git-happens-monitoring"
           echo "      Then visit: http://localhost:9090"
-          echo "   📊 Grafana: kubectl port-forward svc/prometheus-grafana 3000:80 -n monitoring"
+          echo "   📊 Grafana: kubectl port-forward svc/prometheus-grafana 3000:80 -n team-git-happens-monitoring"
           echo "      Then visit: http://localhost:3000"
           echo ""
           echo "🔑 To get Grafana admin password:"
-          echo "   kubectl get secret prometheus-grafana -n monitoring -o jsonpath='{.data.admin-password}' | base64 --decode"
+          echo "   kubectl get secret prometheus-grafana -n team-git-happens-monitoring -o jsonpath='{.data.admin-password}' | base64 --decode"
           echo ""
           echo "📈 Expected metrics endpoints:"
           echo "   - http://authentication-service:8080/actuator/prometheus"
