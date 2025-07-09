@@ -2,7 +2,7 @@ name: CI - Continuous Integration
 
 on:
   push:
-    branches: [ main, develop, k8s ]
+    branches: [ main, develop, add-more-data ]
   #pull_request:
   #  branches: [ main, develop ]
 
@@ -67,7 +67,7 @@ jobs:
     name: Build and Push Images
     runs-on: ubuntu-latest
     needs: [test]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev-branch' || github.ref == 'refs/heads/k8s'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev-branch' || github.ref == 'refs/heads/add-more-data'
     
     outputs:
       image-tag: latest
