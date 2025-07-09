@@ -11,6 +11,33 @@ data:
         index index.html;
         
         # API routes - proxy to backend services
+        
+        # More specific location for course reviews and ratings (must come before /api/courses)
+        location ~ ^/api/courses/([^/]+)/reviews$ {
+            proxy_pass http://review-service:8080/courses/$1/reviews;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location ~ ^/api/courses/([^/]+)/average-rating$ {
+            proxy_pass http://review-service:8080/courses/$1/average-rating;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # General reviews endpoint (must come before /api/courses)
+        location /api/reviews {
+            proxy_pass http://review-service:8080/reviews;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
         location /api/courses {
             proxy_pass http://course-service:8080/courses;
             proxy_set_header Host $host;
@@ -21,15 +48,6 @@ data:
         
         location /api/categories {
             proxy_pass http://course-service:8080/categories;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-        
-        # More specific location for course reviews and ratings
-        location ~ ^/api/courses/([^/]+)/(reviews|average-rating) {
-            proxy_pass http://review-service:8080/courses/$1/$2;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -47,14 +65,6 @@ data:
         
         location /api/auth {
             proxy_pass http://authentication-service:8080/auth;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-        
-        location /api/reviews {
-            proxy_pass http://review-service:8080/reviews;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
