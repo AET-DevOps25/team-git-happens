@@ -4,6 +4,7 @@ metadata:
   name: {{ include "review-service.fullname" . }}
   labels:
     {{- include "review-service.labels" . | nindent 4 }}
+    monitoring: "true"
 spec:
   type: {{ .Values.service.type }}
   ports:

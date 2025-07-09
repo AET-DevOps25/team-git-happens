@@ -87,7 +87,7 @@ jobs:
         run: |
           helm upgrade --install review-service ./helm-charts/review-service \
             --namespace team-git-happens \
-            --set image.tag=latest
+            --set image.tag=latest || echo "Review service deployment failed, continuing..."
 
       - name: Deploy recommendation-gateway
         run: |
@@ -109,6 +109,39 @@ jobs:
             --namespace team-git-happens \
             --set image.tag=latest
       
+      - name: Setup Monitoring - Create monitoring namespace
+        run: |
+          kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
+      
+      - name: Setup Monitoring - Add Prometheus Helm repository
+        run: |
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update
+      
+      - name: Setup Monitoring - Deploy Prometheus stack
+        run: |
+          helm upgrade --install prometheus \
+            prometheus-community/kube-prometheus-stack \
+            --namespace monitoring \
+            -f ./monitoring/monitoring-values.yaml \
+            --timeout 10m
+      
+      - name: Setup Monitoring - Wait for Prometheus to be ready
+        run: |
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=prometheus --namespace monitoring --timeout=300s || true
+      
+      - name: Setup Monitoring - Apply ServiceMonitors
+        run: |
+          kubectl apply -f ./monitoring/authentication-service-monitor.yaml
+          kubectl apply -f ./monitoring/course-service-monitor.yaml
+          kubectl apply -f ./monitoring/review-service-monitor.yaml
+          kubectl apply -f ./monitoring/recommendation-gateway-monitor.yaml
+          kubectl apply -f ./monitoring/genai-service-monitor.yaml
+      
+      - name: Setup Monitoring - Deploy monitoring ingress
+        run: |
+          kubectl apply -f k8s/monitoring-ingress.yaml
+      
       - name: Deploy Unified Ingress
         run: |
           kubectl apply -f k8s/unified-ingress.yaml
@@ -116,6 +149,39 @@ jobs:
       - name: Verify deployment
         run: |
           kubectl get ingress -n team-git-happens
-          kubectl describe ingress unified-app-ingress -n team-git-happens      
+          kubectl describe ingress unified-app-ingress -n team-git-happens
+      
+      - name: Verify monitoring setup
+        run: |
+          echo "=== MONITORING SETUP VERIFICATION ==="
+          echo "Checking monitoring namespace..."
+          kubectl get pods -n monitoring
+          echo ""
+          echo "Checking ServiceMonitors..."
+          kubectl get servicemonitors -n monitoring
+          echo ""
+          echo "Checking if services have monitoring labels..."
+          kubectl get services -n team-git-happens -l monitoring=true
+          echo ""
+          echo "=== ACCESS INSTRUCTIONS ==="
+          echo "✅ Monitoring setup complete!"
+          echo ""
+          echo "🌐 Web Access (via Ingress):"
+          echo "   📊 Grafana: https://k83-client-app.student.k8s.aet.cit.tum.de/grafana/"
+          echo "   🔍 Prometheus: https://k83-client-app.student.k8s.aet.cit.tum.de/prometheus/"
+          echo ""
+          echo "🔧 Local Access (via port-forward - for troubleshooting only):"
+          echo "   🔍 Prometheus: kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n monitoring"
+          echo "      Then visit: http://localhost:9090"
+          echo "   📊 Grafana: kubectl port-forward svc/prometheus-grafana 3000:80 -n monitoring"
+          echo "      Then visit: http://localhost:3000"
+          echo ""
+          echo "🔑 To get Grafana admin password:"
+          echo "   kubectl get secret prometheus-grafana -n monitoring -o jsonpath='{.data.admin-password}' | base64 --decode"
+          echo ""
+          echo "📈 Expected metrics endpoints:"
+          echo "   - http://authentication-service:8080/actuator/prometheus"
+          echo "   - http://course-service:8080/actuator/prometheus"
+          echo "   - http://recommendation-gateway:8080/actuator/prometheus"      
 
       

@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: authentication-service
+  namespace: monitoring
+  labels:
+    monitoring: "true"
+spec:
+  selector:
+    matchLabels:
+      app: authentication-service
+      monitoring: "true"
+  namespaceSelector:
+    matchNames:
+    - team-git-happens
+  endpoints:
+    - port: http
+      interval: 15s
+      path: /actuator/prometheus

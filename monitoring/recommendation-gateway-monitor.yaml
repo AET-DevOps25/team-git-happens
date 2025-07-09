@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: recommendation-gateway
+  namespace: monitoring
+  labels:
+    monitoring: "true"
+spec:
+  selector:
+    matchLabels:
+      app: recommendation-gateway
+      monitoring: "true"
+  namespaceSelector:
+    matchNames:
+    - team-git-happens
+  endpoints:
+    - port: http
+      interval: 15s
+      path: /actuator/prometheus
