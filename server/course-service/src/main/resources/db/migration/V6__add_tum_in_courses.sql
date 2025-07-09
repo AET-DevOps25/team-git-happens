@@ -275,9 +275,7 @@ VALUES
   ('IN2333',      'Protocol Design',
      'Design and evaluation of communication protocols for reliable and efficient data exchange.', 8),
   ('IN2125',      'Virtualization Techniques',
-     'Techniques for implementing and managing virtual machines and hypervisors.', 5)
-     ON CONFLICT DO NOTHING;
-
+     'Techniques for implementing and managing virtual machines and hypervisors.', 5);
 
 
 -- 3) Link each course to its module category
@@ -422,5 +420,4 @@ VALUES
   ('CIT433032',   'Computer Arch., Networks & Dist. Systems'),
   ('CIT433031',   'Computer Arch., Networks & Dist. Systems'),
   ('IN2333',      'Computer Arch., Networks & Dist. Systems'),
-  ('IN2125',      'Computer Arch., Networks & Dist. Systems')
-  ON CONFLICT DO NOTHING;   
+  ('IN2125',      'Computer Arch., Networks & Dist. Systems');
