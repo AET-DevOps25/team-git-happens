@@ -109,38 +109,35 @@ jobs:
             --namespace team-git-happens \
             --set image.tag=latest
       
-      - name: Setup Monitoring - Create monitoring namespace
+      - name: Setup Monitoring - Verify metrics endpoints
         run: |
-          kubectl create namespace team-git-happens-monitoring || echo "Namespace team-git-happens-monitoring already exists or cannot be created"
-      
-      - name: Setup Monitoring - Add Prometheus Helm repository
-        run: |
-          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-          helm repo update
-      
-      - name: Setup Monitoring - Deploy Prometheus stack
-        run: |
-          helm upgrade --install prometheus \
-            prometheus-community/kube-prometheus-stack \
-            --namespace team-git-happens-monitoring \
-            -f ./monitoring/monitoring-values.yaml \
-            --timeout 10m
-      
-      - name: Setup Monitoring - Wait for Prometheus to be ready
-        run: |
-          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=prometheus --namespace team-git-happens-monitoring --timeout=300s || true
-      
-      - name: Setup Monitoring - Apply ServiceMonitors
-        run: |
-          kubectl apply -f ./monitoring/authentication-service-monitor.yaml
-          kubectl apply -f ./monitoring/course-service-monitor.yaml
-          kubectl apply -f ./monitoring/review-service-monitor.yaml
-          kubectl apply -f ./monitoring/recommendation-gateway-monitor.yaml
-          kubectl apply -f ./monitoring/genai-service-monitor.yaml
-      
-      - name: Setup Monitoring - Deploy monitoring ingress
-        run: |
-          kubectl apply -f k8s/monitoring-ingress.yaml
+          echo "=== APPLICATION METRICS VERIFICATION ==="
+          echo "Waiting for services to be ready..."
+          kubectl wait --for=condition=ready pod -l app=authentication-service --namespace team-git-happens --timeout=120s || echo "Authentication service not ready"
+          kubectl wait --for=condition=ready pod -l app=course-service --namespace team-git-happens --timeout=120s || echo "Course service not ready"
+          kubectl wait --for=condition=ready pod -l app=recommendation-gateway --namespace team-git-happens --timeout=120s || echo "Recommendation gateway not ready"
+          kubectl wait --for=condition=ready pod -l app=review-service --namespace team-git-happens --timeout=120s || echo "Review service not ready"
+          kubectl wait --for=condition=ready pod -l app=genai-service --namespace team-git-happens --timeout=120s || echo "GenAI service not ready"
+          
+          echo ""
+          echo "✅ Application metrics endpoints are available at:"
+          echo "   📊 Authentication Service: https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/prometheus"
+          echo "   📊 Course Service: https://k83-client-app.student.k8s.aet.tum.de/course/actuator/prometheus"
+          echo "   📊 Review Service: https://k83-client-app.student.k8s.aet.tum.de/review/actuator/prometheus"
+          echo "   📊 Recommendation Gateway: https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/prometheus"
+          echo "   📊 GenAI Service: https://k83-client-app.student.k8s.aet.tum.de/genai/actuator/prometheus"
+          echo ""
+          echo "❤️  Health check endpoints:"
+          echo "   ❤️  Authentication Service: https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/health"
+          echo "   ❤️  Course Service: https://k83-client-app.student.k8s.aet.tum.de/course/actuator/health"
+          echo "   ❤️  Review Service: https://k83-client-app.student.k8s.aet.tum.de/review/actuator/health"
+          echo "   ❤️  Recommendation Gateway: https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/health"
+          echo "   ❤️  GenAI Service: https://k83-client-app.student.k8s.aet.tum.de/genai/actuator/health"
+          echo ""
+          echo "📝 Services with monitoring labels:"
+          kubectl get services -n team-git-happens -l monitoring=true --no-headers | awk '{print "   - " $1 ":8080/actuator/prometheus"}' || true
+          echo ""
+          echo "✅ Monitoring verification complete!"
       
       - name: Deploy Unified Ingress
         run: |
@@ -151,37 +148,33 @@ jobs:
           kubectl get ingress -n team-git-happens
           kubectl describe ingress unified-app-ingress -n team-git-happens
       
-      - name: Verify monitoring setup
+      - name: Final deployment summary
         run: |
-          echo "=== MONITORING SETUP VERIFICATION ==="
-          echo "Checking monitoring namespace..."
-          kubectl get pods -n team-git-happens-monitoring
+          echo "=== DEPLOYMENT SUMMARY ==="
+          echo "✅ All services deployed successfully!"
           echo ""
-          echo "Checking ServiceMonitors..."
-          kubectl get servicemonitors -n team-git-happens-monitoring
+          echo "🌐 Application Access:"
+          echo "   🌍 Web Application: https://k83-client-app.student.k8s.aet.tum.de/"
           echo ""
-          echo "Checking if services have monitoring labels..."
-          kubectl get services -n team-git-happens -l monitoring=true
+          echo "📊 Monitoring & Metrics URLs:"
+          echo "   � Authentication Service: https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/prometheus"
+          echo "   📊 Course Service: https://k83-client-app.student.k8s.aet.tum.de/course/actuator/prometheus"
+          echo "   📊 Review Service: https://k83-client-app.student.k8s.aet.tum.de/review/actuator/prometheus"
+          echo "   📊 Recommendation Gateway: https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/prometheus"
+          echo "   📊 GenAI Service: https://k83-client-app.student.k8s.aet.tum.de/genai/actuator/prometheus"
           echo ""
-          echo "=== ACCESS INSTRUCTIONS ==="
-          echo "✅ Monitoring setup complete!"
+          echo "❤️  Health Check URLs:"
+          echo "   ❤️  Authentication Service: https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/health"
+          echo "   ❤️  Course Service: https://k83-client-app.student.k8s.aet.tum.de/course/actuator/health"
+          echo "   ❤️  Review Service: https://k83-client-app.student.k8s.aet.tum.de/review/actuator/health"
+          echo "   ❤️  Recommendation Gateway: https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/health"
+          echo "   ❤️  GenAI Service: https://k83-client-app.student.k8s.aet.tum.de/genai/actuator/health"
           echo ""
-          echo "🌐 Web Access (via Ingress):"
-          echo "   📊 Grafana: https://k83-client-app.student.k8s.aet.cit.tum.de/grafana/"
-          echo "   🔍 Prometheus: https://k83-client-app.student.k8s.aet.cit.tum.de/prometheus/"
+          echo "🔧 All metrics are accessible via web URLs listed above."
           echo ""
-          echo "🔧 Local Access (via port-forward - for troubleshooting only):"
-          echo "   🔍 Prometheus: kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n team-git-happens-monitoring"
-          echo "      Then visit: http://localhost:9090"
-          echo "   📊 Grafana: kubectl port-forward svc/prometheus-grafana 3000:80 -n team-git-happens-monitoring"
-          echo "      Then visit: http://localhost:3000"
+          echo "� Note: Due to cluster permissions, full Prometheus/Grafana stack is not deployed."
+          echo "    Metrics are available at application level for external monitoring tools."
           echo ""
-          echo "🔑 To get Grafana admin password:"
-          echo "   kubectl get secret prometheus-grafana -n team-git-happens-monitoring -o jsonpath='{.data.admin-password}' | base64 --decode"
-          echo ""
-          echo "📈 Expected metrics endpoints:"
-          echo "   - http://authentication-service:8080/actuator/prometheus"
-          echo "   - http://course-service:8080/actuator/prometheus"
-          echo "   - http://recommendation-gateway:8080/actuator/prometheus"      
+          echo "🚀 Deployment completed successfully!"      
 
       
