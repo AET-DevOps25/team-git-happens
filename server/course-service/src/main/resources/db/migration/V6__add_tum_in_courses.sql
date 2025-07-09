@@ -1,11 +1,10 @@
-INSERT INTO category(name) VALUES
+INSERT IGNORE INTO category(name) VALUES
   ('Digital Biology and Digital Medicine'),
   ('Software Engineering'),
   ('Formal Methods'),
-  ('Machine Learning and Analytics'),
   ('Computer Arch., Networks & Dist. Systems');
 
-INSERT INTO course (id, title, description, credits)
+INSERT IGNORE INTO course (id, title, description, credits)
 VALUES
  -- Algorithms
   ('IN2239',   'Algorithmic Game Theory',
@@ -279,7 +278,7 @@ VALUES
 
 
 -- 3) Link each course to its module category
-INSERT INTO course_category (course_id, category_name)
+INSERT IGNORE INTO course_category (course_id, category_name)
 VALUES
   -- Algorithms
   ('IN2239',   'Algorithms'),
