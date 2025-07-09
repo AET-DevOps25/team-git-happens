@@ -87,6 +87,47 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
         
+        # Actuator endpoints for monitoring
+        location /auth/actuator/ {
+            proxy_pass http://authentication-service:8080/actuator/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /courses/actuator/ {
+            proxy_pass http://course-service:8080/actuator/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /review/actuator/ {
+            proxy_pass http://review-service:8080/actuator/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /recommendation/actuator/ {
+            proxy_pass http://recommendation-gateway:8080/actuator/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /genai/health {
+            proxy_pass http://genai-service:8000/health;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
         # SPA fallback for React routes
         location / {
             try_files $uri $uri/ /index.html;

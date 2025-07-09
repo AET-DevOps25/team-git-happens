@@ -11,19 +11,18 @@
 After deployment, each Spring Boot service exposes metrics at:
 
 - **Authentication Service**: `https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/prometheus`
-- **Course Service**: `https://k83-client-app.student.k8s.aet.tum.de/course/actuator/prometheus`
+- **Course Service**: `https://k83-client-app.student.k8s.aet.tum.de/courses/actuator/prometheus`
 - **Review Service**: `https://k83-client-app.student.k8s.aet.tum.de/review/actuator/prometheus`
 - **Recommendation Gateway**: `https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/prometheus`
-- **GenAI Service**: `https://k83-client-app.student.k8s.aet.tum.de/genai/actuator/prometheus`
 
 ### ❤️ **Health Check Endpoints**
 
 Health status is available at:
 - **Authentication Service**: `https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/health`
-- **Course Service**: `https://k83-client-app.student.k8s.aet.tum.de/course/actuator/health`
+- **Course Service**: `https://k83-client-app.student.k8s.aet.tum.de/courses/actuator/health`
 - **Review Service**: `https://k83-client-app.student.k8s.aet.tum.de/review/actuator/health`
 - **Recommendation Gateway**: `https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/health`
-- **GenAI Service**: `https://k83-client-app.student.k8s.aet.tum.de/genai/actuator/health`
+- **GenAI Service**: `https://k83-client-app.student.k8s.aet.tum.de/genai/health` (FastAPI service)
 
 ### 📈 **Available Metrics**
 

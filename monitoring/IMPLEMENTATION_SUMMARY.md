@@ -68,14 +68,16 @@
 
 ### **Live Metrics Endpoints**
 - **Auth Service**: `https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/prometheus`
-- **Course Service**: `https://k83-client-app.student.k8s.aet.tum.de/course/actuator/prometheus`
-- **Recommendation**: `https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/prometheus`
+- **Course Service**: `https://k83-client-app.student.k8s.aet.tum.de/courses/actuator/prometheus`
 - **Review Service**: `https://k83-client-app.student.k8s.aet.tum.de/review/actuator/prometheus`
+- **Recommendation Gateway**: `https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/prometheus`
 
 ### **Health Check Endpoints**
 - **Auth Service**: `https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/health`
-- **Course Service**: `https://k83-client-app.student.k8s.aet.tum.de/course/actuator/health`
-- **Recommendation**: `https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/health`
+- **Course Service**: `https://k83-client-app.student.k8s.aet.tum.de/courses/actuator/health`
+- **Review Service**: `https://k83-client-app.student.k8s.aet.tum.de/review/actuator/health`
+- **Recommendation Gateway**: `https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/health`
+- **GenAI Service**: `https://k83-client-app.student.k8s.aet.tum.de/genai/health` (FastAPI service)
 
 ### **Development Access (Port-Forward)**
 ```bash
