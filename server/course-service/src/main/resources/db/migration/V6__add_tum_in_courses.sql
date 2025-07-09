@@ -36,7 +36,6 @@ VALUES
   ('IN99542',  'Accepted Elective Module in Algorithms',
      'Selected topics in cutting-edge algorithm research.', 1),
 
-  -- Computer Graphics & Vision
   ('IN995026', 'Accepted Elective in Computer Graphics and Vision (Theory)',
      'Theoretical principles underlying rendering and vision algorithms.', 1),
   ('IN2246',   'Computer Vision I: Variational Methods',
@@ -70,7 +69,6 @@ VALUES
   ('IN2111',   '3D User Interfaces',
      'Design and implementation of 3D interfaces for immersive user experiences.', 6),
 
-  -- Databases & Information Systems
   ('IN3100',     'Selected Topics in Databases and Information Systems',
      'Explores current research themes and innovations in database systems.', 5),
   ('IN2386',     'Cloud-Based Data Processing',
@@ -88,7 +86,6 @@ VALUES
   ('IN2267',     'Transaction Systems',
      'Principles and protocols for reliable, concurrent transaction processing.', 6),
 
-  -- Machine Learning & Analytics
   ('IN2410',      'Causality',
      'Study of cause–effect relationships and methods for causal inference.', 8),
   ('CIT4230004',  'Statistical Foundations of Learning',
@@ -136,7 +133,6 @@ VALUES
   ('IN2361',      'Natural Language Processing',
      'Algorithms and models for processing and understanding human language.', 6),
 
-  -- Robotics
   ('CIT433034', 'Advanced Multi-Fingered Robotic Hands: Dextrous Manipulation and Learning AI',
      'Design and control of dextrous robotic hands using machine learning techniques.', 3),
   ('IN3460',    'Selected Topics in Robotics',
@@ -174,7 +170,6 @@ VALUES
   ('CIT4330017','Trustworthy Machine Learning Systems',
      'Techniques for ensuring reliability, safety, and fairness in ML-driven systems.', 3),  
 
-  --  Digital Biology and Digital Medicine 
   ('IN3420',       'Selected Topics in Digital Biology and Digital Medicine',
      'Explores computational methods applied to biology and digital medicine research.', 5),
   ('CIT4230001',   'Computational Modeling for System Genetics',
@@ -194,7 +189,6 @@ VALUES
   ('IN2291',       'Protein Prediction II for Computer Scientists',
      'Advanced methods in protein folding and structural bioinformatics.', 8),
 
-  -- Software Engineering
   ('IN2309',     'Advanced Topics of Software Engineering',
      'Explores state-of-the-art methods and tools in software engineering research.', 8),
   ('CIT423002',  'AI Testing',
@@ -224,7 +218,6 @@ VALUES
   ('CIT4230000', 'Strategic IT Management',
      'Strategic planning, governance, and management of IT resources.', 4),
 
-  -- Formal Methods
   ('IN2041', 'Automata and Formal Languages',
      'Fundamental models of computation and the grammars that define languages.', 8),
   ('IN2227', 'Compiler Construction I',
@@ -248,7 +241,6 @@ VALUES
   ('CIT3230000', 'Advanced Concepts of Programming Languages',
      'In-depth exploration of modern language design, type systems, and implementation techniques.', 6),
      
-  --Computer Architecture, Computer Networks and Distributed Systems (RRV)
   ('IN2315',      'Network Coding',
      'Techniques for transmitting data efficiently and reliably using coding theory in networks.', 6),
   ('IN2076',      'Advanced Computer Architecture',
@@ -295,24 +287,24 @@ VALUES
   ('IN99540',  'Algorithms'),
   ('IN99541',  'Algorithms'),
   ('IN99542',  'Algorithms'),
-  -- Computer Graphics & Vision
-  ('IN995026', 'Computer Graphics & Vision'),
-  ('IN2246',   'Computer Graphics & Vision'),
-  ('IN2228',   'Computer Graphics & Vision'),
-  ('IN2124',   'Computer Graphics & Vision'),
-  ('IN0037',   'Computer Graphics & Vision'),
-  ('IN2297',   'Computer Graphics & Vision'),
-  ('IN2133',   'Computer Graphics & Vision'),
-  ('IN2015',   'Computer Graphics & Vision'),
-  ('IN2369',   'Computer Graphics & Vision'),
-  ('IN2409',   'Computer Graphics & Vision'),
-  ('IN2392',   'Computer Graphics & Vision'),
-  ('IN2236',   'Computer Graphics & Vision'),
-  ('IN2026',   'Computer Graphics & Vision'),
-  ('MH4L004277','Computer Graphics & Vision'),
-  ('IN2354',   'Computer Graphics & Vision'),
-  ('IN2111',   'Computer Graphics & Vision'),
-    -- Databases & Information Systems
+
+  ('IN995026', 'Computer graphics and Vision'),
+  ('IN2246',   'Computer graphics and Vision'),
+  ('IN2228',   'Computer graphics and Vision'),
+  ('IN2124',   'Computer graphics and Vision'),
+  ('IN0037',   'Computer graphics and Vision'),
+  ('IN2297',   'Computer graphics and Vision'),
+  ('IN2133',   'Computer graphics and Vision'),
+  ('IN2015',   'Computer graphics and Vision'),
+  ('IN2369',   'Computer graphics and Vision'),
+  ('IN2409',   'Computer graphics and Vision'),
+  ('IN2392',   'Computer graphics and Vision'),
+  ('IN2236',   'Computer graphics and Vision'),
+  ('IN2026',   'Computer graphics and Vision'),
+  ('MH4L004277','Computer graphics and Vision'),
+  ('IN2354',   'Computer graphics and Vision'),
+  ('IN2111',   'Computer graphics and Vision'),
+
   ('IN3100',     'Databases and Information Systems'),
   ('IN2386',     'Databases and Information Systems'),
   ('CIT3230001', 'Databases and Information Systems'),
@@ -321,7 +313,7 @@ VALUES
   ('IN2118',     'Databases and Information Systems'),
   ('IN2288',     'Databases and Information Systems'),
   ('IN2267',     'Databases and Information Systems'),
-  -- Machine Learning & Analytics
+
   ('IN2410',      'Machine Learning and Analytics'),
   ('CIT4230004',  'Machine Learning and Analytics'),
   ('IN99555',     'Machine Learning and Analytics'),
@@ -369,7 +361,7 @@ VALUES
   ('IN2067',    'Robotics'),
   ('IN2068',    'Robotics'),
   ('CIT4330017','Robotics'),
-  -- Digital Biology and Digital Medicine
+
   ('IN3420',       'Digital Biology and Digital Medicine'),
   ('CIT4230001',   'Digital Biology and Digital Medicine'),
   ('IN2021',       'Digital Biology and Digital Medicine'),
@@ -379,7 +371,7 @@ VALUES
   ('IN2293',       'Digital Biology and Digital Medicine'),
   ('IN2322',       'Digital Biology and Digital Medicine'),
   ('IN2291',       'Digital Biology and Digital Medicine'),
-  -- Software Engineering
+
   ('IN2309',     'Software Engineering'),
   ('CIT423002',  'Software Engineering'),
   ('IN3430',     'Software Engineering'),
@@ -394,7 +386,7 @@ VALUES
   ('IN2087',     'Software Engineering'),
   ('IN2235',     'Software Engineering'),
   ('CIT4230000', 'Software Engineering'),
-  -- Formal Methods
+
   ('IN2041', 'Formal Methods'),
   ('IN2227', 'Formal Methods'),
   ('IN2347', 'Formal Methods'),
@@ -406,7 +398,7 @@ VALUES
   ('IN2055', 'Formal Methods'),
   ('IN2040', 'Formal Methods'),
   ('CIT3230000', 'Formal Methods'),      
-  -- Computer Architecture, Computer Networks and Distributed Systems (RRV)
+
   ('IN2315',      'Computer Arch., Networks & Dist. Systems'),
   ('IN2076',      'Computer Arch., Networks & Dist. Systems'),
   ('IN2097',      'Computer Arch., Networks & Dist. Systems'),
