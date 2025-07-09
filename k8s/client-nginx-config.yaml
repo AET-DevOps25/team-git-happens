@@ -104,7 +104,7 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
         
-        location /review/actuator/ {
+        location /reviews/actuator/ {
             proxy_pass http://review-service:8080/actuator/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
@@ -112,7 +112,7 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
         
-        location /recommendation/actuator/ {
+        location /recommendations/actuator/ {
             proxy_pass http://recommendation-gateway:8080/actuator/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
