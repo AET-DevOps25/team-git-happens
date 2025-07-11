@@ -210,7 +210,6 @@ jobs:
               inputs: {
                 environment: 'staging',
                 image_tag: 'latest',
-                namespace: 'team-git-happens',
               }
             });
 
