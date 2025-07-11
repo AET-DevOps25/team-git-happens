@@ -126,5 +126,22 @@ services:
       - course-service
       - review-service
 
+  # Grafana for metrics visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana_dev
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: '${GRAFANA_ADMIN_PASSWORD:-admin123}'
+      GF_SERVER_ROOT_URL: 'http://localhost:3001/'
+      GF_SECURITY_ALLOW_EMBEDDING: 'true'
+    volumes:
+      - grafana_dev_data:/var/lib/grafana
+      - ./monitoring/grafana-dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana-datasources:/etc/grafana/provisioning/datasources
+
 volumes:
   mysql_data:
+  grafana_dev_data:

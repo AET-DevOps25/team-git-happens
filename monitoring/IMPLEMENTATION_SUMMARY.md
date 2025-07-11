@@ -77,7 +77,7 @@
 - **Course Service**: `https://k83-client-app.student.k8s.aet.tum.de/courses/actuator/health`
 - **Review Service**: `https://k83-client-app.student.k8s.aet.tum.de/review/actuator/health`
 - **Recommendation Gateway**: `https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/health`
-- **GenAI Service**: `https://k83-client-app.student.k8s.aet.tum.de/genai/health` (FastAPI service)
+- **GenAI Service**: `https://k83-client-app.student.k8s.aet.tum.de/monitor/genai/health`
 
 ### **Development Access (Port-Forward)**
 ```bash

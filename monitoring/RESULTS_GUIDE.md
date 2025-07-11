@@ -22,7 +22,7 @@ Health status is available at:
 - **Course Service**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/course/health`
 - **Review Service**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/review/health`
 - **Recommendation Gateway**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/gateway/health`
-- **GenAI Service**: `https://k83-client-app.student.k8s.aet.cit.tum.de/genai/health` (FastAPI service)
+- **GenAI Service**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/genai/health`
 
 ### 📈 **Available Metrics**
 
@@ -105,7 +105,7 @@ Waiting for services to be ready...
    📊 Course Service: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/course/prometheus
    📊 Review Service: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/review/prometheus
    📊 Recommendation Gateway: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/gateway/prometheus
-   📊 GenAI Service: https://k83-client-app.student.k8s.aet.cit.tum.de/genai/health
+   📊 GenAI Service: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/genai/health
 
 📝 Services with monitoring labels:
    - authentication-service:8080/actuator/prometheus
