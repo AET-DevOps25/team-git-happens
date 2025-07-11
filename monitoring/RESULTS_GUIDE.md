@@ -10,19 +10,19 @@
 
 After deployment, each Spring Boot service exposes metrics at:
 
-- **Authentication Service**: `https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/prometheus`
-- **Course Service**: `https://k83-client-app.student.k8s.aet.tum.de/courses/actuator/prometheus`
-- **Review Service**: `https://k83-client-app.student.k8s.aet.tum.de/review/actuator/prometheus`
-- **Recommendation Gateway**: `https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/prometheus`
+- **Authentication Service**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/auth/prometheus`
+- **Course Service**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/course/prometheus`
+- **Review Service**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/review/prometheus`
+- **Recommendation Gateway**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/gateway/prometheus`
 
 ### ❤️ **Health Check Endpoints**
 
 Health status is available at:
-- **Authentication Service**: `https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/health`
-- **Course Service**: `https://k83-client-app.student.k8s.aet.tum.de/courses/actuator/health`
-- **Review Service**: `https://k83-client-app.student.k8s.aet.tum.de/review/actuator/health`
-- **Recommendation Gateway**: `https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/health`
-- **GenAI Service**: `https://k83-client-app.student.k8s.aet.tum.de/genai/health` (FastAPI service)
+- **Authentication Service**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/auth/health`
+- **Course Service**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/course/health`
+- **Review Service**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/review/health`
+- **Recommendation Gateway**: `https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/gateway/health`
+- **GenAI Service**: `https://k83-client-app.student.k8s.aet.cit.tum.de/genai/health` (FastAPI service)
 
 ### 📈 **Available Metrics**
 
@@ -101,11 +101,11 @@ The CI/CD pipeline automatically checks that metrics endpoints are working:
 === APPLICATION METRICS VERIFICATION ===
 Waiting for services to be ready...
 ✅ Application metrics endpoints are available at:
-   📊 Authentication Service: https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/prometheus
-   📊 Course Service: https://k83-client-app.student.k8s.aet.tum.de/course/actuator/prometheus
-   📊 Review Service: https://k83-client-app.student.k8s.aet.tum.de/review/actuator/prometheus
-   📊 Recommendation Gateway: https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/prometheus
-   📊 GenAI Service: https://k83-client-app.student.k8s.aet.tum.de/genai/actuator/prometheus
+   📊 Authentication Service: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/auth/prometheus
+   📊 Course Service: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/course/prometheus
+   📊 Review Service: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/review/prometheus
+   📊 Recommendation Gateway: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/gateway/prometheus
+   📊 GenAI Service: https://k83-client-app.student.k8s.aet.cit.tum.de/genai/health
 
 📝 Services with monitoring labels:
    - authentication-service:8080/actuator/prometheus
@@ -123,16 +123,28 @@ If you have access to an external Prometheus instance, add these scrape configs:
 
 ```yaml
 scrape_configs:
-  - job_name: 'team-git-happens'
+  - job_name: 'team-git-happens-auth'
     static_configs:
-      - targets: ['k83-client-app.student.k8s.aet.tum.de']
-    metrics_path: '/auth/actuator/prometheus'
+      - targets: ['k83-client-app.student.k8s.aet.cit.tum.de']
+    metrics_path: '/monitor/auth/prometheus'
     scrape_interval: 30s
     
   - job_name: 'team-git-happens-course'
     static_configs:
-      - targets: ['k83-client-app.student.k8s.aet.tum.de']
-    metrics_path: '/course/actuator/prometheus'
+      - targets: ['k83-client-app.student.k8s.aet.cit.tum.de']
+    metrics_path: '/monitor/course/prometheus'
+    scrape_interval: 30s
+    
+  - job_name: 'team-git-happens-review'
+    static_configs:
+      - targets: ['k83-client-app.student.k8s.aet.cit.tum.de']
+    metrics_path: '/monitor/review/prometheus'
+    scrape_interval: 30s
+    
+  - job_name: 'team-git-happens-gateway'
+    static_configs:
+      - targets: ['k83-client-app.student.k8s.aet.cit.tum.de']
+    metrics_path: '/monitor/gateway/prometheus'
     scrape_interval: 30s
 ```
 

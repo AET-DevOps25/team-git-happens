@@ -87,8 +87,8 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
         
-        # Actuator endpoints for monitoring
-        location /auth/actuator/ {
+        # Monitoring endpoints for Spring Boot services (distinct from API paths)
+        location /monitor/auth/ {
             proxy_pass http://authentication-service:8080/actuator/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
@@ -96,7 +96,7 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
         
-        location /courses/actuator/ {
+        location /monitor/course/ {
             proxy_pass http://course-service:8080/actuator/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
@@ -104,7 +104,7 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
         
-        location /reviews/actuator/ {
+        location /monitor/review/ {
             proxy_pass http://review-service:8080/actuator/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
@@ -112,7 +112,7 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
         
-        location /recommendations/actuator/ {
+        location /monitor/gateway/ {
             proxy_pass http://recommendation-gateway:8080/actuator/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;

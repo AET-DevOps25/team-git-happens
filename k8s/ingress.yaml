@@ -76,20 +76,3 @@ spec:
                 name: client-app
                 port:
                   number: 80
-
-          # Monitoring endpoints (actuator)
-          - path: /auth(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: authentication-service
-                port:
-                  number: 8080
-
-          - path: /courses(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: course-service
-                port:
-                  number: 8080
