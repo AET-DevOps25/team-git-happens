@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  labels:
+    app: prometheus
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      - job_name: 'course-service'
+        static_configs:
+          - targets: ['course-service:8080']
+        metrics_path: '/actuator/prometheus'
+        scrape_interval: 30s
+
+      - job_name: 'authentication-service'
+        static_configs:
+          - targets: ['authentication-service:8080']
+        metrics_path: '/actuator/prometheus'
+        scrape_interval: 30s
+
+      - job_name: 'review-service'
+        static_configs:
+          - targets: ['review-service:8080']
+        metrics_path: '/actuator/prometheus'
+        scrape_interval: 30s
+
+      - job_name: 'recommendation-gateway'
+        static_configs:
+          - targets: ['recommendation-gateway:8080']
+        metrics_path: '/actuator/prometheus'
+        scrape_interval: 30s
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  labels:
+    app: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus:latest
+        ports:
+        - containerPort: 9090
+        args:
+          - '--config.file=/etc/prometheus/prometheus.yml'
+          - '--storage.tsdb.path=/prometheus/'
+          - '--web.console.libraries=/etc/prometheus/console_libraries'
+          - '--web.console.templates=/etc/prometheus/consoles'
+          - '--web.enable-lifecycle'
+        volumeMounts:
+        - name: prometheus-config
+          mountPath: /etc/prometheus/
+      volumes:
+      - name: prometheus-config
+        configMap:
+          name: prometheus-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  labels:
+    app: prometheus
+spec:
+  selector:
+    app: prometheus
+  ports:
+  - port: 9090
+    targetPort: 9090
+    name: web
