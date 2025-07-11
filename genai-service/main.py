@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -10,7 +10,9 @@ import requests
 from dotenv import load_dotenv
 import os
 import logging
+import time
 from typing import Dict
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
 # Configure logging
 logging.basicConfig(
@@ -28,6 +30,12 @@ app = FastAPI(
     description="API for GenAI applications",
     version="1.0.0"
 )
+
+# Prometheus metrics
+REQUEST_COUNT = Counter('genai_requests_total', 'Total requests to GenAI service', ['method', 'endpoint'])
+REQUEST_DURATION = Histogram('genai_request_duration_seconds', 'Request duration in seconds', ['method', 'endpoint'])
+EMBEDDING_REQUESTS = Counter('genai_embedding_requests_total', 'Total embedding requests')
+CHAT_REQUESTS = Counter('genai_chat_requests_total', 'Total chat requests')
 
 class QuestionRequest(BaseModel):
     question: str
@@ -47,7 +55,34 @@ except Exception as e:
 @app.head("/health", status_code=status.HTTP_200_OK)
 def health_check():
     """Health check endpoint for container monitoring"""
+    REQUEST_COUNT.labels(method="GET", endpoint="/health").inc()
     return {"status": "healthy", "service": "genai-service"}
+
+@app.get("/metrics")
+def metrics():
+    """Prometheus metrics endpoint"""
+    return PlainTextResponse(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+@app.get("/metrics")
+def metrics():
+    """Prometheus metrics endpoint"""
+    return PlainTextResponse(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+@app.middleware("http")
+async def prometheus_middleware(request, call_next):
+    """Middleware to collect Prometheus metrics"""
+    start_time = time.time()
+    method = request.method
+    endpoint = request.url.path
+    
+    REQUEST_COUNT.labels(method=method, endpoint=endpoint).inc()
+    
+    response = await call_next(request)
+    
+    duration = time.time() - start_time
+    REQUEST_DURATION.labels(method=method, endpoint=endpoint).observe(duration)
+    
+    return response
 
 def build_rag_context(question: str) -> str:
     response_courses = requests.get("http://course-service:8080/courses")
@@ -75,6 +110,7 @@ def build_rag_context(question: str) -> str:
 
 @app.post("/question")
 def answer_question(req: QuestionRequest):
+    CHAT_REQUESTS.inc()
     context = build_rag_context(req.question)
 
     prompt = f"""Du bist ein KI-System, das bei Kursauswahl hilft.
