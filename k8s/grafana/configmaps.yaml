@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  labels:
+    app: grafana
+data:
+  prometheus.yml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus Course
+        type: prometheus
+        access: proxy
+        url: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/course/prometheus
+        isDefault: true
+        editable: false
+      - name: Prometheus Auth
+        type: prometheus
+        access: proxy
+        url: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/auth/prometheus
+        editable: false
+      - name: Prometheus Review
+        type: prometheus
+        access: proxy
+        url: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/review/prometheus
+        editable: false
+      - name: Prometheus Gateway
+        type: prometheus
+        access: proxy
+        url: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/gateway/prometheus
+        editable: false
+'      - name: Prometheus GenAI
+        type: prometheus
+        access: proxy
+        url: https://k83-client-app.student.k8s.aet.cit.tum.de/monitor/genai/prometheus
+        editable: false
+'
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-config
+  labels:
+    app: grafana
+data:
+  dashboards.yml: |
+    apiVersion: 1
+    providers:
+      - name: 'Team Git Happens Dashboards'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        allowUiUpdates: true
+        options:
+          path: /var/lib/grafana/dashboards
+          foldersFromFilesStructure: true
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  labels:
+    app: grafana
+data:
+  application-metrics.json: |
+    {}
+  service-health.json: |
+    {}
+  system-overview.json: |
+    {}
+  genai-metrics.json: |
+    {}
