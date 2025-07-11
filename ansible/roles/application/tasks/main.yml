@@ -43,12 +43,11 @@
   become: yes
 
 - name: Login to GitHub Container Registry
-  become: true
   docker_login:
     registry: ghcr.io
     username: "{{ github_username }}"
     password: "{{ github_token }}"
-  become: no
+  become: true
   become_user: ec2-user
 
 - name: Pull latest Docker images
