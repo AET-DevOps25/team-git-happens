@@ -39,8 +39,38 @@ We use a **separated CI/CD approach** with distinct pipelines for different depl
    - Deploy using `docker-compose.prod.yml`
    - Perform health checks
 
-### 🔮 **Future: Kubernetes CD Pipeline**
-**Note**: A separate Kubernetes deployment pipeline will be added later for container orchestration deployments.
+###  **Kubernetes CD Pipeline** (`KubernetesCD.yml`)
+**Purpose**: Continuous Deployment of microservices to Kubernetes using Helm
+
+**Name**: "Kubernetes Continuous Deployment"
+
+**Triggers**:
+- Manual dispatch (`workflow_dispatch`) with inputs:
+  - `environment`: `staging` | `prod`
+  - `image_tag`: Docker tag (default: `latest`)
+
+**Environments**: `staging` | `prod`
+
+**Workflow**:
+1. **Setup Phase**:
+   - Checkout repo, set up `kubectl` & `helm`
+   - Configure kubeconfig using secret
+
+2. **Pre-Cleanup**:
+   - Uninstall existing MySQL release (if any)
+
+3. **Deployment Phase**:
+   - Deploy Bitnami MySQL chart with custom values
+   - Deploy services:
+     - `client-app`, `authentication-service`, `course-service`
+     - `review-service`, `recommendation-gateway`, `genai-service`
+     - All via Helm with `image.tag` from input
+   - Apply unified ingress from `k8s/unified-ingress.yaml`
+
+4. **Verification**:
+   - Check ingress status via `kubectl get/describe`
+
+
 
 ## 🎯 **Advantages of Separated Pipelines**
 
