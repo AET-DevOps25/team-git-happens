@@ -7,13 +7,32 @@
 
 An AI-driven course recommendation system designed specifically for TUM Informatics Master students. The platform combines collaborative filtering with AI-powered content analysis to provide personalized course suggestions based on student preferences, peer reviews, and curriculum requirements.
 
+![TUM Course Recommendation UI](docs/imgs/main_app_ui.png)
+
 ## 🎯 Project Overview
 
-Master students in TUM Informatics face challenges selecting suitable courses due to overwhelming options (100+ modules across specializations), lack of peer insights, and complex module handbooks. Our solution provides a comprehensive web-based platform that:
+Master students in TUM Informatics face significant challenges when selecting suitable courses due to:
 
-- **Collects user data** through TUM-ID authentication and course rating interfaces
+- **Overwhelming options**: 100+ modules across specializations (AI, Robotics, Software Engineering, etc.)
+- **Lack of peer insights**: Difficulty gauging course relevance, workload, and quality
+- **Complex module handbooks**: Technical descriptions that are often vague or hard to parse efficiently
+
+Current solutions like Excel sheets and word-of-mouth recommendations lack personalization and data-driven insights.
+
+### Our Solution
+
+A comprehensive web-based platform that:
+
+- **Collects user data** through TUM-ID authentication and intuitive course rating interfaces
 - **Analyzes preferences** using hybrid filtering algorithms and LLM-powered content analysis
-- **Generates personalized recommendations** matching student interests with curriculum requirements
+- **Generates recommendations** that balance popularity with personal relevance while adhering to TUM curriculum requirements
+
+### Key Benefits
+
+- **Reduces time** spent on course selection research
+- **Increases satisfaction** via personalized, peer-validated suggestions  
+- **Improves curriculum adherence** to TUM's degree requirements
+- **Provides transparency** through community-driven reviews and ratings
 
 ## ✨ Key Features
 
@@ -47,6 +66,53 @@ Master students in TUM Informatics face challenges selecting suitable courses du
 - **Alerting system** for proactive issue detection
 
 ## 🏗️ Architecture
+
+### System Overview
+
+Our course recommendation system follows a microservices architecture designed for scalability and maintainability:
+
+![Top Level Architecture](docs/Top%20Level%20Architecture.png)
+
+### Subsystem Decomposition
+
+The system is decomposed into focused microservices with clear responsibilities:
+
+![Subsystem Decomposition](docs/Subsystem%20Decomposition%20Diagram.png)
+
+### Component Interactions
+
+```mermaid
+graph TD
+    Client[Client Application<br/>React/TypeScript] --> API[API Gateway<br/>Nginx]
+    API --> Auth[Authentication Service<br/>Spring Boot]
+    API --> Course[Course Service<br/>Spring Boot]
+    API --> Review[Review Service<br/>Spring Boot]
+    API --> Rec[Recommendation Gateway<br/>Spring Boot]
+    Rec --> AI[GenAI Service<br/>FastAPI]
+    
+    Auth --> DB[(Database<br/>MySQL)]
+    Course --> DB
+    Review --> DB
+    
+    AI --> LLM[External LLM API<br/>GPT-4/OpenAI]
+    
+    Monitor[Prometheus/Grafana] -.-> Auth
+    Monitor -.-> Course
+    Monitor -.-> Review
+    Monitor -.-> Rec
+    Monitor -.-> AI
+    
+    style Client fill:#f9f,stroke:#333,stroke-width:2px
+    style API fill:#ccf,stroke:#333,stroke-width:2px
+    style Auth fill:#cfc,stroke:#333,stroke-width:2px
+    style Course fill:#cfc,stroke:#333,stroke-width:2px
+    style Review fill:#cfc,stroke:#333,stroke-width:2px
+    style Rec fill:#cfc,stroke:#333,stroke-width:2px
+    style AI fill:#fcc,stroke:#333,stroke-width:2px
+    style DB fill:#fcf,stroke:#333,stroke-width:2px
+    style Monitor fill:#cff,stroke:#333,stroke-width:2px
+    style LLM fill:#ffc,stroke:#333,stroke-width:2px
+```
 
 ### Microservices Design
 The system follows a microservices architecture with clear separation of concerns:
@@ -138,7 +204,59 @@ team-git-happens/
 - **Terraform** for AWS infrastructure provisioning
 - **Ansible** for configuration management
 
-## 🚀 Installation
+## � CI/CD Pipeline
+
+Our project implements a comprehensive CI/CD strategy with separated pipelines for different deployment targets:
+
+```mermaid
+graph LR
+    A[Developer Push] --> B[GitHub Actions CI]
+    B --> C{Tests Pass?}
+    C -->|Yes| D[Build Docker Images]
+    C -->|No| E[Notify Failure]
+    D --> F[Push to GHCR]
+    F --> G1[AWS EC2 Deployment]
+    F --> G2[Kubernetes Deployment]
+    G1 --> H1[Terraform + Ansible]
+    G2 --> H2[Helm Charts]
+    H1 --> I1[Monitor EC2]
+    H2 --> I2[Monitor K8s]
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#ccf,stroke:#333,stroke-width:2px
+    style D fill:#cfc,stroke:#333,stroke-width:2px
+    style F fill:#fcf,stroke:#333,stroke-width:2px
+    style G1 fill:#fcc,stroke:#333,stroke-width:2px
+    style G2 fill:#cff,stroke:#333,stroke-width:2px
+    style E fill:#fdd,stroke:#333,stroke-width:2px
+```
+
+### 🔧 CI Pipeline
+**Purpose**: Continuous Integration - Test and Build
+- **Triggers**: Push to `main`/`develop`, Pull requests
+- **Actions**: 
+  - Frontend tests (Jest, linting)
+  - Backend tests (JUnit for all Spring Boot services)
+  - Build and push Docker images to GHCR with SHA tags
+
+### ☁️ AWS CD Pipeline
+**Purpose**: Cloud deployment using Infrastructure as Code
+- **Triggers**: Push to `main`/`develop`, Manual dispatch
+- **Environments**: `staging` | `prod`
+- **Workflow**:
+  1. **Infrastructure**: Terraform provisions AWS EC2 infrastructure
+  2. **Deployment**: Ansible deploys using `docker-compose.prod.yml`
+  3. **Health Checks**: Automated service validation
+
+### 🚢 Kubernetes CD Pipeline  
+**Purpose**: Container orchestration deployment
+- **Triggers**: Manual dispatch with environment selection
+- **Actions**: Deploy to Kubernetes cluster using Helm charts
+- **Features**: Rolling updates, service mesh integration, monitoring
+
+For detailed CI/CD architecture, see [CI/CD Documentation](docs/CI_CD_ARCHITECTURE.md).
+
+## �🚀 Installation
 
 ### Prerequisites
 - **Docker & Docker Compose** (v20.10+)
@@ -247,71 +365,37 @@ curl -X POST http://localhost:3000/api/reviews \
   }'
 ```
 
-## 🔗 API Reference
+## 🔗 API Documentation
 
-### Authentication Service (`/api/auth`)
+The TUM Course Recommendation System provides comprehensive API documentation using Swagger UI/OpenAPI. Instead of listing all endpoints in this README, you can explore the interactive API documentation directly.
 
-#### POST `/auth/register`
-Register a new student account.
-- **Request Body**: `{ matriculationNumber, name, email, password }`
-- **Response**: `201 Created` with student details
-- **Error Codes**: `400 Bad Request`, `409 Conflict`
+![API Documentation](docs/imgs/swagger_ui_screenshot.png)
+*Interactive Swagger UI interface for exploring and testing API endpoints*
 
-#### POST `/auth/login/email`
-Authenticate using email and password.
-- **Request Body**: `{ email, password }`
-- **Response**: `200 OK` with JWT token and student details
-- **Error Codes**: `401 Unauthorized`
+### Swagger UI Access
 
-#### POST `/auth/login/matriculation`
-Authenticate using matriculation number and password.
-- **Request Body**: `{ matriculationNumber, password }`
-- **Response**: `200 OK` with JWT token and student details
-- **Error Codes**: `401 Unauthorized`
+Each microservice has its own Swagger UI documentation available at:
 
-### Course Service (`/api/courses`)
+| Service | Swagger UI URL | Description |
+|---------|---------------|-------------|
+| Authentication Service | [/swagger/auth/](http://k83-client-app.student.k8s.aet.cit.tum.de/swagger/auth/) | User registration, login, and JWT management |
+| Course Service | [/swagger/course/](http://k83-client-app.student.k8s.aet.cit.tum.de/swagger/course/) | Course catalog management and category operations |
+| Review Service | [/swagger/review/](http://k83-client-app.student.k8s.aet.cit.tum.de/swagger/review/) | Course rating and review system |
+| Recommendation Gateway | [/swagger/gateway/](http://k83-client-app.student.k8s.aet.cit.tum.de/swagger/gateway/) | AI-powered course recommendations |
 
-#### GET `/courses`
-Retrieve all available courses.
-- **Response**: `200 OK` with array of course objects
-- **Fields**: `id, title, description, categories, credits, avgRating`
+### Using the Interactive Documentation
 
-#### GET `/courses/{id}`
-Get detailed information for a specific course.
-- **Parameters**: `id` (string) - Course identifier
-- **Response**: `200 OK` with course details
-- **Error Codes**: `404 Not Found`
+1. **Explore Endpoints**: Browse available API endpoints with detailed parameter descriptions
+2. **Try It Out**: Execute API calls directly from the browser interface  
+3. **View Responses**: See real response examples and status codes
+4. **Authentication**: Use the "Authorize" button to test authenticated endpoints
+5. **Download Specs**: Export OpenAPI specifications for integration
 
-#### GET `/categories`
-List all available course categories.
-- **Response**: `200 OK` with array of category objects
+### API Base URLs
 
-### Review Service (`/api/reviews`)
+- **Development**: `http://localhost:3000`
+- **Production**: `http://k83-client-app.student.k8s.aet.cit.tum.de`
 
-#### POST `/reviews`
-Submit a new course review (authentication required).
-- **Request Body**: `{ courseId, rating, reviewText }`
-- **Response**: `201 Created` with review details
-- **Authentication**: JWT token required
-
-#### GET `/courses/{courseId}/reviews`
-Get all reviews for a specific course.
-- **Parameters**: `courseId` (string) - Course identifier
-- **Response**: `200 OK` with array of review objects
-
-#### GET `/courses/{courseId}/average-rating`
-Calculate average rating for a course.
-- **Parameters**: `courseId` (string) - Course identifier
-- **Response**: `200 OK` with numeric rating value
-- **Error Codes**: `404 Not Found` (no reviews)
-
-### Recommendation Service (`/api/recommendation`)
-
-#### POST `/recommendation`
-Generate AI-powered course recommendations.
-- **Request Body**: `{ credits, categories, description }`
-- **Response**: `200 OK` with recommendation array
-- **Format**: `[{ course, reason }]`
 
 ## 🧪 Testing
 
@@ -342,28 +426,86 @@ cd server/[service-name]
 - **Critical path testing** for authentication and recommendations
 - **API contract testing** using OpenAPI specifications
 
-## 🔧 Configuration
+## � Monitoring & Observability
+
+Our system implements comprehensive monitoring and observability using Prometheus, Grafana, and distributed logging to ensure system health and performance tracking.
+
+### Metrics Collection
+
+**Prometheus** collects metrics from all microservices with custom instrumentation:
+
+- **Application metrics**: Request rates, response times, error rates
+- **Business metrics**: User registrations, course recommendations, review submissions
+- **Infrastructure metrics**: CPU, memory, disk usage, container health
+- **Database metrics**: Connection pools, query performance, transaction rates
+
+### Visualization & Dashboards
+
+**Grafana** provides real-time dashboards for different stakeholder needs:
+
+| Dashboard | Purpose | Key Metrics |
+|-----------|---------|-------------|
+| **System Overview** | High-level health monitoring | Service availability, response times, error rates |
+| **Application Performance** | Deep-dive into service performance | Database queries, API latency, throughput |
+| **Business Intelligence** | User engagement and system usage | Daily active users, recommendation accuracy, review trends |
+| **Infrastructure** | Resource utilization and capacity | CPU/Memory usage, container health, network traffic |
+
+### Alerting System
+
+**Alertmanager** provides proactive issue detection with configured rules:
+
+- **Critical alerts**: Service downtime, database connection failures
+- **Warning alerts**: High response times, elevated error rates
+- **Performance alerts**: Memory/CPU threshold breaches
+- **Business alerts**: Unusual user activity patterns
+
+### Access Points
+
+- **Grafana Dashboard**: http://localhost:3001 (admin/admin123)
+- **Prometheus UI**: http://localhost:9090
+- **Alert Manager**: http://localhost:9093
+
+### Health Checks
+
+Each service exposes health check endpoints for monitoring:
+
+```bash
+# Service health endpoints
+curl http://localhost:8080/actuator/health  # Course Service
+curl http://localhost:8081/actuator/health  # Auth Service
+curl http://localhost:8082/actuator/health  # Review Service
+curl http://localhost:8083/actuator/health  # Recommendation Gateway
+curl http://localhost:8000/health           # GenAI Service
+```
+
+For detailed monitoring setup and configuration, see [Monitoring Documentation](docs/Monitoring.md).
+
+## �🔧 Configuration
 
 ### Environment Variables
 
 #### Application Configuration
 ```bash
-# Database
+# Database Configuration
 DB_PASSWORD=your_mysql_password
-USERNAME=your_mysql_username
+DB_USERNAME=your_mysql_username
 
-# JWT Security
-JWT_SECRET=your_jwt_secret_key
-JWT_EXPIRATION=86400
-
-# AI Service
-API_URL=https://your-llm-api-endpoint
+# AI Service Configuration
 API_KEY=your_llm_api_key
+API_URL=https://your-llm-api-endpoint
 MODEL=gpt-4
 
-# Monitoring
-PROMETHEUS_ENABLED=true
-GRAFANA_ADMIN_PASSWORD=admin123
+# AWS Configuration
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+AWS_SESSION_TOKEN=your_aws_session_token
+AWS_REGION=us-east-1
+
+# Kubernetes Configuration
+KUBECONFIG=path_to_your_kubeconfig_file
+
+# Infrastructure Configuration
+EC2_SSH_PRIVATE_KEY=your_ec2_private_key
 ```
 
 #### Service Ports
