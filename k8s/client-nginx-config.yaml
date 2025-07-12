@@ -128,13 +128,113 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # Grafana UI access
-        location /grafana/ {
-            proxy_pass http://grafana:3000/;
+        # Prometheus static assets (must come first for specificity)
+        location ~ ^/prometheus/(static|api|graph|targets|rules|flags|config|service-discovery|status)/ {
+            proxy_pass http://prometheus:9090;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+            
+            # Cache static assets
+            expires 1h;
+            add_header Cache-Control "public";
+        }
+
+        # Prometheus main UI and API
+        location /prometheus/ {
+            proxy_pass http://prometheus:9090/prometheus/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+        }
+        
+        # Handle Prometheus without trailing slash
+        location /prometheus {
+            return 301 /prometheus/;
+        }
+
+        # Grafana static assets (public directory) - must come first for specificity
+        location ~ ^/grafana/public/ {
+            proxy_pass http://grafana:3000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+            
+            # Cache static assets
+            expires 1h;
+            add_header Cache-Control "public";
+        }
+        
+        # Grafana API endpoints
+        location ~ ^/grafana/api/ {
+            proxy_pass http://grafana:3000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+        }
+        
+        # Grafana UI access (main pages)
+        location /grafana/ {
+            proxy_pass http://grafana:3000/grafana/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+        }
+        
+        # Handle Grafana without trailing slash
+        location /grafana {
+            return 301 /grafana/;
+        }
+        
+        # Alertmanager static assets
+        location ~ ^/alertmanager/static/ {
+            proxy_pass http://alertmanager:9093;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            rewrite ^/alertmanager/(.*) /$1 break;
+        }
+        
+        # Alertmanager API endpoints
+        location ~ ^/alertmanager/api/ {
+            proxy_pass http://alertmanager:9093;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            rewrite ^/alertmanager/(.*) /$1 break;
+        }
+        
+        # Alertmanager UI access
+        location /alertmanager/ {
+            proxy_pass http://alertmanager:9093/alertmanager/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+        }
+        
+        # Handle Alertmanager without trailing slash
+        location /alertmanager {
+            return 301 /alertmanager/;
         }
 
         # SPA fallback for React routes

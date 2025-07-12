@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-alert-rules
+  labels:
+    app: prometheus
+data:
+  alert-rules.yml: |
+    groups:
+    - name: team-git-happens-alerts
+      rules:
+      # Service Health Alerts
+      - alert: ServiceDown
+        expr: up == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} on instance {{ $labels.instance }} has been down for more than 30 seconds."
+
+      - alert: ServiceHighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate on {{ $labels.job }}"
+          description: "Service {{ $labels.job }} has an error rate of {{ $value }} errors per second."
+
+      # JVM Memory Alerts
+      - alert: JVMMemoryHigh
+        expr: (jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"}) * 100 > 85
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "JVM heap memory usage is high on {{ $labels.job }}"
+          description: "JVM heap memory usage is {{ $value }}% on instance {{ $labels.instance }}."
+
+      - alert: JVMMemoryCritical
+        expr: (jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"}) * 100 > 95
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "JVM heap memory usage is critically high on {{ $labels.job }}"
+          description: "JVM heap memory usage is {{ $value }}% on instance {{ $labels.instance }}. Immediate action required!"
+
+      # CPU Usage Alerts
+      - alert: HighCPUUsage
+        expr: process_cpu_usage > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.job }}"
+          description: "CPU usage is {{ $value }}% on instance {{ $labels.instance }}."
+
+      # HTTP Response Time Alerts
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time on {{ $labels.job }}"
+          description: "95th percentile response time is {{ $value }}s on service {{ $labels.job }}."
+
+      # Database Connection Alerts
+      - alert: DatabaseConnectionPoolLow
+        expr: hikaricp_connections_active / hikaricp_connections_max > 0.8
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection pool usage is high"
+          description: "Database connection pool usage is {{ $value }}% on {{ $labels.job }}."
+
+      # GenAI Service Specific Alerts
+      - alert: GenAIServiceResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="genai-service"}[5m])) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "GenAI service has high response time"
+          description: "GenAI service 95th percentile response time is {{ $value }}s."
+
+      - alert: GenAIServiceDown
+        expr: up{job="genai-service"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "GenAI service is down"
+          description: "GenAI service has been unreachable for more than 30 seconds."
+
+      # Application Specific Alerts
+      - alert: AuthenticationServiceDown
+        expr: up{job="authentication-service"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Authentication service is down"
+          description: "Authentication service is critical for user access."
+
+      - alert: CourseServiceDown
+        expr: up{job="course-service"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Course service is down"
+          description: "Course service is essential for core functionality."
+
+      # Disk Space Alert (if available)
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Disk space is below 20% on instance {{ $labels.instance }}."
+
+      # Pod Restart Alert
+      - alert: PodCrashLooping
+        expr: rate(kube_pod_container_status_restarts_total[15m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod {{ $labels.pod }} is crash looping"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is restarting frequently."

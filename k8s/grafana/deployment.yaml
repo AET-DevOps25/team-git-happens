@@ -28,6 +28,12 @@ spec:
           value: "https://k83-client-app.student.k8s.aet.cit.tum.de/grafana"
         - name: GF_SERVER_SERVE_FROM_SUB_PATH
           value: "true"
+        - name: GF_SERVER_DOMAIN
+          value: "k83-client-app.student.k8s.aet.cit.tum.de"
+        - name: GF_RENDERING_SERVER_URL
+          value: "http://localhost:3000/"
+        - name: GF_RENDERING_CALLBACK_URL
+          value: "https://k83-client-app.student.k8s.aet.cit.tum.de/grafana"
         volumeMounts:
         - name: grafana-datasources
           mountPath: /etc/grafana/provisioning/datasources

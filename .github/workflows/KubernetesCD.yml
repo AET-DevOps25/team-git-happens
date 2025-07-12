@@ -142,6 +142,51 @@ jobs:
         run: |
           kubectl apply -f k8s/unified-ingress.yaml
           
+      - name: Deploy Monitoring Stack
+        run: |
+          echo "🚀 Deploying Prometheus and Grafana monitoring stack..."
+          
+          echo "📊 Deploying Prometheus and Alert Rules..."
+          # Deploy Prometheus alert rules first
+          kubectl apply -f k8s/prometheus-alert-rules.yaml -n team-git-happens
+          
+          # Deploy Prometheus
+          kubectl apply -f k8s/prometheus.yaml -n team-git-happens
+          
+          echo "🚨 Deploying Alertmanager..."
+          # Deploy Alertmanager
+          kubectl apply -f k8s/alertmanager.yaml -n team-git-happens
+          
+          echo "📈 Deploying Grafana..."
+          # Update Grafana dashboard configmap with all dashboard files
+          echo "🔧 Updating Grafana dashboards configmap..."
+          
+          # Create configmap with all dashboard files
+          kubectl create configmap grafana-dashboards \
+            --from-file=monitoring/grafana-dashboards/ \
+            --dry-run=client -o yaml | \
+            kubectl apply -f - -n team-git-happens
+          
+          # Apply Grafana datasources and dashboard provider configmaps
+          kubectl apply -f k8s/grafana/ -n team-git-happens
+          
+          echo "🔄 Updating NGINX configuration..."
+          # Update NGINX configuration for monitoring endpoints
+          kubectl apply -f k8s/client-nginx-config.yaml
+          
+          echo "⏳ Waiting for deployments to be ready..."
+          # Wait for deployments to be ready
+          kubectl rollout status deployment/prometheus -n team-git-happens --timeout=300s
+          kubectl rollout status deployment/alertmanager -n team-git-happens --timeout=300s
+          kubectl rollout status deployment/grafana -n team-git-happens --timeout=300s
+          
+          echo "✅ Monitoring stack deployment complete!"
+          echo ""
+          echo "🔗 Access URLs:"
+          echo "   • Grafana: https://k83-client-app.student.k8s.aet.cit.tum.de/grafana/"
+          echo "   • Prometheus: https://k83-client-app.student.k8s.aet.cit.tum.de/prometheus/"
+          echo "   • Alertmanager: https://k83-client-app.student.k8s.aet.cit.tum.de/alertmanager/"
+          
       - name: Verify deployment
         run: |
           kubectl get ingress -n team-git-happens
@@ -155,7 +200,13 @@ jobs:
           echo "🌐 Application Access:"
           echo "   🌍 Web Application: https://k83-client-app.student.k8s.aet.tum.de/"
           echo ""
-          echo "📊 Monitoring & Metrics URLs:"
+          echo "📊 Monitoring & Observability:"
+          echo "   📈 Grafana Dashboards: https://k83-client-app.student.k8s.aet.tum.de/grafana/"
+          echo "   🔍 Prometheus Metrics: https://k83-client-app.student.k8s.aet.tum.de/prometheus/"
+          echo "   🚨 Alertmanager: https://k83-client-app.student.k8s.aet.tum.de/alertmanager/"
+          echo "   🔐 Grafana Login: admin / admin123"
+          echo ""
+          echo "📊 Service Metrics URLs:"
           echo "   📊 Authentication Service: https://k83-client-app.student.k8s.aet.tum.de/auth/actuator/prometheus"
           echo "   📊 Course Service: https://k83-client-app.student.k8s.aet.tum.de/courses/actuator/prometheus"
           echo "   📊 Review Service: https://k83-client-app.student.k8s.aet.tum.de/review/actuator/prometheus"
@@ -168,11 +219,12 @@ jobs:
           echo "   ❤️  Recommendation Gateway: https://k83-client-app.student.k8s.aet.tum.de/recommendation/actuator/health"
           echo "   ❤️  GenAI Service: https://k83-client-app.student.k8s.aet.tum.de/genai/health (FastAPI service)"
           echo ""
-          echo "🔧 All metrics are accessible via web URLs listed above."
+          echo "🎯 Dashboard Features:"
+          echo "   • 9 comprehensive Grafana dashboards with enhanced metrics"
+          echo "   • Real-time monitoring of all microservices"
+          echo "   • Email alerts configured for critical issues"
+          echo "   • Performance metrics, JVM monitoring, and service health"
           echo ""
-          echo "� Note: Due to cluster permissions, full Prometheus/Grafana stack is not deployed."
-          echo "    Metrics are available at application level for external monitoring tools."
-          echo ""
-          echo "🚀 Deployment completed successfully!"      
+          echo "🚀 Full monitoring stack deployed successfully!"      
 
       

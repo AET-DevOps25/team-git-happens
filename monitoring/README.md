@@ -2,7 +2,61 @@
 
 This directory contains monitoring configuration files for the Team Git Happens microservices project.
 
-**⚠️ IMPORTANT: Due to limited Kubernetes cluster permissions, the full Prometheus/Grafana stack cannot be automatically deployed. This setup provides application-level metrics that can be consumed by external monitoring tools.**
+## 🚀 New: Complete Grafana Dashboard Integration
+
+✅ **IMPLEMENTED**: Full monitoring stack with Prometheus and Grafana dashboards
+
+### Features
+- **Prometheus**: Metrics collection from all services
+- **Grafana**: Pre-configured dashboards with automatic provisioning
+- **Spring Boot Integration**: All Java services expose metrics via Actuator + Micrometer
+- **GenAI Service Metrics**: Python FastAPI service with Prometheus client
+- **Docker Compose Ready**: Complete stack deployment
+
+## Quick Start
+
+### Local Development
+```bash
+# Validate monitoring setup
+./scripts/validate-monitoring.sh
+
+# Start the complete stack with monitoring
+docker-compose up -d
+
+# Access points
+# Grafana: http://localhost:3001 (admin/admin123)
+# Prometheus: http://localhost:9090
+```
+
+### CI/CD Pipeline
+The monitoring stack is automatically deployed with the application stack. All configuration files are included in the repository.
+
+## Dashboard Overview
+
+### 🎯 Available Dashboards
+
+1. **System Overview** (`system-overview.json`)
+   - Service status across all components
+   - Overall request rates by service
+   - Response time comparison
+   - Error rate monitoring
+
+2. **Application Metrics** (`application-metrics.json`)
+   - HTTP request rates and response times
+   - JVM memory usage (heap/non-heap)
+   - Database connection pool metrics
+   - Spring Boot actuator metrics
+
+3. **Service Health** (`service-health.json`)
+   - Individual service uptime
+   - Error rate breakdown (4xx/5xx)
+   - Service-specific health indicators
+
+4. **GenAI Metrics** (`genai-metrics.json`)
+   - AI service request patterns
+   - Chat request rates
+   - Response time analysis
+   - Custom AI metrics
 
 ## Current Monitoring Setup
 
@@ -13,28 +67,69 @@ This directory contains monitoring configuration files for the Team Git Happens 
 - recommendation-gateway:8080/actuator/prometheus
 - review-service:8080/actuator/prometheus
 
-### 2. Health Check Endpoints
+### 2. GenAI Service Metrics
+✅ **ACTIVE**: Python FastAPI service with Prometheus client
+- genai-service:8000/metrics
+- Request counting and timing
+- Custom business metrics
+
+### 3. Health Check Endpoints
 ✅ **ACTIVE**: Health status available at `/actuator/health` on all services
 
-### 3. Metrics Available
+### 4. Metrics Available
 - HTTP request metrics (rate, duration, status codes)
 - JVM metrics (memory, garbage collection, threads)  
 - Database connection pool metrics (HikariCP)
 - Custom application metrics
+- AI service metrics (request patterns, performance)
 
 ## Files Structure
 
 ```
 monitoring/
-├── README.md                      # This file
-├── RESULTS_GUIDE.md              # Access instructions
-├── monitoring-values.yaml        # Helm values for Prometheus stack (for future use)
-├── authentication-service-monitor.yaml
-├── course-service-monitor.yaml
-├── review-service-monitor.yaml
-├── recommendation-gateway-monitor.yaml
-└── genai-service-monitor.yaml
+├── README.md                           # This file
+├── RESULTS_GUIDE.md                   # Access instructions
+├── IMPLEMENTATION_SUMMARY.md          # Implementation details
+├── ENDPOINT_CONSISTENCY_SUMMARY.md    # Endpoint documentation
+├── monitoring-values.yaml             # Helm values for Prometheus stack
+├── genai-service-monitor.yaml         # GenAI service monitor config
+├── grafana-datasources/               # 🆕 Grafana data source configurations
+│   └── prometheus.yml                 # Prometheus datasource config
+├── grafana-dashboards/                # 🆕 Pre-configured Grafana dashboards
+│   ├── dashboards.yml                 # Dashboard provisioning config
+│   ├── application-metrics.json       # Spring Boot metrics dashboard
+│   ├── service-health.json           # Service health dashboard
+│   ├── genai-metrics.json            # GenAI service dashboard
+│   └── system-overview.json          # System overview dashboard
+└── prometheus/                        # 🆕 Prometheus configuration
+    └── prometheus.yml                 # Prometheus scrape configs
 ```
+
+## 🔧 Configuration Details
+
+### Prometheus Scrape Targets
+```yaml
+# Spring Boot Services (Actuator + Micrometer)
+- course-service:8080/actuator/prometheus
+- review-service:8080/actuator/prometheus  
+- authentication-service:8080/actuator/prometheus
+- recommendation-gateway:8080/actuator/prometheus
+
+# GenAI Service (Python Prometheus Client)
+- genai-service:8000/metrics
+```
+
+### Grafana Datasource
+- **URL**: `http://prometheus:9090`
+- **Type**: Prometheus
+- **Access**: Server (proxy)
+- **Default**: Yes
+
+### Dashboard Features
+- **Auto-refresh**: 10 seconds
+- **Time range**: Configurable (default: last 15-30 minutes)
+- **Responsive design**: Works on desktop and mobile
+- **Dark theme**: Professional appearance
 
 ## Access Methods
 
