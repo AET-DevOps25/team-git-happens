@@ -87,6 +87,147 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
         
+        # Swagger UI and OpenAPI documentation endpoints
+        
+        # General Swagger UI redirect for legacy /swagger-ui.html
+        location /swagger-ui.html {
+            return 301 /swagger/auth/index.html;
+        }
+        
+        # Authentication service Swagger UI - redirect directory to index.html
+        location = /swagger/auth/ {
+            return 301 /swagger/auth/index.html;
+        }
+        
+        # Custom swagger-initializer.js for authentication service
+        location = /swagger/auth/swagger-initializer.js {
+            add_header Content-Type application/javascript;
+            return 200 "window.onload = function() { window.ui = SwaggerUIBundle({ url: '/api-docs/auth', dom_id: '#swagger-ui', deepLinking: true, presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset], plugins: [SwaggerUIBundle.plugins.DownloadUrl], layout: 'StandaloneLayout', configUrl: '/api-docs/auth', validatorUrl: '' }); };";
+        }
+        
+        # Authentication service Swagger UI - handle static resources
+        location ~ ^/swagger/auth/(.*)$ {
+            proxy_pass http://authentication-service:8080/swagger-ui/$1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /swagger/auth {
+            return 301 /swagger/auth/;
+        }
+        
+        # Course service Swagger UI - redirect directory to index.html
+        location = /swagger/course/ {
+            return 301 /swagger/course/index.html;
+        }
+        
+        # Custom swagger-initializer.js for course service
+        location = /swagger/course/swagger-initializer.js {
+            add_header Content-Type application/javascript;
+            return 200 "window.onload = function() { window.ui = SwaggerUIBundle({ url: '/api-docs/course', dom_id: '#swagger-ui', deepLinking: true, presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset], plugins: [SwaggerUIBundle.plugins.DownloadUrl], layout: 'StandaloneLayout', configUrl: '/api-docs/course', validatorUrl: '' }); };";
+        }
+        
+        # Course service Swagger UI - handle static resources
+        location ~ ^/swagger/course/(.*)$ {
+            proxy_pass http://course-service:8080/swagger-ui/$1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /swagger/course {
+            return 301 /swagger/course/;
+        }
+        
+        # Review service Swagger UI - redirect directory to index.html
+        location = /swagger/review/ {
+            return 301 /swagger/review/index.html;
+        }
+        
+        # Custom swagger-initializer.js for review service
+        location = /swagger/review/swagger-initializer.js {
+            add_header Content-Type application/javascript;
+            return 200 "window.onload = function() { window.ui = SwaggerUIBundle({ url: '/api-docs/review', dom_id: '#swagger-ui', deepLinking: true, presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset], plugins: [SwaggerUIBundle.plugins.DownloadUrl], layout: 'StandaloneLayout', configUrl: '/api-docs/review', validatorUrl: '' }); };";
+        }
+        
+        # Review service Swagger UI - handle static resources
+        location ~ ^/swagger/review/(.*)$ {
+            proxy_pass http://review-service:8080/swagger-ui/$1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /swagger/review {
+            return 301 /swagger/review/;
+        }
+        
+        # Recommendation gateway Swagger UI - redirect directory to index.html
+        location = /swagger/gateway/ {
+            return 301 /swagger/gateway/index.html;
+        }
+        
+        # Custom swagger-initializer.js for recommendation gateway
+        location = /swagger/gateway/swagger-initializer.js {
+            add_header Content-Type application/javascript;
+            return 200 "window.onload = function() { window.ui = SwaggerUIBundle({ url: '/api-docs/gateway', dom_id: '#swagger-ui', deepLinking: true, presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset], plugins: [SwaggerUIBundle.plugins.DownloadUrl], layout: 'StandaloneLayout', configUrl: '/api-docs/gateway', validatorUrl: '' }); };";
+        }
+        
+        # Recommendation gateway Swagger UI - handle static resources
+        location ~ ^/swagger/gateway/(.*)$ {
+            proxy_pass http://recommendation-gateway:8080/swagger-ui/$1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /swagger/gateway {
+            return 301 /swagger/gateway/;
+        }
+        
+        # OpenAPI documentation endpoints
+        
+        # Authentication service OpenAPI
+        location /api-docs/auth {
+            proxy_pass http://authentication-service:8080/v3/api-docs;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Course service OpenAPI
+        location /api-docs/course {
+            proxy_pass http://course-service:8080/v3/api-docs;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Review service OpenAPI
+        location /api-docs/review {
+            proxy_pass http://review-service:8080/v3/api-docs;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Recommendation gateway OpenAPI
+        location /api-docs/gateway {
+            proxy_pass http://recommendation-gateway:8080/v3/api-docs;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
         # Monitoring endpoints for Spring Boot services (distinct from API paths)
         location /monitor/auth/ {
             proxy_pass http://authentication-service:8080/actuator/;

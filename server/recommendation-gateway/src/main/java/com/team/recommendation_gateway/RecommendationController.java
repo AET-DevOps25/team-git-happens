@@ -1,5 +1,10 @@
 package com.team.recommendation_gateway;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -11,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/recommendation")
+@Tag(name = "Recommendation Gateway", description = "Course recommendation service that integrates with GenAI to provide personalized course suggestions")
 public class RecommendationController {
 
     @Autowired
@@ -20,12 +26,22 @@ public class RecommendationController {
     private String genaiApiUrl;
 
     @GetMapping("/test")
+    @Operation(summary = "Test CORS configuration", description = "Simple endpoint to test if CORS is working properly")
+    @ApiResponse(responseCode = "200", description = "CORS test successful")
     public ResponseEntity<String> testCors() {
         return ResponseEntity.ok("CORS test successful");
     }
 
     @PostMapping
-    public ResponseEntity<String> getRecommendation(@RequestBody Map<String, Object> payload) {
+    @Operation(summary = "Get course recommendations", description = "Get AI-powered course recommendations based on credits, categories, and description")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Recommendations generated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request payload"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<String> getRecommendation(
+        @Parameter(description = "Request payload containing credits, categories, and description") 
+        @RequestBody Map<String, Object> payload) {
         System.out.println("=== NEW REQUEST RECEIVED ===");
         Integer credits = payload.get("credits") instanceof Integer ? (Integer) payload.get("credits") : 0;
                 List<String> categories = new ArrayList<>();
