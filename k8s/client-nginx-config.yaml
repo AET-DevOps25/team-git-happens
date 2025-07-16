@@ -71,8 +71,8 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
         
-        location /api/recommend {
-            proxy_pass http://recommendation-gateway:8080/api/recommendation;
+        location /api/recommend/ {
+            proxy_pass http://recommendation-gateway:8080/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -87,6 +87,297 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
         
+        # Swagger UI and OpenAPI documentation endpoints
+        
+        # General Swagger UI redirect for legacy /swagger-ui.html
+        location /swagger-ui.html {
+            return 301 /swagger/auth/index.html;
+        }
+        
+        # Authentication service Swagger UI - redirect directory to index.html
+        location = /swagger/auth/ {
+            return 301 /swagger/auth/index.html;
+        }
+        
+        # Custom swagger-initializer.js for authentication service
+        location = /swagger/auth/swagger-initializer.js {
+            add_header Content-Type application/javascript;
+            return 200 "window.onload = function() { window.ui = SwaggerUIBundle({ url: '/api-docs/auth', dom_id: '#swagger-ui', deepLinking: true, presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset], plugins: [SwaggerUIBundle.plugins.DownloadUrl], layout: 'StandaloneLayout', configUrl: '/api-docs/auth', validatorUrl: '' }); };";
+        }
+        
+        # Authentication service Swagger UI - handle static resources
+        location ~ ^/swagger/auth/(.*)$ {
+            proxy_pass http://authentication-service:8080/swagger-ui/$1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /swagger/auth {
+            return 301 /swagger/auth/;
+        }
+        
+        # Course service Swagger UI - redirect directory to index.html
+        location = /swagger/course/ {
+            return 301 /swagger/course/index.html;
+        }
+        
+        # Custom swagger-initializer.js for course service
+        location = /swagger/course/swagger-initializer.js {
+            add_header Content-Type application/javascript;
+            return 200 "window.onload = function() { window.ui = SwaggerUIBundle({ url: '/api-docs/course', dom_id: '#swagger-ui', deepLinking: true, presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset], plugins: [SwaggerUIBundle.plugins.DownloadUrl], layout: 'StandaloneLayout', configUrl: '/api-docs/course', validatorUrl: '' }); };";
+        }
+        
+        # Course service Swagger UI - handle static resources
+        location ~ ^/swagger/course/(.*)$ {
+            proxy_pass http://course-service:8080/swagger-ui/$1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /swagger/course {
+            return 301 /swagger/course/;
+        }
+        
+        # Review service Swagger UI - redirect directory to index.html
+        location = /swagger/review/ {
+            return 301 /swagger/review/index.html;
+        }
+        
+        # Custom swagger-initializer.js for review service
+        location = /swagger/review/swagger-initializer.js {
+            add_header Content-Type application/javascript;
+            return 200 "window.onload = function() { window.ui = SwaggerUIBundle({ url: '/api-docs/review', dom_id: '#swagger-ui', deepLinking: true, presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset], plugins: [SwaggerUIBundle.plugins.DownloadUrl], layout: 'StandaloneLayout', configUrl: '/api-docs/review', validatorUrl: '' }); };";
+        }
+        
+        # Review service Swagger UI - handle static resources
+        location ~ ^/swagger/review/(.*)$ {
+            proxy_pass http://review-service:8080/swagger-ui/$1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /swagger/review {
+            return 301 /swagger/review/;
+        }
+        
+        # Recommendation gateway Swagger UI - redirect directory to index.html
+        location = /swagger/gateway/ {
+            return 301 /swagger/gateway/index.html;
+        }
+        
+        # Custom swagger-initializer.js for recommendation gateway
+        location = /swagger/gateway/swagger-initializer.js {
+            add_header Content-Type application/javascript;
+            return 200 "window.onload = function() { window.ui = SwaggerUIBundle({ url: '/api-docs/gateway', dom_id: '#swagger-ui', deepLinking: true, presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset], plugins: [SwaggerUIBundle.plugins.DownloadUrl], layout: 'StandaloneLayout', configUrl: '/api-docs/gateway', validatorUrl: '' }); };";
+        }
+        
+        # Recommendation gateway Swagger UI - handle static resources
+        location ~ ^/swagger/gateway/(.*)$ {
+            proxy_pass http://recommendation-gateway:8080/swagger-ui/$1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /swagger/gateway {
+            return 301 /swagger/gateway/;
+        }
+        
+        # OpenAPI documentation endpoints
+        
+        # Authentication service OpenAPI
+        location /api-docs/auth {
+            proxy_pass http://authentication-service:8080/v3/api-docs;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Course service OpenAPI
+        location /api-docs/course {
+            proxy_pass http://course-service:8080/v3/api-docs;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Review service OpenAPI
+        location /api-docs/review {
+            proxy_pass http://review-service:8080/v3/api-docs;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Recommendation gateway OpenAPI
+        location /api-docs/gateway {
+            proxy_pass http://recommendation-gateway:8080/v3/api-docs;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Monitoring endpoints for Spring Boot services (distinct from API paths)
+        location /monitor/auth/ {
+            proxy_pass http://authentication-service:8080/actuator/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /monitor/course/ {
+            proxy_pass http://course-service:8080/actuator/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /monitor/review/ {
+            proxy_pass http://review-service:8080/actuator/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /monitor/gateway/ {
+            proxy_pass http://recommendation-gateway:8080/actuator/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        location /monitor/genai/ {
+            proxy_pass http://genai-service:8000/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # Prometheus static assets (must come first for specificity)
+        location ~ ^/prometheus/(static|api|graph|targets|rules|flags|config|service-discovery|status)/ {
+            proxy_pass http://prometheus:9090;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+            
+            # Cache static assets
+            expires 1h;
+            add_header Cache-Control "public";
+        }
+
+        # Prometheus main UI and API
+        location /prometheus/ {
+            proxy_pass http://prometheus:9090/prometheus/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+        }
+        
+        # Handle Prometheus without trailing slash
+        location /prometheus {
+            return 301 /prometheus/;
+        }
+
+        # Grafana static assets (public directory) - must come first for specificity
+        location ~ ^/grafana/public/ {
+            proxy_pass http://grafana:3000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+            
+            # Cache static assets
+            expires 1h;
+            add_header Cache-Control "public";
+        }
+        
+        # Grafana API endpoints
+        location ~ ^/grafana/api/ {
+            proxy_pass http://grafana:3000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+        }
+        
+        # Grafana UI access (main pages)
+        location /grafana/ {
+            proxy_pass http://grafana:3000/grafana/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+        }
+        
+        # Handle Grafana without trailing slash
+        location /grafana {
+            return 301 /grafana/;
+        }
+        
+        # Alertmanager static assets
+        location ~ ^/alertmanager/static/ {
+            proxy_pass http://alertmanager:9093;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            rewrite ^/alertmanager/(.*) /$1 break;
+        }
+        
+        # Alertmanager API endpoints
+        location ~ ^/alertmanager/api/ {
+            proxy_pass http://alertmanager:9093;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            rewrite ^/alertmanager/(.*) /$1 break;
+        }
+        
+        # Alertmanager UI access
+        location /alertmanager/ {
+            proxy_pass http://alertmanager:9093/alertmanager/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port 443;
+        }
+        
+        # Handle Alertmanager without trailing slash
+        location /alertmanager {
+            return 301 /alertmanager/;
+        }
+
         # SPA fallback for React routes
         location / {
             try_files $uri $uri/ /index.html;

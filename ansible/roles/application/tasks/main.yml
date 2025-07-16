@@ -42,13 +42,22 @@
     executable: pip3
   become: yes
 
+- name: Verify Docker access for ec2-user
+  command: docker ps
+  become: no
+  register: docker_access_test
+  failed_when: false
+
+- name: Display Docker access test result
+  debug:
+    msg: "Docker access test result: {{ docker_access_test.rc }} - {{ docker_access_test.stderr if docker_access_test.rc != 0 else 'SUCCESS' }}"
+
 - name: Login to GitHub Container Registry
   docker_login:
     registry: ghcr.io
     username: "{{ github_username }}"
     password: "{{ github_token }}"
   become: no
-  become_user: ec2-user
 
 - name: Pull latest Docker images
   docker_image:
@@ -63,14 +72,12 @@
     - "ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:{{ image_tag }}"
     - "ghcr.io/aet-devops25/team-git-happens/genai-service:{{ image_tag }}"
   become: no
-  become_user: ec2-user
 
 - name: Stop existing application (if any)
   docker_compose:
     project_src: "{{ app_dir }}"
     state: absent
   become: no
-  become_user: ec2-user
   ignore_errors: yes
 
 - name: Start application with docker-compose
@@ -79,7 +86,6 @@
     state: present
     pull: yes
   become: no
-  become_user: ec2-user
   register: docker_compose_result
 
 - name: Wait for application to be ready

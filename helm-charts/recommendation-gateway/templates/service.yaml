@@ -4,6 +4,7 @@ metadata:
   name: {{ include "recommendation-gateway.fullname" . }}
   labels:
     {{- include "recommendation-gateway.labels" . | nindent 4 }}
+    monitoring: "true"
 spec:
   type: {{ .Values.service.type }}
   ports:

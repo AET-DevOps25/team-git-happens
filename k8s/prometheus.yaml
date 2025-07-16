@@ -1,0 +1,103 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  labels:
+    app: prometheus
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              - alertmanager:9093
+
+    rule_files:
+      - "/etc/prometheus/rules/*.yml"
+
+    scrape_configs:
+      - job_name: 'course-service'
+        static_configs:
+          - targets: ['course-service:8080']
+        metrics_path: '/actuator/prometheus'
+        scrape_interval: 30s
+
+      - job_name: 'authentication-service'
+        static_configs:
+          - targets: ['authentication-service:8080']
+        metrics_path: '/actuator/prometheus'
+        scrape_interval: 30s
+
+      - job_name: 'review-service'
+        static_configs:
+          - targets: ['review-service:8080']
+        metrics_path: '/actuator/prometheus'
+        scrape_interval: 30s
+
+      - job_name: 'recommendation-gateway'
+        static_configs:
+          - targets: ['recommendation-gateway:8080']
+        metrics_path: '/actuator/prometheus'
+        scrape_interval: 30s
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  labels:
+    app: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus:latest
+        ports:
+        - containerPort: 9090
+        args:
+          - '--config.file=/etc/prometheus/prometheus.yml'
+          - '--storage.tsdb.path=/prometheus/'
+          - '--web.console.libraries=/etc/prometheus/console_libraries'
+          - '--web.console.templates=/etc/prometheus/consoles'
+          - '--web.enable-lifecycle'
+          - '--web.external-url=https://k83-client-app.student.k8s.aet.cit.tum.de/prometheus'
+          - '--web.route-prefix=/prometheus'
+        volumeMounts:
+        - name: prometheus-config
+          mountPath: /etc/prometheus/
+        - name: alert-rules
+          mountPath: /etc/prometheus/rules/
+      volumes:
+      - name: prometheus-config
+        configMap:
+          name: prometheus-config
+      - name: alert-rules
+        configMap:
+          name: prometheus-alert-rules
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  labels:
+    app: prometheus
+spec:
+  selector:
+    app: prometheus
+  ports:
+  - port: 9090
+    targetPort: 9090
+    name: web

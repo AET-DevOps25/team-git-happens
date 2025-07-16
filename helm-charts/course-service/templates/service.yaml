@@ -4,6 +4,7 @@ metadata:
   name: {{ include "course-service.fullname" . }}
   labels:
     {{- include "course-service.labels" . | nindent 4 }}
+    monitoring: "true"
 spec:
   type: {{ .Values.service.type }}
   ports:

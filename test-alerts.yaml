@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-alert-rules
+  namespace: team-git-happens
+  labels:
+    app: prometheus
+data:
+  test-alert-rules.yml: |
+    groups:
+    - name: test-alerts
+      rules:
+      - alert: TestAlertAlwaysFiring
+        expr: vector(1)
+        for: 10s
+        labels:
+          severity: critical
+          team: git-happens
+          test: "true"
+        annotations:
+          summary: "🧪 Test Alert - Always Firing"
+          description: "This is a test alert that always fires. Used for testing the alerting pipeline."
+      
+      - alert: TestAlertHighValue
+        expr: vector(100) > 50
+        for: 5s
+        labels:
+          severity: warning
+          team: git-happens
+          test: "true"
+        annotations:
+          summary: "🧪 Test Alert - High Value"
+          description: "This alert fires when a constant value (100) is greater than 50 (always true for testing)."
