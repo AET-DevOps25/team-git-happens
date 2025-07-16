@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-console-config
+  namespace: team-git-happens
+data:
+  alertmanager.yml: |
+    global:
+      # Minimal configuration for console logging
+
+    route:
+      group_by: ['alertname']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 1h
+      receiver: 'console-logs'
+
+    receivers:
+    - name: 'console-logs'
+      # No external configuration needed - alerts will be logged in AlertManager logs
+
+    inhibit_rules:
+    - source_match:
+        severity: 'critical'
+      target_match:
+        severity: 'warning'
+      equal: ['alertname', 'instance']
