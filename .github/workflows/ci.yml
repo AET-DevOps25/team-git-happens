@@ -171,17 +171,17 @@ jobs:
         docker push ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:${GITHUB_SHA}
         docker push ghcr.io/aet-devops25/team-git-happens/recommendation-gateway:latest
 
-    - name: Build genai service image (with latest tag)
-      run: |
-        docker build \
-          -t ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA} \
-          -t ghcr.io/aet-devops25/team-git-happens/genai-service:latest \
-          ./genai-service
+#    - name: Build genai service image (with latest tag)
+#      run: |
+#        docker build \
+#          -t ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA} \
+#          -t ghcr.io/aet-devops25/team-git-happens/genai-service:latest \
+#          ./genai-service
 
-    - name: Push genai service images
-      run: |
-        docker push ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA}
-        docker push ghcr.io/aet-devops25/team-git-happens/genai-service:latest
+#    - name: Push genai service images
+#      run: |
+#        docker push ghcr.io/aet-devops25/team-git-happens/genai-service:${GITHUB_SHA}
+#        docker push ghcr.io/aet-devops25/team-git-happens/genai-service:latest
 
     - name: Build summary
       run: |
