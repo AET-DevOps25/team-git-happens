@@ -26,6 +26,29 @@
     name: ec2-user
     groups: docker
     append: yes
+  become: yes
+
+- name: Reset ssh connection to allow user changes to affect current login user
+  meta: reset_connection
+
+- name: Verify user is in docker group
+  command: groups ec2-user
+  register: user_groups
+  become: no
+
+- name: Display user groups
+  debug:
+    msg: "ec2-user groups: {{ user_groups.stdout }}"
+
+- name: Test Docker service accessibility
+  command: docker info
+  become: no
+  register: docker_info_test
+  failed_when: false
+
+- name: Display Docker service test
+  debug:
+    msg: "Docker service accessible: {{ 'YES' if docker_info_test.rc == 0 else 'NO - ' + docker_info_test.stderr }}"
 
 - name: Install Docker Compose
   get_url:

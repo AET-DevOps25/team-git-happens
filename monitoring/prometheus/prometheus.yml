@@ -1,0 +1,29 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'review-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['review-service:8080']
+  
+  - job_name: 'course-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['course-service:8080']
+      
+  - job_name: 'authentication-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['authentication-service:8080']
+  
+  - job_name: 'recommendation-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['recommendation-gateway:8080']
+  
+  - job_name: 'genai-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['genai_app:8000']
