@@ -113,16 +113,15 @@ def answer_question(req: QuestionRequest):
     CHAT_REQUESTS.inc()
     context = build_rag_context(req.question)
 
-    prompt = f"""Du bist ein KI-System, das bei Kursauswahl hilft.
+    prompt = f"""You are an AI system that helps with course selection.
 
-Nutze diesen Kontext:
+Use this context:
 
 {context}
 
-Frage:
+Question:
 {req.question}
 
-Antwort:"""
-
+Answer:"""
     answer = llm.run(prompt)
     return {"answer": answer}
