@@ -378,10 +378,10 @@ Each microservice has its own Swagger UI documentation available at:
 
 | Service | Swagger UI URL | Description |
 |---------|---------------|-------------|
-| Authentication Service | [/swagger/auth/](http://k83-client-app.student.k8s.aet.cit.tum.de/swagger/auth/) | User registration, login, and JWT management |
-| Course Service | [/swagger/course/](http://k83-client-app.student.k8s.aet.cit.tum.de/swagger/course/) | Course catalog management and category operations |
-| Review Service | [/swagger/review/](http://k83-client-app.student.k8s.aet.cit.tum.de/swagger/review/) | Course rating and review system |
-| Recommendation Gateway | [/swagger/gateway/](http://k83-client-app.student.k8s.aet.cit.tum.de/swagger/gateway/) | AI-powered course recommendations |
+| Authentication Service | [/swagger/auth/](http://compass-app.tum.de/swagger/auth/) | User registration, login, and JWT management |
+| Course Service | [/swagger/course/](http://compass-app.tum.de/swagger/course/) | Course catalog management and category operations |
+| Review Service | [/swagger/review/](http://compass-app.tum.de/swagger/review/) | Course rating and review system |
+| Recommendation Gateway | [/swagger/gateway/](http://compass-app.tum.de/swagger/gateway/) | AI-powered course recommendations |
 
 ### Using the Interactive Documentation
 
@@ -394,7 +394,7 @@ Each microservice has its own Swagger UI documentation available at:
 ### API Base URLs
 
 - **Development**: `http://localhost:3000`
-- **Production**: `http://k83-client-app.student.k8s.aet.cit.tum.de`
+- **Production**: `http://compass-app.tum.de`
 
 
 ## 🧪 Testing

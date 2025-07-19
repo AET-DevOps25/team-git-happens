@@ -11,7 +11,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
-  - host: k83-client-app.student.k8s.aet.cit.tum.de
+  - host: compass-app.tum.de
     http:
       paths:
       # Frontend handles everything, including API routes

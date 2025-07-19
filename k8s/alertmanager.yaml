@@ -62,7 +62,7 @@ spec:
         args:
           - '--config.file=/etc/alertmanager/alertmanager.yml'
           - '--storage.path=/alertmanager'
-          - '--web.external-url=https://k83-client-app.student.k8s.aet.cit.tum.de/alertmanager/'
+          - '--web.external-url=https://compass-app.tum.de/alertmanager/'
           - '--web.route-prefix=/alertmanager/'
         ports:
         - name: web

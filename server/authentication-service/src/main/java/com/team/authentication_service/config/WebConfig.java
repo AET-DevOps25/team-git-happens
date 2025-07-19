@@ -19,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOriginPatterns(
                         "http://localhost:3000",
                         "https://client-app.student.k8s.aet.cit.tum.de",
-                        "https://k83-client-app.student.k8s.aet.cit.tum.de")
+                        "https://compass-app.tum.de")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Authorization", "Content-Type")
                 .allowCredentials(true);

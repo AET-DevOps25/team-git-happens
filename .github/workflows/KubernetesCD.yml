@@ -183,9 +183,9 @@ jobs:
           echo "✅ Monitoring stack deployment complete!"
           echo ""
           echo "🔗 Access URLs:"
-          echo "   • Grafana: https://k83-client-app.student.k8s.aet.cit.tum.de/grafana/"
-          echo "   • Prometheus: https://k83-client-app.student.k8s.aet.cit.tum.de/prometheus/"
-          echo "   • Alertmanager: https://k83-client-app.student.k8s.aet.cit.tum.de/alertmanager/"
+          echo "   • Grafana: https://compass-app.tum.de/grafana/"
+          echo "   • Prometheus: https://compass-app.tum.de/prometheus/"
+          echo "   • Alertmanager: https://compass-app.tum.de/alertmanager/"
           
       - name: Verify deployment
         run: |

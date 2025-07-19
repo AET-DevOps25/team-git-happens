@@ -15,7 +15,7 @@ prometheus:
     serviceMonitorSelector:
       matchLabels:
         monitoring: "true"
-    externalUrl: https://k83-client-app.student.k8s.aet.cit.tum.de/prometheus/
+    externalUrl: https://compass-app.tum.de/prometheus/
     routePrefix: /
 
 grafana:
@@ -26,8 +26,8 @@ grafana:
     size: 10Gi
   grafana.ini:
     server:
-      domain: k83-client-app.student.k8s.aet.cit.tum.de
-      root_url: https://k83-client-app.student.k8s.aet.cit.tum.de/grafana/
+      domain: compass-app.tum.de
+      root_url: https://compass-app.tum.de/grafana/
       serve_from_sub_path: true
     security:
       allow_embedding: true

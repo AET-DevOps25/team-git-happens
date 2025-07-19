@@ -67,7 +67,7 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
   hosts:
-    - host: k83-client-app.student.k8s.aet.cit.tum.de
+    - host: compass-app.tum.de
       paths:
         - path: /api/auth
           pathType: Prefix
